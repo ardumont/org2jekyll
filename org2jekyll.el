@@ -90,7 +90,7 @@
 (defvar org2jekyll/jekyll-post-ext ".org"
   "File extension of Jekyll posts.")
 
-(defvar org2jekyll/jekyll-org-post-template "#+STARTUP: showall\n#+STARTUP: hidestars\n#+OPTIONS: H:2 num:nil tags:nil toc:1 timestamps:t\n#+BLOG: %s\n#+LAYOUT: post\n#+AUTHOR: %s\n#+DATE: %s\n#+TITLE: %s\n#+DESCRIPTION: %s\n#+CATEGORIES: %s\n\n* "
+(defvar org2jekyll/jekyll-org-post-template "#+STARTUP: showall\n#+STARTUP: hidestars\n#+OPTIONS: H:2 num:nil tags:nil toc:nil timestamps:t\n#+BLOG: %s\n#+LAYOUT: post\n#+AUTHOR: %s\n#+DATE: %s\n#+TITLE: %s\n#+DESCRIPTION: %s\n#+CATEGORIES: %s\n\n* "
   "Default template for org2jekyll draft posts.
 The `'%s`' will be replaced respectively by the blog entry name, the author, the generated date, the title, the description and the categories.")
 
