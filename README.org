@@ -27,7 +27,9 @@ Here is an example of my configuration:
 (require 'org)
 (require 'org2jekyll)
 
-(custom-set-variables '(org2jekyll/source-directory  (expand-file-name "~/org/"))
+(custom-set-variables '(org2jekyll/blog-entry "tony-blog")
+                      '(org2jekyll/blog-author "ardumont")
+                      '(org2jekyll/source-directory  (expand-file-name "~/org/"))
                       '(org2jekyll/jekyll-directory  (expand-file-name "~/public_html/"))
                       '(org2jekyll/jekyll-drafts-dir "_drafts/")
                       '(org2jekyll/jekyll-posts-dir  "_posts/")
@@ -95,7 +97,7 @@ Add some org headers in your org-mode file:
 #+BLOG: tony-blog
 #+LAYOUT: post
 #+AUTHOR: ardumont
-#+DATE: 2014-12-19
+#+DATE: 2014-12-19 Fri 23:49
 #+STARTUP: showall
 #+STARTUP: hidestars
 #+OPTIONS: H:2 num:nil tags:nil toc:1 timestamps:t
@@ -105,8 +107,11 @@ Add some org headers in your org-mode file:
 #+CATEGORIES: some-category
 #+end_src
 
-You could create a draft with <kbd>M-x org2jekyll/create-draft!</kbd>, this will ask you a title and create a file.
+To easily do that, <kbd>M-x org2jekyll/create-draft!</kbd>, this will ask you for everything needed and create a file with such metadata.
 
-*Note* BLOG entry refers to the `tony-blog` entry in `org-publish-project-alist`
+Now publish it <kbd>M-x org2jekyll/publish-post!</kbd>.
 
-Now publish it <kbd>M-x org2jekyll/publish-post!</kbd>
+This will generate another org-mode with the necessary yaml and publish to the jekyll directory.
+Then your jekyll will be in charge of rendering accordingly.
+
+*Note* the `#+BLOG` entry refers to the `tony-blog` entry in `org-publish-project-alist`.
