@@ -4,7 +4,8 @@
 * TODO 0.0.5 [%]
 - [ ] Create backlog
 - [ ] Create minor-mode
-* IN-PROGRESS 0.0.4 [100%]
+* DONE 0.0.4 [100%]
+CLOSED: [2014-12-20 Sat 00:01]
 - [X] Create backlog
 - [X] Update version
 - [X] Fix draft template creation
