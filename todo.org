@@ -5,7 +5,8 @@
 - [ ] Create backlog
 - [ ] Create minor-mode
 - [ ] Update version
-* IN-PROGRESS 0.0.5 [100%]
+* DONE 0.0.5 [100%]
+CLOSED: [2014-12-20 Sat 00:45]
 - [X] Create backlog
 - [X] Update version
 - [X] No toc in the default template header
