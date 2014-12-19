@@ -4,7 +4,7 @@
 
 ;; Author: Antoine R. Dumont <eniotna.t AT gmail.com>
 ;; Maintainer: Antoine R. Dumont <eniotna.t AT gmail.com>
-;; Version: 0.0.4
+;; Version: 0.0.5
 ;; Package-Requires: ((dash "2.8.0") (s "1.9.0") (deferred "0.3.2"))
 ;; Keywords: org-mode jekyll blog publish
 ;; URL: https://github.com/ardumont/org2jekyll
@@ -90,7 +90,7 @@
 (defvar org2jekyll/jekyll-post-ext ".org"
   "File extension of Jekyll posts.")
 
-(defvar org2jekyll/jekyll-org-post-template "#+STARTUP: showall\n#+STARTUP: hidestars\n#+OPTIONS: H:2 num:nil tags:nil toc:1 timestamps:t\n#+BLOG: %s\n#+LAYOUT: post\n#+AUTHOR: %s\n#+DATE: %s\n#+TITLE: %s\n#+DESCRIPTION: %s\n#+CATEGORIES: %s\n\n* "
+(defvar org2jekyll/jekyll-org-post-template "#+STARTUP: showall\n#+STARTUP: hidestars\n#+OPTIONS: H:2 num:nil tags:nil toc:nil timestamps:t\n#+BLOG: %s\n#+LAYOUT: post\n#+AUTHOR: %s\n#+DATE: %s\n#+TITLE: %s\n#+DESCRIPTION: %s\n#+CATEGORIES: %s\n\n* "
   "Default template for org2jekyll draft posts.
 The `'%s`' will be replaced respectively by the blog entry name, the author, the generated date, the title, the description and the categories.")
 
@@ -246,18 +246,6 @@ Depends on the metadata header blog."
           (org-publish-file temp-postfile (assoc blog-project org-publish-project-alist)) ;; publish the file with the right projects
           (delete-file temp-postfile))                  ;; remove the temporary file
       (message "This file is not an article, skip."))))
-
-;; Improve our blogging experience with Org-Jekyll. This code sets four
-;; functions with corresponding key bindings:
-;;
-;; C-c b n - Create new draft
-;; C-c b P - Post current draft
-;; C-c b d - Show all drafts
-;; C-c b p - Show all posts
-;;
-;; Once a draft has been posted (i.e., moved from the _drafts
-;; directory to _post with the required date prefix in the filename), we
-;; then need to html-export it to the jekyll rootdir (with org-publish).
 
 ;; (global-set-key (kbd "C-c b n") 'org2jekyll/create-draft!)
 ;; (global-set-key (kbd "C-c b p") 'org2jekyll/publish-post!)
