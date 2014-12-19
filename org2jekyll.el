@@ -247,18 +247,6 @@ Depends on the metadata header blog."
           (delete-file temp-postfile))                  ;; remove the temporary file
       (message "This file is not an article, skip."))))
 
-;; Improve our blogging experience with Org-Jekyll. This code sets four
-;; functions with corresponding key bindings:
-;;
-;; C-c b n - Create new draft
-;; C-c b P - Post current draft
-;; C-c b d - Show all drafts
-;; C-c b p - Show all posts
-;;
-;; Once a draft has been posted (i.e., moved from the _drafts
-;; directory to _post with the required date prefix in the filename), we
-;; then need to html-export it to the jekyll rootdir (with org-publish).
-
 ;; (global-set-key (kbd "C-c b n") 'org2jekyll/create-draft!)
 ;; (global-set-key (kbd "C-c b p") 'org2jekyll/publish-post!)
 ;; (global-set-key (kbd "C-c b l") 'org2jekyll/list-posts)
