@@ -40,8 +40,11 @@
 (defvar org2jekyll/jekyll-directory         nil "Path to Jekyll blog.")
 (defvar org2jekyll/jekyll-drafts-dir        nil "Relative path to drafts directory.")
 (defvar org2jekyll/jekyll-posts-dir         nil "Relative path to posts directory.")
-(defvar org2jekyll/jekyll-post-ext          nil "File extension of Jekyll posts.")
-(defvar org2jekyll/jekyll-org-post-template nil
+
+(defvar org2jekyll/jekyll-post-ext ".org"
+  "File extension of Jekyll posts.")
+
+(defvar org2jekyll/jekyll-org-post-template "#+STARTUP: showall\n#+STARTUP: hidestars\n#+OPTIONS: H:2 num:nil tags:nil toc:1 timestamps:t\n#+LAYOUT: post\n#+TITLE: %s\n#+DESCRIPTION: \n#+CATEGORIES:\n\n* "
   "Default template for org2jekyll posts.
 %s will be replace by the post title.")
 
@@ -68,7 +71,7 @@
     s))
 
 ;;;###autoload
-(defun org2jekyll/create-draft-post (title)
+(defun org2jekyll/create-draft! (title)
   "Create a new Jekyll blog post with TITLE."
   (interactive "sPost Title: ")
   (let ((draft-file (concat org2jekyll/jekyll-directory org2jekyll/jekyll-drafts-dir
@@ -203,7 +206,7 @@ Depends on the metadata header blog."
 ;; directory to _post with the required date prefix in the filename), we
 ;; then need to html-export it to the jekyll rootdir (with org-publish).
 
-;; (global-set-key (kbd "C-c b n") 'org2jekyll/create-draft-post)
+;; (global-set-key (kbd "C-c b n") 'org2jekyll/create-draft!)
 ;; (global-set-key (kbd "C-c b p") 'org2jekyll/publish-post!)
 ;; (global-set-key (kbd "C-c b l") 'org2jekyll/list-posts)
 ;; (global-set-key (kbd "C-c b d") 'org2jekyll/list-drafts)

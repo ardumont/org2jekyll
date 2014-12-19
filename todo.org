@@ -4,10 +4,11 @@
 * 0.0.4 [0%]
 - [ ] Create backlog
 - [ ] Create minor-mode
-* IN-PROGRESS 0.0.3 [66%]
+* IN-PROGRESS 0.0.3 [75%]
 - [X] Create backlog
 - [X] Add autoloads on public functions
-- [ ] Improve README.org documentation
+- [X] Improve README.org documentation
+- [ ] Use custom variable
 * DONE 0.0.2 [100%]
 CLOSED: [2014-12-19 Fri 22:16]
 - [X] Create backlog
