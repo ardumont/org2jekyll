@@ -28,7 +28,17 @@
 
 ;;; Commentary:
 
-;; Functions to ease publishing jekyll posts from org file
+;; Functions to ease publishing jekyll posts from org-mode file
+
+;; Providing you have a working `'jekyll`' and `'org-publish`'
+;; This will permit you to simply export an org-mode file to the right format to
+;; the right folder for jekyll to understand
+;;
+;; M-x org2jekyll/create-draft! create a draft with the necessary metadata
+;;
+;; M-x org2jekyll/publish-post! publish the post to the jekyll folder
+;;
+;; More information on https://github.com/ardumont/org2jekyll
 
 ;;; Code:
 
