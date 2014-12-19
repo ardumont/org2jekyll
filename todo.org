@@ -6,6 +6,7 @@
 - [ ] Create minor-mode
 * IN-PROGRESS 0.0.3 [75%]
 - [X] Create backlog
+- [X] Update version
 - [X] Add autoloads on public functions
 - [X] Improve README.org documentation
 - [ ] Use custom variable
