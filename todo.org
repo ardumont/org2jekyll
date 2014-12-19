@@ -1,8 +1,9 @@
 #+title: Backlog
 #+author: ardumont
 
-* TODO 0.0.1 [0%]
-- [ ] Create backlog
+* IN-PROGRESS 0.0.2 [25%]
+- [X] Create backlog
+- [ ] Add release script
 - [ ] Release to marmalade
 - [ ] Release notes
 * DONE 0.0.1 [100%]
