@@ -1,9 +1,14 @@
 #+title: Backlog
 #+author: ardumont
 
-* TODO 0.0.5 [%]
+* TODO 0.0.6 [0%]
 - [ ] Create backlog
 - [ ] Create minor-mode
+- [ ] Update version
+* IN-PROGRESS 0.0.5 [33%]
+- [X] Create backlog
+- [ ] Update version
+- [ ] No toc in the default template header
 * DONE 0.0.4 [100%]
 CLOSED: [2014-12-20 Sat 00:01]
 - [X] Create backlog
@@ -13,7 +18,8 @@ CLOSED: [2014-12-20 Sat 00:01]
 - [X] Ask for categories and description for draft creation
 - [X] Update README.org
 - [X] Create a simple readme section in org2jekyll.el
-* IN-PROGRESS 0.0.3 [100%]
+* DONE 0.0.3 [100%]
+CLOSED: [2014-12-19 Sat 23:36]
 - [X] Create backlog
 - [X] Update version
 - [X] Add autoloads on public functions
