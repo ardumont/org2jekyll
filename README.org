@@ -81,10 +81,10 @@ Name it as you want, just refer to it in your #+BLOG entry after that.
 
 * Rationale
 
-- standard org-mode rocks
-- github uses jekyll
-- jekyll is nice
-- existing solutions regarding org-mode and jekyll needs the org-mode files to be altered to work together
+- Standard org-mode rocks
+- Github uses jekyll
+- Jekyll is nice
+- Existing solutions regarding org-mode and jekyll needs the org-mode files to be altered with non-org notations to work together
 - I don't want to alter my org-mode files with alien yaml headers to satisfy jekyll
 
 Enters org2jekyll.
@@ -109,9 +109,11 @@ Add some org headers in your org-mode file:
 
 To easily do that, <kbd>M-x org2jekyll/create-draft!</kbd>, this will ask you for everything needed and create a file with such metadata.
 
-Now publish it <kbd>M-x org2jekyll/publish-post!</kbd>.
+Now create your article and publish it when ready <kbd>M-x org2jekyll/publish-post!</kbd>.
+
+*Note* the `#+BLOG` entry refers to the `tony-blog` entry in `org-publish-project-alist`.
+
+* What's going on?
 
 This will generate another org-mode with the necessary yaml and publish to the jekyll directory.
 Then your jekyll will be in charge of rendering accordingly.
-
-*Note* the `#+BLOG` entry refers to the `tony-blog` entry in `org-publish-project-alist`.
