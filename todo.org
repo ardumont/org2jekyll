@@ -4,9 +4,9 @@
 * TODO 0.0.5 [%]
 - [ ] Create backlog
 - [ ] Create minor-mode
-* IN-PROGRESS 0.0.4 [20%]
+* IN-PROGRESS 0.0.4 [40%]
 - [X] Create backlog
-- [ ] Update version
+- [X] Update version
 - [ ] Fix draft creation
 - [ ] Update readme
 - [ ] Create a simple readme section in org2jekyll.el
