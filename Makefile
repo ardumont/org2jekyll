@@ -46,3 +46,6 @@ package: clean pkg-el
 
 info:
 	cask info
+
+release:
+	./release.sh $(VERSION)

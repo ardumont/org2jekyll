@@ -1,10 +1,12 @@
 #+title: Backlog
 #+author: ardumont
 
-* TODO 0.0.1 [0%]
-- [ ] Create backlog
-- [ ] Release to marmalade
-- [ ] Release notes
+* DONE 0.0.2 [100%]
+CLOSED: [2014-12-19 Fri 22:16]
+- [X] Create backlog
+- [X] Add release script
+- [X] Update version
+- [X] Release to marmalade - https://marmalade-repo.org/packages/org2jekyll
 * DONE 0.0.1 [100%]
 CLOSED: [2014-12-19 Fri 22:03]
 - [X] Create backlog
