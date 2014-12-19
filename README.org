@@ -27,12 +27,11 @@ Here is an example of my configuration:
 (require 'org)
 (require 'org2jekyll)
 
-(setq org2jekyll/source-directory  (expand-file-name "~/org/")
-      org2jekyll/jekyll-directory  (expand-file-name "~/public_html/")
-      org2jekyll/jekyll-drafts-dir "_drafts/"
-      org2jekyll/jekyll-posts-dir  "_posts/")
-
-(custom-set-variables '(org-publish-project-alist
+(custom-set-variables '(org2jekyll/source-directory  (expand-file-name "~/org/"))
+                      '(org2jekyll/jekyll-directory  (expand-file-name "~/public_html/"))
+                      '(org2jekyll/jekyll-drafts-dir "_drafts/")
+                      '(org2jekyll/jekyll-posts-dir  "_posts/")
+                      '(org-publish-project-alist
                         `(("tony-blog"
                            :base-directory ,(org2jekyll/input-directory)
                            :base-extension "org"

@@ -36,10 +36,34 @@
 (require 'dash)
 (require 's)
 
-(defvar org2jekyll/source-directory         nil "Path to the source directory.")
-(defvar org2jekyll/jekyll-directory         nil "Path to Jekyll blog.")
-(defvar org2jekyll/jekyll-drafts-dir        nil "Relative path to drafts directory.")
-(defvar org2jekyll/jekyll-posts-dir         nil "Relative path to posts directory.")
+(defgroup org2jekyll nil " Org2jekyll customisation group."
+  :tag "org2jekyll"
+  :version "0.0.3"
+  :group 'org)
+
+(defcustom org2jekyll/source-directory nil
+  "Path to the source directory."
+  :type 'string
+  :require 'org2jekyll
+  :group 'org2jekyll)
+
+(defcustom org2jekyll/jekyll-directory nil
+  "Path to Jekyll blog."
+  :type 'string
+  :require 'org2jekyll
+  :group 'org2jekyll)
+
+(defcustom org2jekyll/jekyll-drafts-dir nil
+  "Relative path to drafts directory."
+  :type 'string
+  :require 'org2jekyll
+  :group 'org2jekyll)
+
+(defcustom org2jekyll/jekyll-posts-dir nil
+  "Relative path to posts directory."
+  :type 'string
+  :require 'org2jekyll
+  :group 'org2jekyll)
 
 (defvar org2jekyll/jekyll-post-ext ".org"
   "File extension of Jekyll posts.")
