@@ -73,8 +73,9 @@ Name it as you want, just refer to it in your #+BLOG entry after that.
 
 ** Example
 
-blog: http://ardumont.github.io/ (the style is ugly right now but the technicals work)
-source: https://github.com/ardumont/ardumont.github.io
+- blog: http://ardumont.github.io/ (the style is ugly right now but the technicals work)
+
+- source: https://github.com/ardumont/ardumont.github.io
 
 * Rationale
 
@@ -92,11 +93,16 @@ Add some org headers in your org-mode file:
 
 #+begin_src org
 #+BLOG: tony-blog
-#+DATE: 2012-12-22
-#+TITLE: About me
-#+AUTHOR: Antoine R. Dumont
-#+CATEGORIES: category0, category1
-#+DESCRIPTION: Some description that makes sense for your article
+#+LAYOUT: post
+#+AUTHOR: ardumont
+#+DATE: 2014-12-19
+#+STARTUP: showall
+#+STARTUP: hidestars
+#+OPTIONS: H:2 num:nil tags:nil toc:1 timestamps:t
+#+LAYOUT: post
+#+TITLE: hello
+#+DESCRIPTION: some description
+#+CATEGORIES: some-category
 #+end_src
 
 You could create a draft with <kbd>M-x org2jekyll/create-draft!</kbd>, this will ask you a title and create a file.

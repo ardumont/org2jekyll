@@ -4,10 +4,12 @@
 * TODO 0.0.5 [%]
 - [ ] Create backlog
 - [ ] Create minor-mode
-* IN-PROGRESS 0.0.4 [40%]
+* IN-PROGRESS 0.0.4 [71%]
 - [X] Create backlog
 - [X] Update version
-- [ ] Fix draft creation
+- [X] Fix draft template creation
+- [X] Generate date when draft creation
+- [X] Ask for categories and description for draft creation
 - [ ] Update readme
 - [ ] Create a simple readme section in org2jekyll.el
 * IN-PROGRESS 0.0.3 [100%]

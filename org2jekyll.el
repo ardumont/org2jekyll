@@ -41,6 +41,18 @@
   :version "0.0.3"
   :group 'org)
 
+(defcustom org2jekyll/blog-entry nil
+  "Blog entry name."
+  :type 'string
+  :require 'org2jekyll
+  :group 'org2jekyll)
+
+(defcustom org2jekyll/blog-author nil
+  "Blog entry author."
+  :type 'string
+  :require 'org2jekyll
+  :group 'org2jekyll)
+
 (defcustom org2jekyll/source-directory nil
   "Path to the source directory."
   :type 'string
@@ -68,9 +80,9 @@
 (defvar org2jekyll/jekyll-post-ext ".org"
   "File extension of Jekyll posts.")
 
-(defvar org2jekyll/jekyll-org-post-template "#+STARTUP: showall\n#+STARTUP: hidestars\n#+OPTIONS: H:2 num:nil tags:nil toc:1 timestamps:t\n#+LAYOUT: post\n#+TITLE: %s\n#+DESCRIPTION: \n#+CATEGORIES:\n\n* "
-  "Default template for org2jekyll posts.
-%s will be replace by the post title.")
+(defvar org2jekyll/jekyll-org-post-template "#+STARTUP: showall\n#+STARTUP: hidestars\n#+OPTIONS: H:2 num:nil tags:nil toc:1 timestamps:t\n#+BLOG: %s\n#+LAYOUT: post\n#+AUTHOR: %s\n#+DATE: %s\n#+TITLE: %s\n#+DESCRIPTION: %s\n#+CATEGORIES: %s\n\n* "
+  "Default template for org2jekyll draft posts.
+The `'%s`' will be replaced respectively by the blog entry name, the author, the generated date, the title, the description and the categories.")
 
 (defun org2jekyll/input-directory (&optional folder-name)
   "Compute the input folder from the FOLDER-NAME."
@@ -95,16 +107,23 @@
     s))
 
 ;;;###autoload
-(defun org2jekyll/create-draft! (title)
+(defun org2jekyll/create-draft! ()
   "Create a new Jekyll blog post with TITLE."
-  (interactive "sPost Title: ")
-  (let ((draft-file (concat org2jekyll/jekyll-directory org2jekyll/jekyll-drafts-dir
-                            (org2jekyll/--make-slug title)
-                            org2jekyll/jekyll-post-ext)))
-    (if (file-exists-p draft-file)
-        (find-file draft-file)
-      (progn (find-file draft-file)
-             (insert (format org2jekyll/jekyll-org-post-template (org2jekyll/--yaml-escape title)))))))
+  (interactive)
+  "The `'%s`' will be replaced respectively by the blog entry name, the author, the generated date, the title, the description and the categories."
+  (let ((post-blog-entry  org2jekyll/blog-entry)
+        (post-author      org2jekyll/blog-author)
+        (post-date        (format-time-string "%Y-%m-%d %a %H:%M"))
+        (post-title       (read-string "Post Title: "))
+        (post-description (read-string "Post Description: "))
+        (post-categories  (read-string "Post Categories (comma separated entries): ")))
+    (let ((draft-file (concat org2jekyll/jekyll-directory org2jekyll/jekyll-drafts-dir
+                              (org2jekyll/--make-slug post-title)
+                              org2jekyll/jekyll-post-ext)))
+      (if (file-exists-p draft-file)
+          (find-file draft-file)
+        (progn (find-file draft-file)
+               (insert (format org2jekyll/jekyll-org-post-template post-blog-entry post-author post-date (org2jekyll/--yaml-escape post-title) post-description post-categories)))))))
 
 ;;;###autoload
 (defun org2jekyll/list-posts ()
