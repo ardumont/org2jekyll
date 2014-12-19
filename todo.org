@@ -1,10 +1,10 @@
 #+title: Backlog
 #+author: ardumont
 
-* 0.0.1 [66%]
+* 0.0.1 [83%]
 - [X] Create backlog
 - [X] Retrieve existing code from https://github.com/ardumont/ardumont.github.io
 - [X] Add Cask
 - [X] Create package
-- [ ] Ensure tests are ok
+- [X] Ensure tests are ok + Make tests launchable
 - [ ] Release

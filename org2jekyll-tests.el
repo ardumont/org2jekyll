@@ -1,7 +1,7 @@
 (require 'ert)
 (require 'el-mock)
 
-(require 'publish)
+(require 'org2jekyll)
 
 (ert-deftest test-org2jekyll/get-option-from-file! ()
   (let ((temp-filename "/tmp/test-publish-article-p"))
@@ -56,14 +56,14 @@
   (should (equal "\n- jabber\n- emacs\n- gtalk\n- tools\n- authentication"  (org2jekyll/--categories-csv-to-yaml "jabber, emacs, gtalk, tools, authentication")))
   (should (equal "\n- jabber\n- emacs\n- gtalk\n- tools\n- authentication"  (org2jekyll/--categories-csv-to-yaml "jabber,emacs,gtalk,tools,authentication"))))
 
-(ert-deftest test-org2jkyll/--to-yaml-header ()
+(ert-deftest test-org2jekyll/--to-yaml-header ()
   (should (string= "#+BEGIN_HTML
 ---
 layout: post
 title: gtalk in emacs using jabber mode
 date: 2013-01-13
 author: Antoine R. Dumont
-categories:
+categories: 
 - jabber
 - emacs
 - tools
