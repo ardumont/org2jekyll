@@ -1,11 +1,11 @@
 #+title: Backlog
 #+author: ardumont
 
-* IN-PROGRESS 0.0.2 [60%]
+* IN-PROGRESS 0.0.2 [80%]
 - [X] Create backlog
 - [X] Add release script
 - [X] Update version
-- [ ] Release to marmalade
+- [X] Release to marmalade - https://marmalade-repo.org/packages/org2jekyll
 - [ ] Release notes
 * DONE 0.0.1 [100%]
 CLOSED: [2014-12-19 Fri 22:03]
