@@ -27,7 +27,9 @@ Here is an example of my configuration:
 (require 'org)
 (require 'org2jekyll)
 
-(custom-set-variables '(org2jekyll/source-directory  (expand-file-name "~/org/"))
+(custom-set-variables '(org2jekyll/blog-entry "tony-blog")
+                      '(org2jekyll/blog-author "ardumont")
+                      '(org2jekyll/source-directory  (expand-file-name "~/org/"))
                       '(org2jekyll/jekyll-directory  (expand-file-name "~/public_html/"))
                       '(org2jekyll/jekyll-drafts-dir "_drafts/")
                       '(org2jekyll/jekyll-posts-dir  "_posts/")
@@ -73,15 +75,16 @@ Name it as you want, just refer to it in your #+BLOG entry after that.
 
 ** Example
 
-blog: http://ardumont.github.io/ (the style is ugly right now but the technicals work)
-source: https://github.com/ardumont/ardumont.github.io
+- blog: http://ardumont.github.io/ (the style is ugly right now but the technicals work)
+
+- source: https://github.com/ardumont/ardumont.github.io
 
 * Rationale
 
-- standard org-mode rocks
-- github uses jekyll
-- jekyll is nice
-- existing solutions regarding org-mode and jekyll needs the org-mode files to be altered to work together
+- Standard org-mode rocks
+- Github uses jekyll
+- Jekyll is nice
+- Existing solutions regarding org-mode and jekyll needs the org-mode files to be altered with non-org notations to work together
 - I don't want to alter my org-mode files with alien yaml headers to satisfy jekyll
 
 Enters org2jekyll.
@@ -92,15 +95,25 @@ Add some org headers in your org-mode file:
 
 #+begin_src org
 #+BLOG: tony-blog
-#+DATE: 2012-12-22
-#+TITLE: About me
-#+AUTHOR: Antoine R. Dumont
-#+CATEGORIES: category0, category1
-#+DESCRIPTION: Some description that makes sense for your article
+#+LAYOUT: post
+#+AUTHOR: ardumont
+#+DATE: 2014-12-19 Fri 23:49
+#+STARTUP: showall
+#+STARTUP: hidestars
+#+OPTIONS: H:2 num:nil tags:nil toc:1 timestamps:t
+#+LAYOUT: post
+#+TITLE: hello
+#+DESCRIPTION: some description
+#+CATEGORIES: some-category
 #+end_src
 
-You could create a draft with <kbd>M-x org2jekyll/create-draft!</kbd>, this will ask you a title and create a file.
+To easily do that, <kbd>M-x org2jekyll/create-draft!</kbd>, this will ask you for everything needed and create a file with such metadata.
 
-*Note* BLOG entry refers to the `tony-blog` entry in `org-publish-project-alist`
+Now create your article and publish it when ready <kbd>M-x org2jekyll/publish-post!</kbd>.
 
-Now publish it <kbd>M-x org2jekyll/publish-post!</kbd>
+*Note* the `#+BLOG` entry refers to the `tony-blog` entry in `org-publish-project-alist`.
+
+* What's going on?
+
+This will generate another org-mode with the necessary yaml and publish to the jekyll directory.
+Then your jekyll will be in charge of rendering accordingly.
