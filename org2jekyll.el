@@ -4,7 +4,7 @@
 
 ;; Author: Antoine R. Dumont <eniotna.t AT gmail.com>
 ;; Maintainer: Antoine R. Dumont <eniotna.t AT gmail.com>
-;; Version: 0.0.2
+;; Version: 0.0.3
 ;; Package-Requires: ((dash "2.8.0") (s "1.9.0") (deferred "0.3.2"))
 ;; Keywords: org-mode jekyll blog publish
 ;; URL: https://github.com/ardumont/org2jekyll
@@ -36,12 +36,39 @@
 (require 'dash)
 (require 's)
 
-(defvar org2jekyll/source-directory         nil "Path to the source directory.")
-(defvar org2jekyll/jekyll-directory         nil "Path to Jekyll blog.")
-(defvar org2jekyll/jekyll-drafts-dir        nil "Relative path to drafts directory.")
-(defvar org2jekyll/jekyll-posts-dir         nil "Relative path to posts directory.")
-(defvar org2jekyll/jekyll-post-ext          nil "File extension of Jekyll posts.")
-(defvar org2jekyll/jekyll-org-post-template nil
+(defgroup org2jekyll nil " Org2jekyll customisation group."
+  :tag "org2jekyll"
+  :version "0.0.3"
+  :group 'org)
+
+(defcustom org2jekyll/source-directory nil
+  "Path to the source directory."
+  :type 'string
+  :require 'org2jekyll
+  :group 'org2jekyll)
+
+(defcustom org2jekyll/jekyll-directory nil
+  "Path to Jekyll blog."
+  :type 'string
+  :require 'org2jekyll
+  :group 'org2jekyll)
+
+(defcustom org2jekyll/jekyll-drafts-dir nil
+  "Relative path to drafts directory."
+  :type 'string
+  :require 'org2jekyll
+  :group 'org2jekyll)
+
+(defcustom org2jekyll/jekyll-posts-dir nil
+  "Relative path to posts directory."
+  :type 'string
+  :require 'org2jekyll
+  :group 'org2jekyll)
+
+(defvar org2jekyll/jekyll-post-ext ".org"
+  "File extension of Jekyll posts.")
+
+(defvar org2jekyll/jekyll-org-post-template "#+STARTUP: showall\n#+STARTUP: hidestars\n#+OPTIONS: H:2 num:nil tags:nil toc:1 timestamps:t\n#+LAYOUT: post\n#+TITLE: %s\n#+DESCRIPTION: \n#+CATEGORIES:\n\n* "
   "Default template for org2jekyll posts.
 %s will be replace by the post title.")
 
@@ -67,7 +94,8 @@
       (concat "\"" (replace-regexp-in-string "\"" "\\\\\"" s) "\"")
     s))
 
-(defun org2jekyll/create-draft-post (title)
+;;;###autoload
+(defun org2jekyll/create-draft! (title)
   "Create a new Jekyll blog post with TITLE."
   (interactive "sPost Title: ")
   (let ((draft-file (concat org2jekyll/jekyll-directory org2jekyll/jekyll-drafts-dir
@@ -78,11 +106,13 @@
       (progn (find-file draft-file)
              (insert (format org2jekyll/jekyll-org-post-template (org2jekyll/--yaml-escape title)))))))
 
+;;;###autoload
 (defun org2jekyll/list-posts ()
   "Lists the posts folder."
   (interactive)
   (find-file (org2jekyll/output-directory org2jekyll/jekyll-posts-dir)))
 
+;;;###autoload
 (defun org2jekyll/list-drafts ()
   "Lists the drafts folder."
   (interactive)
@@ -162,6 +192,7 @@ Depends on the metadata header blog."
     s-trim
     (concat "\n")))
 
+;;;###autoload
 (defun org2jekyll/publish-post! (&optional org-file)
   "Publish a post ready for jekyll to render it."
   (interactive)
@@ -199,12 +230,10 @@ Depends on the metadata header blog."
 ;; directory to _post with the required date prefix in the filename), we
 ;; then need to html-export it to the jekyll rootdir (with org-publish).
 
-;; (global-set-key (kbd "C-c b n") 'org2jekyll/create-draft-post)
-;; (global-set-key (kbd "C-c b P") 'jekyll-publish-post)
-;; (global-set-key (kbd "C-c b p") 'org2jekyll/list-posts)
-;; (global-set-key (kbd "C-c b D") 'jekyll-list-drafs)
-
-;; org setup for publishing blog
+;; (global-set-key (kbd "C-c b n") 'org2jekyll/create-draft!)
+;; (global-set-key (kbd "C-c b p") 'org2jekyll/publish-post!)
+;; (global-set-key (kbd "C-c b l") 'org2jekyll/list-posts)
+;; (global-set-key (kbd "C-c b d") 'org2jekyll/list-drafts)
 
 (provide 'org2jekyll)
 ;;; org2jekyll.el ends here
