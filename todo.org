@@ -1,10 +1,13 @@
 #+title: Backlog
 #+author: ardumont
 
-* IN-PROGRESS 0.0.3 [33%]
+* 0.0.4 [0%]
+- [ ] Create backlog
+- [ ] Create minor-mode
+* IN-PROGRESS 0.0.3 [66%]
 - [X] Create backlog
-- [ ] Add autoloads on public functions
-- [ ] Improve readme documentation
+- [X] Add autoloads on public functions
+- [ ] Improve README.org documentation
 * DONE 0.0.2 [100%]
 CLOSED: [2014-12-19 Fri 22:16]
 - [X] Create backlog

@@ -67,6 +67,7 @@
       (concat "\"" (replace-regexp-in-string "\"" "\\\\\"" s) "\"")
     s))
 
+;;;###autoload
 (defun org2jekyll/create-draft-post (title)
   "Create a new Jekyll blog post with TITLE."
   (interactive "sPost Title: ")
@@ -78,11 +79,13 @@
       (progn (find-file draft-file)
              (insert (format org2jekyll/jekyll-org-post-template (org2jekyll/--yaml-escape title)))))))
 
+;;;###autoload
 (defun org2jekyll/list-posts ()
   "Lists the posts folder."
   (interactive)
   (find-file (org2jekyll/output-directory org2jekyll/jekyll-posts-dir)))
 
+;;;###autoload
 (defun org2jekyll/list-drafts ()
   "Lists the drafts folder."
   (interactive)
@@ -162,6 +165,7 @@ Depends on the metadata header blog."
     s-trim
     (concat "\n")))
 
+;;;###autoload
 (defun org2jekyll/publish-post! (&optional org-file)
   "Publish a post ready for jekyll to render it."
   (interactive)
@@ -200,11 +204,9 @@ Depends on the metadata header blog."
 ;; then need to html-export it to the jekyll rootdir (with org-publish).
 
 ;; (global-set-key (kbd "C-c b n") 'org2jekyll/create-draft-post)
-;; (global-set-key (kbd "C-c b P") 'jekyll-publish-post)
-;; (global-set-key (kbd "C-c b p") 'org2jekyll/list-posts)
-;; (global-set-key (kbd "C-c b D") 'jekyll-list-drafs)
-
-;; org setup for publishing blog
+;; (global-set-key (kbd "C-c b p") 'org2jekyll/publish-post!)
+;; (global-set-key (kbd "C-c b l") 'org2jekyll/list-posts)
+;; (global-set-key (kbd "C-c b d") 'org2jekyll/list-drafts)
 
 (provide 'org2jekyll)
 ;;; org2jekyll.el ends here
