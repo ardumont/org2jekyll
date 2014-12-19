@@ -1,6 +1,10 @@
 #+title: Backlog
 #+author: ardumont
 
+* TODO 0.0.3 [0%]
+- [ ] Create backlog
+- [ ] Improve readme documentation
+
 * DONE 0.0.2 [100%]
 CLOSED: [2014-12-19 Fri 22:16]
 - [X] Create backlog
