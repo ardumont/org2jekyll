@@ -1,0 +1,15 @@
+#+title: Backlog
+#+author: ardumont
+
+* TODO 0.0.1 [0%]
+- [ ] Create backlog
+- [ ] Release to marmalade
+- [ ] Release notes
+* DONE 0.0.1 [100%]
+CLOSED: [2014-12-19 Fri 22:03]
+- [X] Create backlog
+- [X] Retrieve existing code from https://github.com/ardumont/ardumont.github.io
+- [X] Add Cask
+- [X] Create package
+- [X] Ensure tests are ok + Make tests launchable
+- [X] Add ci-travis

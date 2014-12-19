@@ -1,0 +1,81 @@
+#+title: org2jekyll
+#+author: ardumont
+
+Blogging with org-mode and jekyll without strange yaml headers.
+
+* Description
+
+Let org2jekyll exports your org-mode file to jekyll to be happy.
+
+* Pre-requisite
+
+You have your org-publish ready.
+
+Here is mine as example:
+
+#+begin_src emacs-lisp
+(custom-set-variables '(org-publish-project-alist
+                        `(("tony-blog"
+                           :base-directory ,(org2jekyll/input-directory)
+                           :base-extension "org"
+                           :publishing-directory ,(org2jekyll/output-directory "_posts")
+                           :publishing-function org-html-publish-to-html
+                           :headline-levels 4
+                           :section-numbers nil
+                           :with-toc nil
+                           :html-head "<link rel=\"stylesheet\" href=\"./css/style.css\" type=\"text/css\"/>"
+                           :html-preamble t
+                           :recursive t
+                           :make-index t
+                           :html-extension "html"
+                           :body-only t)
+
+                          ("images"
+                           :base-directory ,(org2jekyll/input-directory "img")
+                           :base-extension "jpg\\|gif\\|png"
+                           :publishing-directory ,(org2jekyll/output-directory "img")
+                           :publishing-function org-publish-attachment)
+
+                          ("js"
+                           :base-directory ,(org2jekyll/input-directory "js")
+                           :base-extension "js"
+                           :publishing-directory ,(org2jekyll/output-directory "js")
+                           :publishing-function org-publish-attachment)
+
+                          ("other"
+                           :base-directory ,(org2jekyll/input-directory "css")
+                           :base-extension "css\\|el"
+                           :publishing-directory ,(org2jekyll/output-directory "css")
+                           :publishing-function org-publish-attachment)
+
+                          ("website" :components ("org" "tony-blog" "images" "js" "css")))))
+#+end_src
+
+`tony-blog` is an important entry here
+
+* Rationale
+
+- standard org-mode rocks
+- github uses jekyll
+- jekyll is nice
+- existing solutions regarding org-mode and jekyll needs the org-mode files to be altered to work together
+- I don't want to alter my org-mode files with alien yaml headers to satisfy jekyll
+
+Enters org2jekyll.
+
+* How
+
+Add some org headers:
+
+#+begin_src org
+#+BLOG: tony-blog
+#+DATE: 2012-12-22
+#+TITLE: About me
+#+AUTHOR: Antoine R. Dumont
+#+CATEGORIES: category0, category1
+#+DESCRIPTION: Some description that makes sense for your article
+#+end_src
+
+*Note* BLOG entry refers to the `tony-blog` entry in `org-publish-project-alist`
+
+Now publish it <kbd>M-x org2jekyll/publish-post!</kbd>
