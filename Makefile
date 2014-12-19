@@ -5,7 +5,7 @@ ARCHIVE=$(PACKAGE_FOLDER).tar
 EMACS=emacs
 
 pr:
-	hub pull-request -b origin:master
+	hub pull-request -b ardumont:master
 
 .PHONY: clean
 
