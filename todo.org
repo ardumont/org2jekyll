@@ -1,9 +1,15 @@
 #+title: Backlog
 #+author: ardumont
 
-* 0.0.4 [0%]
+* TODO 0.0.5 [%]
 - [ ] Create backlog
 - [ ] Create minor-mode
+* IN-PROGRESS 0.0.4 [20%]
+- [X] Create backlog
+- [ ] Update version
+- [ ] Fix draft creation
+- [ ] Update readme
+- [ ] Create a simple readme section in org2jekyll.el
 * IN-PROGRESS 0.0.3 [100%]
 - [X] Create backlog
 - [X] Update version
