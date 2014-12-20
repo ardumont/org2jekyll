@@ -43,6 +43,7 @@
 ;;; Code:
 
 (require 'org)
+(require 'ox-publish)
 (require 'dash)
 (require 's)
 
@@ -264,7 +265,7 @@ If not provided, current buffer is used (if it's an org and jekyll ready file)."
   (interactive)
   (let ((orgfile (if org-file org-file (buffer-file-name (current-buffer)))))
     (if (org2jekyll/article-p! orgfile)
-        (let* ((org-metadata    (org2jekyll/read-metadata! org-file))
+        (let* ((org-metadata    (org2jekyll/read-metadata! orgfile))
                (date            (assoc-default "date" org-metadata))
                (blog-project    (assoc-default "blog" org-metadata))
                (jekyll-filename (org2jekyll/--copy-org-file-to-jekyll-org-file date orgfile org-metadata)))
