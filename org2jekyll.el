@@ -43,7 +43,8 @@
 ;;; Code:
 
 (require 'org)
-(require 'ox-publish)
+(require (if (version< emacs-version "24.4") 'org-publish 'ox-publish))
+
 (require 'dash)
 (require 's)
 

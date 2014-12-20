@@ -14,6 +14,8 @@
 - [X] Ensure install works with clean install mechanism
 - [X] When publishing remove the org2jekyll/jekyll-drafts-dir arborescence
 - [X] Improve default header computation
+- [X] Fix ci-travis for emacs 24.3
+- [X] Add ci-travis status badge
 * DONE 0.0.5 [100%]
 CLOSED: [2014-12-20 Sat 00:45]
 - [X] Create backlog
