@@ -1,15 +1,16 @@
 #+title: Backlog
 #+author: ardumont
 
-* IN-PROGRESS 0.0.6 [75%]
+* IN-PROGRESS 0.0.6 [77%]
 - [X] Create backlog
 - [X] Update version
 - [X] Remove dead code
 - [X] Fix draft folder computation to be in source input directory
 - [X] Permit the blog metadata to determine the desired layout
 - [X] Refactor main function in multiple sub functions to ease testing
-- [ ] Permit options to be null without breaking jekyll publishing
+- [X] Update deps version
 - [ ] Add missing unit tests on upper functions
+- [ ] Permit options to be null without breaking jekyll publishing
 * DONE 0.0.5 [100%]
 CLOSED: [2014-12-20 Sat 00:45]
 - [X] Create backlog
