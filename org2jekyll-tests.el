@@ -13,10 +13,10 @@
 
 (ert-deftest test-org2jekyll/get-option-from-file! ()
   (let ((temp-filename "/tmp/test-publish-article-p"))
-    (with-temp-file temp-filename  (insert "#+BLOG: tony's blog\n#+DATE: some-date"))
-    (should (equal '(("blog" . "tony's blog")
+    (with-temp-file temp-filename  (insert "#+LAYOUT: post\n#+DATE: some-date"))
+    (should (equal '(("layout" . "post")
                      ("date" . "some-date"))
-                   (org2jekyll/get-options-from-file! temp-filename '("blog" "date"))))
+                   (org2jekyll/get-options-from-file! temp-filename '("layout" "date"))))
     (should (equal '(("date" . "some-date"))
                    (org2jekyll/get-options-from-file! temp-filename '("date"))))
     (should (equal '(("unknown"))
@@ -47,7 +47,7 @@
 
 (ert-deftest test-org2jekyll/article-p! ()
   (should (let ((temp-filename "/tmp/test-publish-article-p"))
-            (with-temp-file temp-filename  (insert "#+BLOG: tony's blog\n#+DATE: some-date"))
+            (with-temp-file temp-filename  (insert "#+LAYOUT: post\n#+DATE: some-date"))
             (org2jekyll/article-p! temp-filename)))
   (should-not (let ((temp-filename "/tmp/test-publish-article-p"))
                 (with-temp-file temp-filename  (insert "#+NOT-AN-ARTICLE: tony's blog\n#+DATE: some-date"))
@@ -157,16 +157,14 @@ excerpt: some-fake-description with spaces and all
                    ("categories" . "
 - cat0")
                    ("author" . "me")
-                   ("description" . "desc")
-                   ("blog" . "my-blog"))
-                 (mocklet (((org2jekyll/get-options-from-file! "org-file" '("title" "date" "categories" "description" "author" "blog" "layout"))
+                   ("description" . "desc"))
+                 (mocklet (((org2jekyll/get-options-from-file! "org-file" '("title" "date" "categories" "description" "author" "layout"))
                             => `(("layout"      . "default")
                                  ("title"       . "some-title")
                                  ("date"        . "2015-12-23 Sat 14:20")
                                  ("categories"  . "cat0")
                                  ("author"      . "me")
-                                 ("description" . "desc")
-                                 ("blog"        . "my-blog"))))
+                                 ("description" . "desc"))))
                    (org2jekyll/read-metadata! "org-file"))))
 
   (should (equal '(("layout" . "post")
@@ -175,9 +173,8 @@ excerpt: some-fake-description with spaces and all
                    ("categories" . "
 - dummy-category-should-be-replaced")
                    ("author" . "")
-                   ("description" . "")
-                   ("blog" . "dummy-blog-should-be-replaced"))
-                 (mocklet (((org2jekyll/get-options-from-file! "org-file-2" '("title" "date" "categories" "description" "author" "blog" "layout"))
+                   ("description" . ""))
+                 (mocklet (((org2jekyll/get-options-from-file! "org-file-2" '("title" "date" "categories" "description" "author" "layout"))
                             => nil)
                            ((org2jekyll/now!)
                             => "2015-01-01 Sat 14:20"))
@@ -187,7 +184,6 @@ excerpt: some-fake-description with spaces and all
   (should (equal "#+STARTUP: showall
 #+STARTUP: hidestars
 #+OPTIONS: H:2 num:nil tags:nil toc:nil timestamps:t
-#+BLOG: blog-entry
 #+LAYOUT: post
 #+AUTHOR: blog-author
 #+DATE: post-date
@@ -196,4 +192,4 @@ excerpt: some-fake-description with spaces and all
 #+CATEGORIES: post-category, other-category
 
 "
-                 (org2jekyll/default-headers-template "blog-entry" "blog-author" "post-date" "post title with spaces" "post some description" "post-category, other-category"))))
+                 (org2jekyll/default-headers-template "blog-author" "post-date" "post title with spaces" "post some description" "post-category, other-category"))))
