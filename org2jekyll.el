@@ -116,6 +116,10 @@ The `'%s`' will be replaced respectively by the blog entry name, the author, the
       (concat "\"" (replace-regexp-in-string "\"" "\\\\\"" s) "\"")
     s))
 
+(defun org2jekyll/now! ()
+  "Generate a formatted now date."
+  (format-time-string "%Y-%m-%d %a %H:%M"))
+
 ;;;###autoload
 (defun org2jekyll/create-draft! ()
   "Create a new Jekyll blog post with TITLE."
@@ -123,7 +127,7 @@ The `'%s`' will be replaced respectively by the blog entry name, the author, the
   "The `'%s`' will be replaced respectively by the blog entry name, the author, the generated date, the title, the description and the categories."
   (let ((post-blog-entry  org2jekyll/blog-entry)
         (post-author      org2jekyll/blog-author)
-        (post-date        (format-time-string "%Y-%m-%d %a %H:%M"))
+        (post-date        (org2jekyll/now!))
         (post-title       (read-string "Post Title: "))
         (post-description (read-string "Post Description: "))
         (post-categories  (read-string "Post Categories (comma separated entries): ")))
@@ -233,6 +237,25 @@ This returns the new filename path."
       (insert (org2jekyll/--to-yaml-header yaml-headers)))
     jekyll-filename))
 
+(defun org2jekyll/assoc-default (key org-data default-value)
+  "Given KEY, ORG-DATA and DEFAULT-VALUE, return the value associated with key.
+Return DEFAULT-VALUE if not found."
+  (-if-let (data (assoc-default key org-data nil default-value))
+      data
+    default-value))
+
+(defun org2jekyll/read-metadata! (org-file)
+  "Given an ORG-FILE, return it's org metadata.
+If missing values, they are replaced with dummy ones."
+  (let ((org-metadata (org2jekyll/get-options-from-file! org-file '("title" "date" "categories" "description" "author" "blog" "layout"))))
+    `(("layout"      . ,(-> "layout"      (org2jekyll/assoc-default org-metadata "post")))
+      ("title"       . ,(-> "title"       (org2jekyll/assoc-default org-metadata "dummy-title-should-be-replaced")))
+      ("date"        . ,(-> "date"        (org2jekyll/assoc-default org-metadata (org2jekyll/now!)) org2jekyll/--convert-timestamp-to-yyyy-dd-mm))
+      ("categories"  . ,(-> "categories"  (org2jekyll/assoc-default org-metadata "dummy-category-should-be-replaced") org2jekyll/--categories-csv-to-yaml))
+      ("author"      . ,(-> "author"      (org2jekyll/assoc-default org-metadata "")))
+      ("description" . ,(-> "description" (org2jekyll/assoc-default org-metadata "")))
+      ("blog"        . ,(-> "blog"        (org2jekyll/assoc-default org-metadata "dummy-blog-should-be-replaced"))))))
+
 ;;;###autoload
 (defun org2jekyll/publish-post! (&optional org-file)
   "Publish a post ready for jekyll to render it.
@@ -241,16 +264,10 @@ If not provided, current buffer is used (if it's an org and jekyll ready file)."
   (interactive)
   (let ((orgfile (if org-file org-file (buffer-file-name (current-buffer)))))
     (if (org2jekyll/article-p! orgfile)
-        (let* ((org-metadata    (org2jekyll/get-options-from-file! orgfile '("title" "date" "categories" "description" "author" "blog" "layout")))
-               (date            (org2jekyll/--convert-timestamp-to-yyyy-dd-mm (assoc-default "date" org-metadata)))
+        (let* ((org-metadata    (org2jekyll/read-metadata! org-file))
+               (date            (assoc-default "date" org-metadata))
                (blog-project    (assoc-default "blog" org-metadata))
-               (yaml-headers    `(("layout"      . ,(assoc-default "layout" org-metadata))
-                                  ("title"       . ,(assoc-default "title" org-metadata))
-                                  ("date"        . ,date)
-                                  ("categories"  . ,(org2jekyll/--categories-csv-to-yaml (assoc-default "categories" org-metadata)))
-                                  ("author"      . ,(assoc-default "author" org-metadata))
-                                  ("description" . ,(assoc-default "description" org-metadata))))
-               (jekyll-filename (org2jekyll/--copy-org-file-to-jekyll-org-file date orgfile yaml-headers)))
+               (jekyll-filename (org2jekyll/--copy-org-file-to-jekyll-org-file date orgfile org-metadata)))
           (org-publish-file jekyll-filename (assoc blog-project org-publish-project-alist)) ;; publish the file with the right projects
           (delete-file jekyll-filename))
       (message "This file is not an article, skip."))))

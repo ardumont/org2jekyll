@@ -1,7 +1,7 @@
 #+title: Backlog
 #+author: ardumont
 
-* IN-PROGRESS 0.0.6 [77%]
+* IN-PROGRESS 0.0.6 [100%]
 - [X] Create backlog
 - [X] Update version
 - [X] Remove dead code
@@ -9,8 +9,7 @@
 - [X] Permit the blog metadata to determine the desired layout
 - [X] Refactor main function in multiple sub functions to ease testing
 - [X] Update deps version
-- [ ] Add missing unit tests on upper functions
-- [ ] Permit options to be null without breaking jekyll publishing
+- [X] Permit options to be null without breaking jekyll publishing
 * DONE 0.0.5 [100%]
 CLOSED: [2014-12-20 Sat 00:45]
 - [X] Create backlog
