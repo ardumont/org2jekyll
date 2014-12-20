@@ -75,7 +75,7 @@ Name it as you want, just refer to it in your #+BLOG entry after that.
 
 ** Example
 
-- blog: http://ardumont.github.io/ (the style is ugly right now but the technicals work)
+- blog: [[http://ardumont.github.io/blog/]] (the style is ugly as hell right now but the technicals which is described here work)
 
 - source: https://github.com/ardumont/ardumont.github.io
 
