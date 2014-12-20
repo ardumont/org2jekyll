@@ -108,17 +108,17 @@ Enters org2jekyll.
 
 * How
 
-Add some org headers in your org-mode file:
+** Post
+
+Add some org headers in your org-mode file for a blog post:
 
 #+begin_src org
-#+BLOG: tony-blog
 #+LAYOUT: post
 #+AUTHOR: ardumont
 #+DATE: 2014-12-19 Fri 23:49
 #+STARTUP: showall
 #+STARTUP: hidestars
 #+OPTIONS: H:2 num:nil tags:nil toc:1 timestamps:t
-#+LAYOUT: post
 #+TITLE: hello
 #+DESCRIPTION: some description
 #+CATEGORIES: some-category
@@ -126,9 +126,35 @@ Add some org headers in your org-mode file:
 
 To easily do that, <kbd>M-x org2jekyll/create-draft!</kbd>, this will ask you for everything needed and create a file with such metadata.
 
-Now create your article and publish it when ready <kbd>M-x org2jekyll/publish-post!</kbd>.
+Now create your article and publish it when ready <kbd>M-x org2jekyll/publish!</kbd>.
 
-*Note* the `#+BLOG` entry refers to the `tony-blog` entry in `org-publish-project-alist`.
+This will be published as post article.
+
+*Note* the `#+LAYOUT` entry refers to the `post` entry in `org-publish-project-alist`.
+
+** Page
+
+A simple page.
+
+Add some org headers in your org-mode file for a blog post:
+
+#+begin_src org
+#+LAYOUT: default
+#+AUTHOR: ardumont
+#+DATE: 2014-12-19 Fri 23:49
+#+STARTUP: showall
+#+STARTUP: hidestars
+#+OPTIONS: H:2 num:nil tags:nil toc:1 timestamps:t
+#+TITLE: hello
+#+DESCRIPTION: some description
+#+CATEGORIES: some-category
+#+end_src
+
+Now create your article and publish it when ready <kbd>M-x org2jekyll/publish!</kbd>.
+
+This will be published as page article.
+
+*Note* the `#+LAYOUT` entry refers to the `default` entry in `org-publish-project-alist`.
 
 * What's going on?
 
