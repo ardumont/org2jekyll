@@ -319,6 +319,19 @@ If not provided, current buffer is used (if it's an org and jekyll ready file)."
             (save-buffer))
           (org2jekyll/message "Page '%s' published!" (file-name-nondirectory orgfile)))
       (org2jekyll/message "This is not an article, skip."))))
+;;;###autoload
+(defun org2jekyll/publish! ()
+  "Publish the current org file as post or page depending on the chosen layout.
+Layout `'post`' is a jekyll post.
+Layout `'default`' is a page."
+  (interactive)
+  (let* ((cur-buffer (current-buffer))
+         (orgfile (buffer-file-name cur-buffer)))
+    (if (org2jekyll/article-p! orgfile)
+        (call-interactively (if (string= "post" (org2jekyll/get-option-at-point! "layout"))
+                                'org2jekyll/publish-post!
+                              org2jekyll/publish-page!))
+      (org2jekyll/message "This is not an article, publication skipped!"))))
 
 ;; (global-set-key (kbd "C-c b n") 'org2jekyll/create-draft!)
 ;; (global-set-key (kbd "C-c b p") 'org2jekyll/publish-post!)
