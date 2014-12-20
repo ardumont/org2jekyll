@@ -219,14 +219,16 @@ Depends on the metadata header blog."
 
 ;;;###autoload
 (defun org2jekyll/publish-post! (&optional org-file)
-  "Publish a post ready for jekyll to render it."
+  "Publish a post ready for jekyll to render it.
+ORG-FILE is optional and represents the source org-file to render.
+If not provided, current buffer is used (if it's an org and jekyll ready file)."
   (interactive)
   (let ((orgfile (if org-file org-file (buffer-file-name (current-buffer)))))
     (if (org2jekyll/article-p! orgfile)
-        (let* ((org-metadata             (org2jekyll/get-options-from-file! orgfile '("title" "date" "categories" "description" "author" "blog")))
+        (let* ((org-metadata             (org2jekyll/get-options-from-file! orgfile '("title" "date" "categories" "description" "author" "blog" "layout")))
                (date                     (org2jekyll/--convert-timestamp-to-yyyy-dd-mm (assoc-default "date" org-metadata)))
                (blog-project             (assoc-default "blog" org-metadata))
-               (yaml-headers             `(("layout"      . "post")
+               (yaml-headers             `(("layout"      . ,(assoc-default "layout" org-metadata))
                                            ("title"       . ,(assoc-default "title" org-metadata))
                                            ("date"        . ,date)
                                            ("categories"  . ,(org2jekyll/--categories-csv-to-yaml (assoc-default "categories" org-metadata)))
