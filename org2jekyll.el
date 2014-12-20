@@ -127,7 +127,7 @@ The `'%s`' will be replaced respectively by the blog entry name, the author, the
         (post-title       (read-string "Post Title: "))
         (post-description (read-string "Post Description: "))
         (post-categories  (read-string "Post Categories (comma separated entries): ")))
-    (let ((draft-file (concat org2jekyll/jekyll-directory org2jekyll/jekyll-drafts-dir
+    (let ((draft-file (concat (org2jekyll/input-directory org2jekyll/jekyll-drafts-dir)
                               (org2jekyll/--make-slug post-title)
                               org2jekyll/jekyll-post-ext)))
       (if (file-exists-p draft-file)
