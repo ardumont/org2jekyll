@@ -179,10 +179,6 @@ The `'%s`' will be replaced respectively by the blog entry name, the author, the
 Depends on the metadata header blog."
   (org2jekyll/get-option-from-file! orgfile "BLOG"))
 
-(defun org2jekyll/get-publish-date! (orgfile)
-  "Get the publication date from an ORGFILE."
-  (org2jekyll/get-option-from-file! orgfile "DATE"))
-
 (defvar org2jekyll/map-keys '(("title" . "title")
                               ("categories" . "categories")
                               ("date" . "date")
