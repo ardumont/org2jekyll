@@ -179,13 +179,13 @@ The `'%s`' will be replaced respectively by the blog entry name, the author, the
 Depends on the metadata header blog."
   (org2jekyll/get-option-from-file! orgfile "BLOG"))
 
-(defvar org2jekyll/map-keys '(("title" . "title")
-                              ("categories" . "categories")
-                              ("date" . "date")
+(defvar org2jekyll/map-keys '(("title"       . "title")
+                              ("categories"  . "categories")
+                              ("date"        . "date")
                               ("description" . "excerpt")
-                              ("author" . "author")
-                              ("layout" . "layout")
-                              ("blog" . "blog"))
+                              ("author"      . "author")
+                              ("layout"      . "layout")
+                              ("blog"        . "blog"))
   "Keys to map from org headers to jekyll's headers.")
 
 (defun org2jekyll/--org-to-yaml-metadata (org-metadata)
@@ -217,6 +217,22 @@ Depends on the metadata header blog."
     s-trim
     (concat "\n")))
 
+(defun org2jekyll/--compute-ready-jekyll-file-name (date org-file)
+  "Given a DATE and an ORG-FILE, compute a ready jekyll file name."
+  (let ((temp-org-jekyll-filename  (format "%s-%s" date (file-name-nondirectory org-file)))
+        (temp-org-jekyll-directory (file-name-directory org-file)))
+    (format "%s%s" temp-org-jekyll-directory temp-org-jekyll-filename)))
+
+(defun org2jekyll/--copy-org-file-to-jekyll-org-file (date org-file yaml-headers)
+  "Given DATE, ORG-FILE and YAML-HEADERS, copy content as org-jekyll ready file.
+This returns the new filename path."
+  (let ((jekyll-filename (org2jekyll/--compute-ready-jekyll-file-name date org-file)))
+    (with-temp-file jekyll-filename ;; write temporary file updated with jekyll specifics
+      (insert-file-contents org-file)
+      (goto-char (point-min))
+      (insert (org2jekyll/--to-yaml-header yaml-headers)))
+    jekyll-filename))
+
 ;;;###autoload
 (defun org2jekyll/publish-post! (&optional org-file)
   "Publish a post ready for jekyll to render it.
@@ -225,24 +241,18 @@ If not provided, current buffer is used (if it's an org and jekyll ready file)."
   (interactive)
   (let ((orgfile (if org-file org-file (buffer-file-name (current-buffer)))))
     (if (org2jekyll/article-p! orgfile)
-        (let* ((org-metadata             (org2jekyll/get-options-from-file! orgfile '("title" "date" "categories" "description" "author" "blog" "layout")))
-               (date                     (org2jekyll/--convert-timestamp-to-yyyy-dd-mm (assoc-default "date" org-metadata)))
-               (blog-project             (assoc-default "blog" org-metadata))
-               (yaml-headers             `(("layout"      . ,(assoc-default "layout" org-metadata))
-                                           ("title"       . ,(assoc-default "title" org-metadata))
-                                           ("date"        . ,date)
-                                           ("categories"  . ,(org2jekyll/--categories-csv-to-yaml (assoc-default "categories" org-metadata)))
-                                           ("author"      . ,(assoc-default "author" org-metadata))
-                                           ("description" . ,(assoc-default "description" org-metadata))))
-               (temp-org-jekyll-filename  (format "%s-%s" date (file-name-nondirectory orgfile)))
-               (temp-org-jekyll-directory (file-name-directory orgfile))
-               (temp-postfile             (format "%s/%s" temp-org-jekyll-directory temp-org-jekyll-filename)))
-          (with-temp-file temp-postfile                 ;; write temporary file updated with jekyll specifics
-            (insert-file-contents orgfile)
-            (goto-char (point-min))
-            (insert (org2jekyll/--to-yaml-header yaml-headers)))
-          (org-publish-file temp-postfile (assoc blog-project org-publish-project-alist)) ;; publish the file with the right projects
-          (delete-file temp-postfile))                  ;; remove the temporary file
+        (let* ((org-metadata    (org2jekyll/get-options-from-file! orgfile '("title" "date" "categories" "description" "author" "blog" "layout")))
+               (date            (org2jekyll/--convert-timestamp-to-yyyy-dd-mm (assoc-default "date" org-metadata)))
+               (blog-project    (assoc-default "blog" org-metadata))
+               (yaml-headers    `(("layout"      . ,(assoc-default "layout" org-metadata))
+                                  ("title"       . ,(assoc-default "title" org-metadata))
+                                  ("date"        . ,date)
+                                  ("categories"  . ,(org2jekyll/--categories-csv-to-yaml (assoc-default "categories" org-metadata)))
+                                  ("author"      . ,(assoc-default "author" org-metadata))
+                                  ("description" . ,(assoc-default "description" org-metadata))))
+               (jekyll-filename (org2jekyll/--copy-org-file-to-jekyll-org-file date orgfile yaml-headers)))
+          (org-publish-file jekyll-filename (assoc blog-project org-publish-project-alist)) ;; publish the file with the right projects
+          (delete-file jekyll-filename))
       (message "This file is not an article, skip."))))
 
 ;; (global-set-key (kbd "C-c b n") 'org2jekyll/create-draft!)
