@@ -1,10 +1,13 @@
 #+title: Backlog
 #+author: ardumont
 
-* TODO 0.0.6 [0%]
-- [ ] Create backlog
-- [ ] Create minor-mode
+* IN-PROGRESS 0.0.6 [16%]
+- [X] Create backlog
 - [ ] Update version
+- [ ] Remove dead code
+- [ ] Fix draft folder computation to be in source input directory
+- [ ] Permit options to be null without breaking jekyll publishing
+- [ ] Permit the blog metadata to determine the desired layout
 * DONE 0.0.5 [100%]
 CLOSED: [2014-12-20 Sat 00:45]
 - [X] Create backlog
