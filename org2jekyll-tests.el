@@ -182,3 +182,18 @@ excerpt: some-fake-description with spaces and all
                            ((org2jekyll/now!)
                             => "2015-01-01 Sat 14:20"))
                    (org2jekyll/read-metadata! "org-file-2")))))
+
+(ert-deftest test-org2jekyll/default-headers-template ()
+  (should (equal "#+STARTUP: showall
+#+STARTUP: hidestars
+#+OPTIONS: H:2 num:nil tags:nil toc:nil timestamps:t
+#+BLOG: blog-entry
+#+LAYOUT: post
+#+AUTHOR: blog-author
+#+DATE: post-date
+#+TITLE: post title with spaces
+#+DESCRIPTION: post some description
+#+CATEGORIES: post-category, other-category
+
+"
+                 (org2jekyll/default-headers-template "blog-entry" "blog-author" "post-date" "post title with spaces" "post some description" "post-category, other-category"))))

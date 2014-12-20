@@ -91,7 +91,7 @@
 (defvar org2jekyll/jekyll-post-ext ".org"
   "File extension of Jekyll posts.")
 
-(defvar org2jekyll/jekyll-org-post-template "#+STARTUP: showall\n#+STARTUP: hidestars\n#+OPTIONS: H:2 num:nil tags:nil toc:nil timestamps:t\n#+BLOG: %s\n#+LAYOUT: post\n#+AUTHOR: %s\n#+DATE: %s\n#+TITLE: %s\n#+DESCRIPTION: %s\n#+CATEGORIES: %s\n\n* "
+(defvar org2jekyll/jekyll-org-post-template "#+STARTUP: showall\n#+STARTUP: hidestars\n#+OPTIONS: H:2 num:nil tags:nil toc:nil timestamps:t\n#+BLOG: %s\n#+LAYOUT: post\n#+AUTHOR: %s\n#+DATE: %s\n#+TITLE: %s\n#+DESCRIPTION: %s\n#+CATEGORIES: %s\n\n"
   "Default template for org2jekyll draft posts.
 The `'%s`' will be replaced respectively by the blog entry name, the author, the generated date, the title, the description and the categories.")
 
@@ -121,6 +121,16 @@ The `'%s`' will be replaced respectively by the blog entry name, the author, the
   "Generate a formatted now date."
   (format-time-string "%Y-%m-%d %a %H:%M"))
 
+(defun org2jekyll/default-headers-template (blog-entry blog-author post-date post-title post-description post-categories)
+  "Compute default headers.
+BLOG-ENTRY is the blog entry.
+BLOG-AUTHOR is the author.
+POST-DATE is the date of the post.
+POST-TITLE is the title.
+POST-DESCRIPTION is the description.
+POST-CATEGORIES is the categories."
+  (format org2jekyll/jekyll-org-post-template blog-entry blog-author post-date (org2jekyll/--yaml-escape post-title) post-description post-categories))
+
 ;;;###autoload
 (defun org2jekyll/create-draft! ()
   "Create a new Jekyll blog post with TITLE."
@@ -138,7 +148,8 @@ The `'%s`' will be replaced respectively by the blog entry name, the author, the
       (if (file-exists-p draft-file)
           (find-file draft-file)
         (progn (find-file draft-file)
-               (insert (format org2jekyll/jekyll-org-post-template post-blog-entry post-author post-date (org2jekyll/--yaml-escape post-title) post-description post-categories)))))))
+               (insert (org2jekyll/default-headers-template post-blog-entry post-author post-date post-title post-description post-categories))
+               (insert "* "))))))
 
 ;;;###autoload
 (defun org2jekyll/list-posts ()
