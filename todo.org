@@ -1,7 +1,7 @@
 #+title: Backlog
 #+author: ardumont
 
-* DONE 0.0.6 [100%]
+* DONE 0.0.6 [90%]
 `CLOSED: [2014-12-20 Sat 13:05]
 - [X] Create backlog
 - [X] Update version
@@ -12,6 +12,8 @@
 - [X] Update deps version
 - [X] Permit options to be null without breaking jekyll publishing
 - [X] Ensure install works with clean install mechanism
+- [X] When publishing remove the org2jekyll/jekyll-drafts-dir arborescence
+- [ ] Inject default header on current org buffer
 * DONE 0.0.5 [100%]
 CLOSED: [2014-12-20 Sat 00:45]
 - [X] Create backlog

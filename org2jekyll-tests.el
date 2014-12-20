@@ -99,7 +99,12 @@ excerpt: Installing jabber and using it from emacs + authentication tips and tri
 
 (ert-deftest test-org2jekyll/--compute-ready-jekyll-file-name ()
   (should (equal "/home/tony/org/2012-10-10-scratch.org"
-                 (org2jekyll/--compute-ready-jekyll-file-name "2012-10-10" "/home/tony/org/scratch.org"))))
+                 (org2jekyll/--compute-ready-jekyll-file-name "2012-10-10" "/home/tony/org/scratch.org")))
+  (should (equal "/home/tony/org/2012-10-10-scratch.org"
+                 (let* ((fake-drafts-folder "fake-drafts-folder")
+                        (org2jekyll/jekyll-drafts-dir fake-drafts-folder))
+                   (org2jekyll/--compute-ready-jekyll-file-name "2012-10-10" (format "/home/tony/org/%s/scratch.org" fake-drafts-folder))))))
+
 (require 'el-mock)
 (ert-deftest test-org2jekyll/--copy-org-file-to-jekyll-org-file ()
   (should (equal "#+BEGIN_HTML

@@ -223,10 +223,14 @@ Depends on the metadata header blog."
     (concat "\n")))
 
 (defun org2jekyll/--compute-ready-jekyll-file-name (date org-file)
-  "Given a DATE and an ORG-FILE, compute a ready jekyll file name."
+  "Given a DATE and an ORG-FILE, compute a ready jekyll file name.
+If the current path contains the `'org2jekyll/jekyll-drafts-dir`', removes it."
   (let ((temp-org-jekyll-filename  (format "%s-%s" date (file-name-nondirectory org-file)))
         (temp-org-jekyll-directory (file-name-directory org-file)))
-    (format "%s%s" temp-org-jekyll-directory temp-org-jekyll-filename)))
+    (->> temp-org-jekyll-filename
+      (format "%s%s" temp-org-jekyll-directory)
+      (replace-regexp-in-string (format "%s" org2jekyll/jekyll-drafts-dir) "")
+      (replace-regexp-in-string "//" "/"))))
 
 (defun org2jekyll/--copy-org-file-to-jekyll-org-file (date org-file yaml-headers)
   "Given DATE, ORG-FILE and YAML-HEADERS, copy content as org-jekyll ready file.
