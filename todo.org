@@ -1,6 +1,11 @@
 #+title: Backlog
 #+author: ardumont
 
+* IN-PROGRESS 0.0.7 [25%]
+- [X] Create backlog
+- [ ] Update version
+- [ ] Permit to publish jekyll ready html page (not blog post) using the same mechanism as blog post
+- [ ] Expose only one command to publish post or html page
 * DONE 0.0.6 [100%]
 `CLOSED: [2014-12-20 Sat 13:05]
 - [X] Create backlog
