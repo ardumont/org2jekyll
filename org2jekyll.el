@@ -273,6 +273,10 @@ If missing values, they are replaced with dummy ones."
       ("description" . ,(-> "description" (org2jekyll/assoc-default org-metadata "")))
       ("blog"        . ,(-> "blog"        (org2jekyll/assoc-default org-metadata "dummy-blog-should-be-replaced"))))))
 
+(defun org2jekyll/message (&rest args)
+  "Log formatted ARGS."
+  (apply 'message (format "org2jekyll - %s" (car args)) (cdr args)))
+
 ;;;###autoload
 (defun org2jekyll/publish-post! ()
   "Publish a post ready for jekyll to render it.
@@ -286,8 +290,35 @@ If not provided, current buffer is used (if it's an org and jekyll ready file)."
                (blog-project    (assoc-default "blog" org-metadata))
                (jekyll-filename (org2jekyll/--copy-org-file-to-jekyll-org-file date orgfile org-metadata)))
           (org-publish-file jekyll-filename (assoc blog-project org-publish-project-alist)) ;; publish the file with the right projects
-          (delete-file jekyll-filename))
-      (message "This file is not an article, skip."))))
+          (delete-file jekyll-filename)
+          (org2jekyll/message "Post '%s' published!" (file-name-nondirectory orgfile)))
+      (org2jekyll/message "This is not an article, skip."))))
+
+;;;###autoload
+(defun org2jekyll/publish-page! ()
+  "Publish the current org file to an org ready page for jekyll to render it.
+ORG-FILE is optional and represents the source org-file to render.
+If not provided, current buffer is used (if it's an org and jekyll ready file)."
+  (interactive)
+  (let* ((cur-buffer (current-buffer))
+         (orgfile (buffer-file-name cur-buffer)))
+    (if (org2jekyll/article-p! orgfile)
+        (let* ((org-metadata    (org2jekyll/read-metadata! orgfile))
+               (date            (assoc-default "date" org-metadata))
+               (blog-project    (assoc-default "blog" org-metadata)))
+          (undo-boundary)
+          (save-excursion
+            (with-current-buffer cur-buffer
+              (goto-char (point-min))
+              (insert (org2jekyll/--to-yaml-header org-metadata))
+              (save-buffer)))
+          (org-publish-file orgfile (assoc blog-project org-publish-project-alist)) ;; publish the file with the right projects
+          (undo-boundary)
+          (undo)
+          (with-current-buffer cur-buffer
+            (save-buffer))
+          (org2jekyll/message "Page '%s' published!" (file-name-nondirectory orgfile)))
+      (org2jekyll/message "This is not an article, skip."))))
 
 ;; (global-set-key (kbd "C-c b n") 'org2jekyll/create-draft!)
 ;; (global-set-key (kbd "C-c b p") 'org2jekyll/publish-post!)
