@@ -4,7 +4,7 @@
 
 ;; Author: Antoine R. Dumont <eniotna.t AT gmail.com>
 ;; Maintainer: Antoine R. Dumont <eniotna.t AT gmail.com>
-;; Version: 0.0.6
+;; Version: 0.0.7
 ;; Package-Requires: ((dash "2.10.0") (s "1.9.0") (deferred "0.3.2"))
 ;; Keywords: org-mode jekyll blog publish
 ;; URL: https://github.com/ardumont/org2jekyll
@@ -53,12 +53,6 @@
   :version "0.0.3"
   :group 'org)
 
-(defcustom org2jekyll/blog-entry nil
-  "Blog entry name."
-  :type 'string
-  :require 'org2jekyll
-  :group 'org2jekyll)
-
 (defcustom org2jekyll/blog-author nil
   "Blog entry author."
   :type 'string
@@ -92,9 +86,9 @@
 (defvar org2jekyll/jekyll-post-ext ".org"
   "File extension of Jekyll posts.")
 
-(defvar org2jekyll/jekyll-org-post-template "#+STARTUP: showall\n#+STARTUP: hidestars\n#+OPTIONS: H:2 num:nil tags:nil toc:nil timestamps:t\n#+BLOG: %s\n#+LAYOUT: post\n#+AUTHOR: %s\n#+DATE: %s\n#+TITLE: %s\n#+DESCRIPTION: %s\n#+CATEGORIES: %s\n\n"
+(defvar org2jekyll/jekyll-org-post-template "#+STARTUP: showall\n#+STARTUP: hidestars\n#+OPTIONS: H:2 num:nil tags:nil toc:nil timestamps:t\n#+LAYOUT: post\n#+AUTHOR: %s\n#+DATE: %s\n#+TITLE: %s\n#+DESCRIPTION: %s\n#+CATEGORIES: %s\n\n"
   "Default template for org2jekyll draft posts.
-The `'%s`' will be replaced respectively by the blog entry name, the author, the generated date, the title, the description and the categories.")
+The `'%s`' will be replaced respectively by name, the author, the generated date, the title, the description and the categories.")
 
 (defun org2jekyll/input-directory (&optional folder-name)
   "Compute the input folder from the FOLDER-NAME."
@@ -122,23 +116,21 @@ The `'%s`' will be replaced respectively by the blog entry name, the author, the
   "Generate a formatted now date."
   (format-time-string "%Y-%m-%d %a %H:%M"))
 
-(defun org2jekyll/default-headers-template (blog-entry blog-author post-date post-title post-description post-categories)
+(defun org2jekyll/default-headers-template (blog-author post-date post-title post-description post-categories)
   "Compute default headers.
-BLOG-ENTRY is the blog entry.
 BLOG-AUTHOR is the author.
 POST-DATE is the date of the post.
 POST-TITLE is the title.
 POST-DESCRIPTION is the description.
 POST-CATEGORIES is the categories."
-  (format org2jekyll/jekyll-org-post-template blog-entry blog-author post-date (org2jekyll/--yaml-escape post-title) post-description post-categories))
+  (format org2jekyll/jekyll-org-post-template blog-author post-date (org2jekyll/--yaml-escape post-title) post-description post-categories))
 
 ;;;###autoload
 (defun org2jekyll/create-draft! ()
   "Create a new Jekyll blog post with TITLE."
   (interactive)
   "The `'%s`' will be replaced respectively by the blog entry name, the author, the generated date, the title, the description and the categories."
-  (let ((post-blog-entry  org2jekyll/blog-entry)
-        (post-author      org2jekyll/blog-author)
+  (let ((post-author      org2jekyll/blog-author)
         (post-date        (org2jekyll/now!))
         (post-title       (read-string "Post Title: "))
         (post-description (read-string "Post Description: "))
@@ -149,7 +141,7 @@ POST-CATEGORIES is the categories."
       (if (file-exists-p draft-file)
           (find-file draft-file)
         (progn (find-file draft-file)
-               (insert (org2jekyll/default-headers-template post-blog-entry post-author post-date post-title post-description post-categories))
+               (insert (org2jekyll/default-headers-template post-author post-date post-title post-description post-categories))
                (insert "* "))))))
 
 ;;;###autoload
@@ -193,16 +185,15 @@ POST-CATEGORIES is the categories."
 
 (defun org2jekyll/article-p! (orgfile)
   "Determine if the current ORGFILE is an article or not.
-Depends on the metadata header blog."
-  (org2jekyll/get-option-from-file! orgfile "BLOG"))
+Depends on the metadata header layout."
+  (org2jekyll/get-option-from-file! orgfile "layout"))
 
 (defvar org2jekyll/map-keys '(("title"       . "title")
                               ("categories"  . "categories")
                               ("date"        . "date")
                               ("description" . "excerpt")
                               ("author"      . "author")
-                              ("layout"      . "layout")
-                              ("blog"        . "blog"))
+                              ("layout"      . "layout"))
   "Keys to map from org headers to jekyll's headers.")
 
 (defun org2jekyll/--org-to-yaml-metadata (org-metadata)
@@ -264,30 +255,70 @@ Return DEFAULT-VALUE if not found."
 (defun org2jekyll/read-metadata! (org-file)
   "Given an ORG-FILE, return it's org metadata.
 If missing values, they are replaced with dummy ones."
-  (let ((org-metadata (org2jekyll/get-options-from-file! org-file '("title" "date" "categories" "description" "author" "blog" "layout"))))
+  (let ((org-metadata (org2jekyll/get-options-from-file! org-file '("title" "date" "categories" "description" "author" "layout"))))
     `(("layout"      . ,(-> "layout"      (org2jekyll/assoc-default org-metadata "post")))
       ("title"       . ,(-> "title"       (org2jekyll/assoc-default org-metadata "dummy-title-should-be-replaced")))
       ("date"        . ,(-> "date"        (org2jekyll/assoc-default org-metadata (org2jekyll/now!)) org2jekyll/--convert-timestamp-to-yyyy-dd-mm))
       ("categories"  . ,(-> "categories"  (org2jekyll/assoc-default org-metadata "dummy-category-should-be-replaced") org2jekyll/--categories-csv-to-yaml))
       ("author"      . ,(-> "author"      (org2jekyll/assoc-default org-metadata "")))
-      ("description" . ,(-> "description" (org2jekyll/assoc-default org-metadata "")))
-      ("blog"        . ,(-> "blog"        (org2jekyll/assoc-default org-metadata "dummy-blog-should-be-replaced"))))))
+      ("description" . ,(-> "description" (org2jekyll/assoc-default org-metadata ""))))))
+
+(defun org2jekyll/message (&rest args)
+  "Log formatted ARGS."
+  (apply 'message (format "org2jekyll - %s" (car args)) (cdr args)))
 
 ;;;###autoload
-(defun org2jekyll/publish-post! (&optional org-file)
-  "Publish a post ready for jekyll to render it.
-ORG-FILE is optional and represents the source org-file to render.
-If not provided, current buffer is used (if it's an org and jekyll ready file)."
+(defun org2jekyll/publish-post! ()
+  "Publish a post ready for jekyll to render it."
   (interactive)
-  (let ((orgfile (if org-file org-file (buffer-file-name (current-buffer)))))
+  (let ((orgfile (buffer-file-name (current-buffer))))
     (if (org2jekyll/article-p! orgfile)
         (let* ((org-metadata    (org2jekyll/read-metadata! orgfile))
                (date            (assoc-default "date" org-metadata))
-               (blog-project    (assoc-default "blog" org-metadata))
+               (blog-project    (assoc-default "layout" org-metadata))
                (jekyll-filename (org2jekyll/--copy-org-file-to-jekyll-org-file date orgfile org-metadata)))
           (org-publish-file jekyll-filename (assoc blog-project org-publish-project-alist)) ;; publish the file with the right projects
-          (delete-file jekyll-filename))
-      (message "This file is not an article, skip."))))
+          (delete-file jekyll-filename)
+          (org2jekyll/message "Post '%s' published!" (file-name-nondirectory orgfile)))
+      (org2jekyll/message "This is not an article, publication skipped!"))))
+
+;;;###autoload
+(defun org2jekyll/publish-page! ()
+  "Publish the current org file to an org ready page for jekyll to render it."
+  (interactive)
+  (let* ((cur-buffer (current-buffer))
+         (orgfile (buffer-file-name cur-buffer)))
+    (if (org2jekyll/article-p! orgfile)
+        (let* ((org-metadata    (org2jekyll/read-metadata! orgfile))
+               (date            (assoc-default "date" org-metadata))
+               (blog-project    (assoc-default "layout" org-metadata)))
+          (undo-boundary)
+          (save-excursion
+            (with-current-buffer cur-buffer
+              (goto-char (point-min))
+              (insert (org2jekyll/--to-yaml-header org-metadata))
+              (save-buffer)))
+          (org-publish-file orgfile (assoc blog-project org-publish-project-alist)) ;; publish the file with the right projects
+          (undo-boundary)
+          (undo)
+          (with-current-buffer cur-buffer
+            (save-buffer))
+          (org2jekyll/message "Page '%s' published!" (file-name-nondirectory orgfile)))
+      (org2jekyll/message "This is not an article, publication skipped!"))))
+
+;;;###autoload
+(defun org2jekyll/publish! ()
+  "Publish the current org file as post or page depending on the chosen layout.
+Layout `'post`' is a jekyll post.
+Layout `'default`' is a page."
+  (interactive)
+  (let* ((cur-buffer (current-buffer))
+         (orgfile (buffer-file-name cur-buffer)))
+    (if (org2jekyll/article-p! orgfile)
+        (call-interactively (if (string= "post" (org2jekyll/get-option-at-point! "layout"))
+                                'org2jekyll/publish-post!
+                              'org2jekyll/publish-page!))
+      (org2jekyll/message "This is not an article, publication skipped!"))))
 
 ;; (global-set-key (kbd "C-c b n") 'org2jekyll/create-draft!)
 ;; (global-set-key (kbd "C-c b p") 'org2jekyll/publish-post!)

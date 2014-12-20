@@ -29,14 +29,29 @@ Here is an example of my configuration:
 (require 'org)
 (require 'org2jekyll)
 
-(custom-set-variables '(org2jekyll/blog-entry        "tony-blog")
-                      '(org2jekyll/blog-author       "ardumont")
+(custom-set-variables '(org2jekyll/blog-author       "ardumont")
                       '(org2jekyll/source-directory  (expand-file-name "~/org/"))
                       '(org2jekyll/jekyll-directory  (expand-file-name "~/public_html/"))
                       '(org2jekyll/jekyll-drafts-dir "_drafts/")
                       '(org2jekyll/jekyll-posts-dir  "_posts/")
                       '(org-publish-project-alist
-                        `(("tony-blog"
+                        `(("default"
+                           :base-directory ,(org2jekyll/input-directory)
+                           :base-extension "org"
+                           ;; :publishing-directory "/ssh:user@host:~/html/notebook/"
+                           :publishing-directory ,(org2jekyll/output-directory "blog")
+                           :publishing-function org-html-publish-to-html
+                           :headline-levels 4
+                           :section-numbers nil
+                           :with-toc nil
+                           :html-head "<link rel=\"stylesheet\" href=\"./css/style.css\" type=\"text/css\"/>"
+                           :html-preamble t
+                           :recursive t
+                           :make-index t
+                           :html-extension "html"
+                           :body-only t)
+
+                          ("post"
                            :base-directory ,(org2jekyll/input-directory)
                            :base-extension "org"
                            :publishing-directory ,(org2jekyll/output-directory org2jekyll/jekyll-posts-dir)
@@ -69,7 +84,7 @@ Here is an example of my configuration:
                            :publishing-directory ,(org2jekyll/output-directory "css")
                            :publishing-function org-publish-attachment)
 
-                          ("website" :components ("org" "tony-blog" "images" "js" "css")))))
+                          ("website" :components ("default" "post" "images" "js" "css")))))
 #+end_src
 
 `tony-blog` is an important entry here which will be used when publishing the post.
@@ -93,17 +108,17 @@ Enters org2jekyll.
 
 * How
 
-Add some org headers in your org-mode file:
+** Post
+
+Add some org headers in your org-mode file for a blog post:
 
 #+begin_src org
-#+BLOG: tony-blog
 #+LAYOUT: post
 #+AUTHOR: ardumont
 #+DATE: 2014-12-19 Fri 23:49
 #+STARTUP: showall
 #+STARTUP: hidestars
 #+OPTIONS: H:2 num:nil tags:nil toc:1 timestamps:t
-#+LAYOUT: post
 #+TITLE: hello
 #+DESCRIPTION: some description
 #+CATEGORIES: some-category
@@ -111,9 +126,35 @@ Add some org headers in your org-mode file:
 
 To easily do that, <kbd>M-x org2jekyll/create-draft!</kbd>, this will ask you for everything needed and create a file with such metadata.
 
-Now create your article and publish it when ready <kbd>M-x org2jekyll/publish-post!</kbd>.
+Now create your article and publish it when ready <kbd>M-x org2jekyll/publish!</kbd>.
 
-*Note* the `#+BLOG` entry refers to the `tony-blog` entry in `org-publish-project-alist`.
+This will be published as post article.
+
+*Note* the `#+LAYOUT` entry refers to the `post` entry in `org-publish-project-alist`.
+
+** Page
+
+A simple page.
+
+Add some org headers in your org-mode file for a blog post:
+
+#+begin_src org
+#+LAYOUT: default
+#+AUTHOR: ardumont
+#+DATE: 2014-12-19 Fri 23:49
+#+STARTUP: showall
+#+STARTUP: hidestars
+#+OPTIONS: H:2 num:nil tags:nil toc:1 timestamps:t
+#+TITLE: hello
+#+DESCRIPTION: some description
+#+CATEGORIES: some-category
+#+end_src
+
+Now create your article and publish it when ready <kbd>M-x org2jekyll/publish!</kbd>.
+
+This will be published as page article.
+
+*Note* the `#+LAYOUT` entry refers to the `default` entry in `org-publish-project-alist`.
 
 * What's going on?
 
