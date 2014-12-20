@@ -274,12 +274,12 @@ If missing values, they are replaced with dummy ones."
       ("blog"        . ,(-> "blog"        (org2jekyll/assoc-default org-metadata "dummy-blog-should-be-replaced"))))))
 
 ;;;###autoload
-(defun org2jekyll/publish-post! (&optional org-file)
+(defun org2jekyll/publish-post! ()
   "Publish a post ready for jekyll to render it.
 ORG-FILE is optional and represents the source org-file to render.
 If not provided, current buffer is used (if it's an org and jekyll ready file)."
   (interactive)
-  (let ((orgfile (if org-file org-file (buffer-file-name (current-buffer)))))
+  (let ((orgfile (buffer-file-name (current-buffer))))
     (if (org2jekyll/article-p! orgfile)
         (let* ((org-metadata    (org2jekyll/read-metadata! orgfile))
                (date            (assoc-default "date" org-metadata))
