@@ -1,10 +1,21 @@
 #+title: Backlog
 #+author: ardumont
 
-* TODO 0.0.6 [0%]
-- [ ] Create backlog
-- [ ] Create minor-mode
-- [ ] Update version
+* DONE 0.0.6 [100%]
+`CLOSED: [2014-12-20 Sat 13:05]
+- [X] Create backlog
+- [X] Update version
+- [X] Remove dead code
+- [X] Fix draft folder computation to be in source input directory
+- [X] Permit the blog metadata to determine the desired layout
+- [X] Refactor main function in multiple sub functions to ease testing
+- [X] Update deps version
+- [X] Permit options to be null without breaking jekyll publishing
+- [X] Ensure install works with clean install mechanism
+- [X] When publishing remove the org2jekyll/jekyll-drafts-dir arborescence
+- [X] Improve default header computation
+- [X] Fix ci-travis for emacs 24.3
+- [X] Add ci-travis status badge
 * DONE 0.0.5 [100%]
 CLOSED: [2014-12-20 Sat 00:45]
 - [X] Create backlog

@@ -1,7 +1,9 @@
 #+title: org2jekyll
 #+author: ardumont
 
-Blogging with org-mode and jekyll without strange yaml headers.
+[[https://travis-ci.org/ardumont/org2jekyll][https://travis-ci.org/ardumont/org2jekyll.svg]]
+
+Blogging with org-mode and jekyll without alien yaml headers.
 
 * Description
 
@@ -27,8 +29,8 @@ Here is an example of my configuration:
 (require 'org)
 (require 'org2jekyll)
 
-(custom-set-variables '(org2jekyll/blog-entry "tony-blog")
-                      '(org2jekyll/blog-author "ardumont")
+(custom-set-variables '(org2jekyll/blog-entry        "tony-blog")
+                      '(org2jekyll/blog-author       "ardumont")
                       '(org2jekyll/source-directory  (expand-file-name "~/org/"))
                       '(org2jekyll/jekyll-directory  (expand-file-name "~/public_html/"))
                       '(org2jekyll/jekyll-drafts-dir "_drafts/")
@@ -37,7 +39,7 @@ Here is an example of my configuration:
                         `(("tony-blog"
                            :base-directory ,(org2jekyll/input-directory)
                            :base-extension "org"
-                           :publishing-directory ,(org2jekyll/output-directory "_posts")
+                           :publishing-directory ,(org2jekyll/output-directory org2jekyll/jekyll-posts-dir)
                            :publishing-function org-html-publish-to-html
                            :headline-levels 4
                            :section-numbers nil
@@ -75,7 +77,7 @@ Name it as you want, just refer to it in your #+BLOG entry after that.
 
 ** Example
 
-- blog: http://ardumont.github.io/ (the style is ugly right now but the technicals work)
+- blog: [[http://ardumont.github.io/blog/]] (the style is ugly as hell right now but the technicals which is described here work)
 
 - source: https://github.com/ardumont/ardumont.github.io
 

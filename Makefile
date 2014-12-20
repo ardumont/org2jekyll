@@ -49,3 +49,6 @@ info:
 
 release:
 	./release.sh $(VERSION)
+
+emacs-install-clean: package
+	~/bin/emacs/emacs-install-clean.sh ./$(ARCHIVE)
