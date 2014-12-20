@@ -1,9 +1,9 @@
 #+title: Backlog
 #+author: ardumont
 
-* IN-PROGRESS 0.0.6 [16%]
+* IN-PROGRESS 0.0.6 [33%]
 - [X] Create backlog
-- [ ] Update version
+- [X] Update version
 - [ ] Remove dead code
 - [ ] Fix draft folder computation to be in source input directory
 - [ ] Permit options to be null without breaking jekyll publishing
