@@ -4,8 +4,10 @@
 * IN-PROGRESS 0.0.8 [50%]
 - [X] Create backlog
 - [X] Update version
-- [ ] Improve doc (header + README.org)
-- [ ] Fix typo in default configuration sample
+- [X] Fix implementation of output-directory function
+- [ ] Remove unused dependency
+- [ ] Improve doc (header + README.org + talk about customization group)
+- [ ] Create minor mode with default bindings
 
 * DONE 0.0.7 [100%]
 CLOSED: [2014-12-20 Sat 18:22]

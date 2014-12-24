@@ -90,13 +90,17 @@
   "Default template for org2jekyll draft posts.
 The `'%s`' will be replaced respectively by name, the author, the generated date, the title, the description and the categories.")
 
+(defun org2jekyll/--optional-folder (folder-source &optional folder-name)
+  "Compute the folder name from a FOLDER-SOURCE and an optional FOLDER-NAME."
+  (format "%s/%s" folder-source (if folder-name folder-name "")))
+
 (defun org2jekyll/input-directory (&optional folder-name)
   "Compute the input folder from the FOLDER-NAME."
-  (format "%s/%s" org2jekyll/source-directory (if folder-name folder-name "")))
+  (org2jekyll/--optional-folder org2jekyll/source-directory folder-name))
 
-(defun org2jekyll/output-directory (folder-name)
-  "Compute the output folder from the FOLDER-NAME."
-  (format "%s/%s" org2jekyll/jekyll-directory folder-name))
+(defun org2jekyll/output-directory (&optional folder-name)
+  "Compute the output folder from the optional FOLDER-NAME."
+  (org2jekyll/--optional-folder org2jekyll/jekyll-directory folder-name))
 
 (defun org2jekyll/--make-slug (s)
   "Turn a string S into a slug."
