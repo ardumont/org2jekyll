@@ -60,11 +60,11 @@ Update your packages archive with marmalade:
 (package-initialize)
 #+end_src
 
-<kbd>M-x package-install RET org2jekyll RET</kbd>
+/M-x package-install RET org2jekyll RET/
 
 ** Setup
 
-<kbd>M-x customize-group RET org2jekyll RET</kbd>
+/M-x customize-group RET org2jekyll RET/
 
 Here is an example of my configuration for my [[http://ardumont.github.io/][blog site]]:
 #+begin_src emacs-lisp
@@ -159,9 +159,9 @@ Add some org headers in your org-mode file for a blog post:
 #+CATEGORIES: some-category
 #+end_src
 
-To easily do that, <kbd>M-x org2jekyll/create-draft!</kbd>, this will ask you for everything needed and create a file with such metadata.
+To easily do that, /M-x org2jekyll/create-draft!/, this will ask you for everything needed and create a file with such metadata.
 
-Now create your article and publish it when ready <kbd>M-x org2jekyll/publish!</kbd>.
+Now create your article and publish it when ready /M-x org2jekyll/publish!/.
 
 This will be published as post article.
 
@@ -185,7 +185,7 @@ Add some org headers in your org-mode file for a blog post:
 #+CATEGORIES: some-category
 #+end_src
 
-Now create your article and publish it when ready <kbd>M-x org2jekyll/publish!</kbd>.
+Now create your article and publish it when ready /M-x org2jekyll/publish!/.
 
 This will be published as page article.
 
@@ -211,6 +211,6 @@ org2jekyll proposes you a minor with the following default binding:
 
 *Note* [[https://www.gnu.org/software/emacs/manual/html_node/elisp/Key-Binding-Conventions.html#Key-Binding-Conventions][Respecting the default minor mode convention for binding]]
 
-To (de)activate this in an org file: <kbd>M-x org2jekyll-mode</kbd>
+To (de)activate this in an org file: /M-x org2jekyll-mode/
 
 As usual, you can use emacs' power to setup your own bindings.
