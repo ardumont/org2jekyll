@@ -1,12 +1,12 @@
 #+title: Backlog
 #+author: ardumont
 
-* IN-PROGRESS 0.0.8 [66%]
+* IN-PROGRESS 0.0.8 [83%]
 - [X] Create backlog
 - [X] Update version
 - [X] Fix implementation of output-directory function
 - [X] Remove unused dependency deferred (for the moment not used)
-- [ ] Improve doc (header + README.org + talk about customization group)
+- [X] Improve doc (header + README.org + customization group + install step)
 - [ ] Create minor mode with default bindings
 
 * DONE 0.0.7 [100%]

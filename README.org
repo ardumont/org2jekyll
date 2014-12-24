@@ -7,7 +7,7 @@ Blogging with org-mode and jekyll without alien yaml headers.
 
 * Description
 
-Let `org2jekyll` export your org-mode file to jekyll.
+Let *org2jekyll* export your org-mode file to jekyll.
 
 What's the difference with [[https://github.com/juanre/org-jekyll][org-jekyll]]?
 
@@ -21,10 +21,10 @@ Only emacs' dependencies (org, etc...) no external ruby script.
 * Pre-requisite
 
 You have:
-- your `org-publish` ready.
+- your [[http://orgmode.org/worg/org-tutorials/org-publish-html-tutorial.html][*org-publish*]] setup ready.
 - a running [[http://github.com/mojombo/jekyll][jekyll]] installation
 
-Here is an example of my configuration:
+Here is an example of my configuration for my [[http://ardumont.github.io/][blog site]]:
 #+begin_src emacs-lisp
 (require 'org)
 (require 'org2jekyll)
@@ -38,12 +38,11 @@ Here is an example of my configuration:
                         `(("default"
                            :base-directory ,(org2jekyll/input-directory)
                            :base-extension "org"
-                           :publishing-directory ,(org2jekyll/output-directory "blog")
+                           :publishing-directory ,(org2jekyll/output-directory)
                            :publishing-function org-html-publish-to-html
                            :headline-levels 4
                            :section-numbers nil
                            :with-toc nil
-                           :html-head "<link rel=\"stylesheet\" href=\"./css/style.css\" type=\"text/css\"/>"
                            :html-preamble t
                            :recursive t
                            :make-index t
@@ -58,7 +57,6 @@ Here is an example of my configuration:
                            :headline-levels 4
                            :section-numbers nil
                            :with-toc nil
-                           :html-head "<link rel=\"stylesheet\" href=\"./css/style.css\" type=\"text/css\"/>"
                            :html-preamble t
                            :recursive t
                            :make-index t
@@ -86,20 +84,26 @@ Here is an example of my configuration:
                           ("website" :components ("default" "post" "images" "js" "css")))))
 #+end_src
 
-`tony-blog` is an important entry here which will be used when publishing the post.
-Name it as you want, just refer to it in your #+BLOG entry after that.
+*default* and *post* are important entries which represent the possible jekyll layout you use in your jekyll installation.
+Name it as you want, just refer to it in your #+LAYOUT entry after that.
 
-** Example
+Regarding *org2jekyll* setup, you can use emacs's customize-group command: <kbd>M-x customize-group RET org2jekyll RET</kbd>
 
-- blog: [[http://ardumont.github.io/blog/]] (the style is ugly as hell right now but the technicals which is described here work)
+** A working example
 
-- source: https://github.com/ardumont/ardumont.github.io
+- blog: [[http://ardumont.github.io/]]
+
+- jekyll exported source: https://github.com/ardumont/ardumont.github.io
+
+- the org files: https://github.com/ardumont/org.git
+
+*Note* Yes, I may have to merge the last 2 repositories at some point...
 
 * Rationale
 
-- Standard org-mode rocks
-- Github uses jekyll
-- Jekyll is nice
+- [[http://orgmode.org/][org-mode]] rocks
+- Github uses [[http://jekyllrb.com/][Jekyll]]
+- [[http://jekyllrb.com/][Jekyll]] is nice
 - Existing solutions regarding org-mode and jekyll needs the org-mode files to be altered with non-org notations to work together
 - I don't want to alter my org-mode files with alien yaml headers to satisfy jekyll
 
@@ -129,7 +133,7 @@ Now create your article and publish it when ready <kbd>M-x org2jekyll/publish!</
 
 This will be published as post article.
 
-*Note* the `#+LAYOUT` entry refers to the `post` entry in `org-publish-project-alist`.
+*Note* the *#+LAYOUT* entry refers to the *post* entry in *org-publish-project-alist*.
 
 ** Page
 
@@ -153,9 +157,22 @@ Now create your article and publish it when ready <kbd>M-x org2jekyll/publish!</
 
 This will be published as page article.
 
-*Note* the `#+LAYOUT` entry refers to the `default` entry in `org-publish-project-alist`.
+*Note* the *#+LAYOUT* entry refers to the *default* entry in *org-publish-project-alist*.
 
 * What's going on?
 
 This will generate another org-mode with the necessary yaml and publish to the jekyll directory.
 Then your jekyll will be in charge of rendering accordingly.
+
+* Install
+
+Available only on [[https://marmalade-repo.org/][marmalade]] for the moment.
+Update your packages archive with marmalade:
+
+#+begin_src emacs-lisp
+(require 'package)
+(add-to-list 'package-archives '("marmalade" . "https://marmalade-repo.org/packages") t)
+(package-initialize)
+#+end_src
+
+<kbd>M-x package-install RET org2jekyll RET</kbd>
