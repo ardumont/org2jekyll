@@ -5,6 +5,20 @@
 
 Blogging with org-mode and jekyll without alien yaml headers.
 
+* Table of Contents                                                     :TOC:
+ - [[#description][Description]]
+     - [[#rationale][Rationale]]
+     - [[#pre-requisite][Pre-requisite]]
+ - [[#installsetup][Install/Setup]]
+     - [[#install][Install]]
+     - [[#setup][Setup]]
+     - [[#a-working-example][A working example]]
+ - [[#use][Use]]
+     - [[#post][Post]]
+     - [[#page][Page]]
+     - [[#whats-going-on][What's going on?]]
+ - [[#minor-mode][Minor mode]]
+
 * Description
 
 Let *org2jekyll* export your org-mode file to jekyll.
@@ -18,11 +32,39 @@ What's the difference with [[https://github.com/bmaland/happyblogger][happyblogg
 
 Only emacs' dependencies (org, etc...) no external ruby script.
 
-* Pre-requisite
+** Rationale
+
+- [[http://orgmode.org/][org-mode]] rocks
+- Github uses [[http://jekyllrb.com/][Jekyll]]
+- [[http://jekyllrb.com/][Jekyll]] is nice
+- Existing solutions regarding org-mode and jekyll needs the org-mode files to be altered with non-org notations to work together
+- I don't want to alter my org-mode files with alien yaml headers to satisfy jekyll
+
+Enters org2jekyll.
+
+** Pre-requisite
 
 You have:
 - your [[http://orgmode.org/worg/org-tutorials/org-publish-html-tutorial.html][*org-publish*]] setup ready.
 - a running [[http://github.com/mojombo/jekyll][jekyll]] installation
+* Install/Setup
+
+** Install
+
+Available only on [[https://marmalade-repo.org/][marmalade]] for the moment.
+Update your packages archive with marmalade:
+
+#+begin_src emacs-lisp
+(require 'package)
+(add-to-list 'package-archives '("marmalade" . "https://marmalade-repo.org/packages") t)
+(package-initialize)
+#+end_src
+
+<kbd>M-x package-install RET org2jekyll RET</kbd>
+
+** Setup
+
+<kbd>M-x customize-group RET org2jekyll RET</kbd>
 
 Here is an example of my configuration for my [[http://ardumont.github.io/][blog site]]:
 #+begin_src emacs-lisp
@@ -87,8 +129,6 @@ Here is an example of my configuration for my [[http://ardumont.github.io/][blog
 *default* and *post* are important entries which represent the possible jekyll layout you use in your jekyll installation.
 Name it as you want, just refer to it in your #+LAYOUT entry after that.
 
-Regarding *org2jekyll* setup, you can use emacs's customize-group command: <kbd>M-x customize-group RET org2jekyll RET</kbd>
-
 ** A working example
 
 - blog: [[http://ardumont.github.io/]]
@@ -99,29 +139,21 @@ Regarding *org2jekyll* setup, you can use emacs's customize-group command: <kbd>
 
 *Note* Yes, I may have to merge the last 2 repositories at some point...
 
-* Rationale
+* Use
 
-- [[http://orgmode.org/][org-mode]] rocks
-- Github uses [[http://jekyllrb.com/][Jekyll]]
-- [[http://jekyllrb.com/][Jekyll]] is nice
-- Existing solutions regarding org-mode and jekyll needs the org-mode files to be altered with non-org notations to work together
-- I don't want to alter my org-mode files with alien yaml headers to satisfy jekyll
-
-Enters org2jekyll.
-
-* How
+Add some org headers to your org files.
 
 ** Post
 
 Add some org headers in your org-mode file for a blog post:
 
 #+begin_src org
+#+STARTUP: showall
+#+STARTUP: hidestars
+#+OPTIONS: H:2 num:nil tags:nil toc:nil timestamps:t
 #+LAYOUT: post
 #+AUTHOR: ardumont
 #+DATE: 2014-12-19 Fri 23:49
-#+STARTUP: showall
-#+STARTUP: hidestars
-#+OPTIONS: H:2 num:nil tags:nil toc:1 timestamps:t
 #+TITLE: hello
 #+DESCRIPTION: some description
 #+CATEGORIES: some-category
@@ -142,12 +174,12 @@ A simple page.
 Add some org headers in your org-mode file for a blog post:
 
 #+begin_src org
+#+STARTUP: showall
+#+STARTUP: hidestars
+#+OPTIONS: H:2 num:nil tags:nil toc:nil timestamps:t
 #+LAYOUT: default
 #+AUTHOR: ardumont
 #+DATE: 2014-12-19 Fri 23:49
-#+STARTUP: showall
-#+STARTUP: hidestars
-#+OPTIONS: H:2 num:nil tags:nil toc:1 timestamps:t
 #+TITLE: hello
 #+DESCRIPTION: some description
 #+CATEGORIES: some-category
@@ -159,24 +191,10 @@ This will be published as page article.
 
 *Note* the *#+LAYOUT* entry refers to the *default* entry in *org-publish-project-alist*.
 
-
 ** What's going on?
 
-This will generate another org-mode with the necessary yaml and publish to the jekyll directory.
+This will generate another org-mode with the necessary yaml and publish to the jekyll directory (according to your org-publish setup).
 Then your jekyll will be in charge of rendering accordingly.
-
-* Install
-
-Available only on [[https://marmalade-repo.org/][marmalade]] for the moment.
-Update your packages archive with marmalade:
-
-#+begin_src emacs-lisp
-(require 'package)
-(add-to-list 'package-archives '("marmalade" . "https://marmalade-repo.org/packages") t)
-(package-initialize)
-#+end_src
-
-<kbd>M-x package-install RET org2jekyll RET</kbd>
 
 * Minor mode
 
@@ -194,3 +212,5 @@ org2jekyll proposes you a minor with the following default binding:
 *Note* [[https://www.gnu.org/software/emacs/manual/html_node/elisp/Key-Binding-Conventions.html#Key-Binding-Conventions][Respecting the default minor mode convention for binding]]
 
 To (de)activate this in an org file: <kbd>M-x org2jekyll-mode</kbd>
+
+As usual, you can use emacs' power to setup your own bindings.

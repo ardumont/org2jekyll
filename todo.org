@@ -1,7 +1,7 @@
 #+title: Backlog
 #+author: ardumont
 
-* IN-PROGRESS 0.0.8 [87%]
+* IN-PROGRESS 0.0.8 [100%]
 - [X] Create backlog
 - [X] Update version
 - [X] Fix implementation of output-directory function
@@ -9,7 +9,7 @@
 - [X] Improve doc (header + README.org + customization group + install step)
 - [X] Create minor mode with default bindings
 - [X] Update readme about minor mode
-- [ ] Add TOC to readme
+- [X] Add TOC to readme
 
 * DONE 0.0.7 [100%]
 CLOSED: [2014-12-20 Sat 18:22]
