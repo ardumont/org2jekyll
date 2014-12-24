@@ -193,3 +193,17 @@ excerpt: some-fake-description with spaces and all
 
 "
                  (org2jekyll/default-headers-template "blog-author" "post-date" "post title with spaces" "post some description" "post-category, other-category"))))
+
+(ert-deftest test-org2jekyll/--optional-folder ()
+  (should (equal "hello/there" (org2jekyll/--optional-folder "hello" "there")))
+  (should (equal "hello/" (org2jekyll/--optional-folder "hello"))))
+
+(ert-deftest test-org2jekyll/input-directory ()
+  (let ((org2jekyll/source-directory "source-directory"))
+    (should (equal "source-directory/there" (org2jekyll/input-directory "there")))
+    (should (equal "source-directory/" (org2jekyll/input-directory)))))
+
+(ert-deftest test-org2jekyll/output-directory ()
+  (let ((org2jekyll/jekyll-directory "out-directory"))
+    (should (equal "out-directory/there" (org2jekyll/output-directory "there")))
+    (should (equal "out-directory/" (org2jekyll/output-directory)))))

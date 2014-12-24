@@ -4,8 +4,8 @@
 
 ;; Author: Antoine R. Dumont <eniotna.t AT gmail.com>
 ;; Maintainer: Antoine R. Dumont <eniotna.t AT gmail.com>
-;; Version: 0.0.7
-;; Package-Requires: ((dash "2.10.0") (s "1.9.0") (deferred "0.3.2"))
+;; Version: 0.0.8
+;; Package-Requires: ((dash "2.10.0") (s "1.9.0"))
 ;; Keywords: org-mode jekyll blog publish
 ;; URL: https://github.com/ardumont/org2jekyll
 
@@ -31,12 +31,14 @@
 ;; Functions to ease publishing jekyll posts from org-mode file
 
 ;; Providing you have a working `'jekyll`' and `'org-publish`'
-;; This will permit you to simply export an org-mode file to the right format to
-;; the right folder for jekyll to understand
+;; This will permit you to simply export an org-mode file with the right jekyll
+;; format to the right folder
 ;;
 ;; M-x org2jekyll/create-draft! create a draft with the necessary metadata
 ;;
-;; M-x org2jekyll/publish-post! publish the post to the jekyll folder
+;; M-x org2jekyll/publish! publish the post (or page) to the jekyll folder
+;;
+;; You can customize using M-x customize-group RET org2jekyll RET
 ;;
 ;; More information on https://github.com/ardumont/org2jekyll
 
@@ -90,13 +92,17 @@
   "Default template for org2jekyll draft posts.
 The `'%s`' will be replaced respectively by name, the author, the generated date, the title, the description and the categories.")
 
+(defun org2jekyll/--optional-folder (folder-source &optional folder-name)
+  "Compute the folder name from a FOLDER-SOURCE and an optional FOLDER-NAME."
+  (format "%s/%s" folder-source (if folder-name folder-name "")))
+
 (defun org2jekyll/input-directory (&optional folder-name)
   "Compute the input folder from the FOLDER-NAME."
-  (format "%s/%s" org2jekyll/source-directory (if folder-name folder-name "")))
+  (org2jekyll/--optional-folder org2jekyll/source-directory folder-name))
 
-(defun org2jekyll/output-directory (folder-name)
-  "Compute the output folder from the FOLDER-NAME."
-  (format "%s/%s" org2jekyll/jekyll-directory folder-name))
+(defun org2jekyll/output-directory (&optional folder-name)
+  "Compute the output folder from the optional FOLDER-NAME."
+  (org2jekyll/--optional-folder org2jekyll/jekyll-directory folder-name))
 
 (defun org2jekyll/--make-slug (s)
   "Turn a string S into a slug."
@@ -320,10 +326,30 @@ Layout `'default`' is a page."
                               'org2jekyll/publish-page!))
       (org2jekyll/message "This is not an article, publication skipped!"))))
 
-;; (global-set-key (kbd "C-c b n") 'org2jekyll/create-draft!)
-;; (global-set-key (kbd "C-c b p") 'org2jekyll/publish-post!)
-;; (global-set-key (kbd "C-c b l") 'org2jekyll/list-posts)
-;; (global-set-key (kbd "C-c b d") 'org2jekyll/list-drafts)
+(defvar org2jekyll-mode-map nil "Default Bindings map for org2jekyll minor mode.")
+
+(setq org2jekyll-mode-map
+      (let ((map (make-sparse-keymap)))
+        (define-key map (kbd "C-c . n") 'org2jekyll/create-draft!)
+        (define-key map (kbd "C-c . p") 'org2jekyll/publish-post!)
+        (define-key map (kbd "C-c . l") 'org2jekyll/list-posts)
+        (define-key map (kbd "C-c . d") 'org2jekyll/list-drafts)
+        map))
+
+;;;###autoload
+(define-minor-mode org2jekyll-mode
+  "Toggle org2jekyll-mode mode.
+With no argument, the mode is toggled on/off.
+Non-nil argument turns mode on.
+Nil argument turns mode off.
+
+Commands:
+\\{org2jekyll-mode-map}"
+
+  :init-value nil
+  :lighter " o2j"
+  :group 'org2jekyll
+  :keymap org2jekyll-mode-map)
 
 (provide 'org2jekyll)
 ;;; org2jekyll.el ends here
