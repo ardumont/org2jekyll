@@ -1,6 +1,12 @@
 #+title: Backlog
 #+author: ardumont
 
+* IN-PROGRESS 0.0.8 [25%]
+- [X] Create backlog
+- [ ] Update version
+- [ ] Improve doc (header + README.org)
+- [ ] Fix typo in default configuration sample
+
 * DONE 0.0.7 [100%]
 CLOSED: [2014-12-20 Sat 18:22]
 - [X] Create backlog
