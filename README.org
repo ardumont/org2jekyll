@@ -159,7 +159,8 @@ This will be published as page article.
 
 *Note* the *#+LAYOUT* entry refers to the *default* entry in *org-publish-project-alist*.
 
-* What's going on?
+
+** What's going on?
 
 This will generate another org-mode with the necessary yaml and publish to the jekyll directory.
 Then your jekyll will be in charge of rendering accordingly.
@@ -176,3 +177,20 @@ Update your packages archive with marmalade:
 #+end_src
 
 <kbd>M-x package-install RET org2jekyll RET</kbd>
+
+* Minor mode
+
+org2jekyll proposes you a minor with the following default binding:
+#+begin_src emacs-lisp
+(setq org2jekyll-mode-map
+      (let ((map (make-sparse-keymap)))
+        (define-key map (kbd "C-c . n") 'org2jekyll/create-draft!)
+        (define-key map (kbd "C-c . p") 'org2jekyll/publish-post!)
+        (define-key map (kbd "C-c . l") 'org2jekyll/list-posts)
+        (define-key map (kbd "C-c . d") 'org2jekyll/list-drafts)
+        map))
+#+end_src
+
+*Note* [[https://www.gnu.org/software/emacs/manual/html_node/elisp/Key-Binding-Conventions.html#Key-Binding-Conventions][Respecting the default minor mode convention for binding]]
+
+To (de)activate this in an org file: <kbd>M-x org2jekyll-mode</kbd>
