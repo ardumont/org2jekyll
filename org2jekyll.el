@@ -326,10 +326,30 @@ Layout `'default`' is a page."
                               'org2jekyll/publish-page!))
       (org2jekyll/message "This is not an article, publication skipped!"))))
 
-;; (global-set-key (kbd "C-c b n") 'org2jekyll/create-draft!)
-;; (global-set-key (kbd "C-c b p") 'org2jekyll/publish-post!)
-;; (global-set-key (kbd "C-c b l") 'org2jekyll/list-posts)
-;; (global-set-key (kbd "C-c b d") 'org2jekyll/list-drafts)
+(defvar org2jekyll-mode-map nil "Default Bindings map for org2jekyll minor mode.")
+
+(setq org2jekyll-mode-map
+      (let ((map (make-sparse-keymap)))
+        (define-key map (kbd "C-c . n") 'org2jekyll/create-draft!)
+        (define-key map (kbd "C-c . p") 'org2jekyll/publish-post!)
+        (define-key map (kbd "C-c . l") 'org2jekyll/list-posts)
+        (define-key map (kbd "C-c . d") 'org2jekyll/list-drafts)
+        map))
+
+;;;###autoload
+(define-minor-mode org2jekyll-mode
+  "Toggle org2jekyll-mode mode.
+With no argument, the mode is toggled on/off.
+Non-nil argument turns mode on.
+Nil argument turns mode off.
+
+Commands:
+\\{org2jekyll-mode-map}"
+
+  :init-value nil
+  :lighter " o2j"
+  :group 'org2jekyll
+  :keymap org2jekyll-mode-map)
 
 (provide 'org2jekyll)
 ;;; org2jekyll.el ends here
