@@ -88,9 +88,12 @@
 (defvar org2jekyll/jekyll-post-ext ".org"
   "File extension of Jekyll posts.")
 
-(defvar org2jekyll/jekyll-org-post-template "#+STARTUP: showall\n#+STARTUP: hidestars\n#+OPTIONS: H:2 num:nil tags:nil toc:nil timestamps:t\n#+LAYOUT: post\n#+AUTHOR: %s\n#+DATE: %s\n#+TITLE: %s\n#+DESCRIPTION: %s\n#+CATEGORIES: %s\n\n"
+(defvar org2jekyll/jekyll-org-post-template nil
   "Default template for org2jekyll draft posts.
 The `'%s`' will be replaced respectively by name, the author, the generated date, the title, the description and the categories.")
+
+(setq org2jekyll/jekyll-org-post-template
+      "#+STARTUP: showall\n#+STARTUP: hidestars\n#+OPTIONS: H:2 num:nil tags:nil toc:nil timestamps:t\n#+LAYOUT: post\n#+AUTHOR: %s\n#+DATE: %s\n#+TITLE: %s\n#+DESCRIPTION: %s\n#+CATEGORIES: %s\n\n")
 
 (defun org2jekyll/--optional-folder (folder-source &optional folder-name)
   "Compute the folder name from a FOLDER-SOURCE and an optional FOLDER-NAME."
@@ -122,32 +125,34 @@ The `'%s`' will be replaced respectively by name, the author, the generated date
   "Generate a formatted now date."
   (format-time-string "%Y-%m-%d %a %H:%M"))
 
-(defun org2jekyll/default-headers-template (blog-author post-date post-title post-description post-categories)
+(defun org2jekyll/default-headers-template (blog-layout blog-author post-date post-title post-description post-categories)
   "Compute default headers.
+BLOG-LAYOUT is the layout of the post.
 BLOG-AUTHOR is the author.
 POST-DATE is the date of the post.
 POST-TITLE is the title.
 POST-DESCRIPTION is the description.
 POST-CATEGORIES is the categories."
-  (format org2jekyll/jekyll-org-post-template blog-author post-date (org2jekyll/--yaml-escape post-title) post-description post-categories))
+  (format org2jekyll/jekyll-org-post-template blog-layout blog-author post-date (org2jekyll/--yaml-escape post-title) post-description post-categories))
 
 ;;;###autoload
 (defun org2jekyll/create-draft! ()
   "Create a new Jekyll blog post with TITLE."
   (interactive)
   "The `'%s`' will be replaced respectively by the blog entry name, the author, the generated date, the title, the description and the categories."
-  (let ((post-author      org2jekyll/blog-author)
-        (post-date        (org2jekyll/now!))
-        (post-title       (read-string "Post Title: "))
-        (post-description (read-string "Post Description: "))
-        (post-categories  (read-string "Post Categories (comma separated entries): ")))
+  (let ((author      org2jekyll/blog-author)
+        (date        (org2jekyll/now!))
+        (layout      (read-string "Layout (post, default, ...): "))
+        (title       (read-string "Title: "))
+        (description (read-string "Description: "))
+        (categories  (read-string "Categories (comma separated entries): ")))
     (let ((draft-file (concat (org2jekyll/input-directory org2jekyll/jekyll-drafts-dir)
-                              (org2jekyll/--make-slug post-title)
+                              (org2jekyll/--make-slug title)
                               org2jekyll/jekyll-post-ext)))
       (if (file-exists-p draft-file)
           (find-file draft-file)
         (progn (find-file draft-file)
-               (insert (org2jekyll/default-headers-template post-author post-date post-title post-description post-categories))
+               (insert (org2jekyll/default-headers-template layout author date title description categories))
                (insert "* "))))))
 
 ;;;###autoload
