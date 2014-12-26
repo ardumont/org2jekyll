@@ -207,3 +207,18 @@ excerpt: some-fake-description with spaces and all
   (let ((org2jekyll/jekyll-directory "out-directory"))
     (should (equal "out-directory/there" (org2jekyll/output-directory "there")))
     (should (equal "out-directory/" (org2jekyll/output-directory)))))
+
+(ert-deftest test-org2jekyll/read-metadata-and-execute! ()
+  (should (equal "org2jekyll - Post 'some-org-file' published!"
+                 (mocklet (((org2jekyll/article-p! "org-file") => t)
+                           ((file-name-nondirectory "org-file") => "some-org-file")
+                           ((org2jekyll/read-metadata! "org-file") => '(("layout" . "post"))))
+                   (org2jekyll/read-metadata-and-execute! (lambda (org-metadata org-file cur-buffer) 2) "org-file" "cur-buffer"))))
+  (should (equal "org2jekyll - 'some-org-file' is not an article, publication skipped!"
+                 (mocklet (((org2jekyll/article-p! "org-file") => nil)
+                           ((file-name-nondirectory "org-file") => "some-org-file"))
+                   (org2jekyll/read-metadata-and-execute! (lambda (org-metadata org-file cur-buffer) 2) "org-file" "cur-buffer")))))
+
+(ert-deftest test-org2jekyll/post-p! ()
+  (should (org2jekyll/post-p! "post"))
+  (should-not (org2jekyll/post-p! "default")))

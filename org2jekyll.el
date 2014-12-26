@@ -4,8 +4,8 @@
 
 ;; Author: Antoine R. Dumont <eniotna.t AT gmail.com>
 ;; Maintainer: Antoine R. Dumont <eniotna.t AT gmail.com>
-;; Package-Requires: ((dash "2.10.0") (s "1.9.0"))
 ;; Version: 0.1.0
+;; Package-Requires: ((dash "2.10.0") (s "1.9.0") (deferred "0.3.2"))
 ;; Keywords: org-mode jekyll blog publish
 ;; URL: https://github.com/ardumont/org2jekyll
 
@@ -49,6 +49,7 @@
 
 (require 'dash)
 (require 's)
+(require 'deferred)
 
 (defgroup org2jekyll nil " Org2jekyll customisation group."
   :tag "org2jekyll"
@@ -264,7 +265,7 @@ Return DEFAULT-VALUE if not found."
     default-value))
 
 (defun org2jekyll/read-metadata! (org-file)
-  "Given an ORG-FILE, return it's org metadata.
+  "Given an ORG-FILE, return its org metadata.
 If missing values, they are replaced with dummy ones."
   (let ((org-metadata (org2jekyll/get-options-from-file! org-file '("title" "date" "categories" "description" "author" "layout"))))
     `(("layout"      . ,(-> "layout"      (org2jekyll/assoc-default org-metadata "post")))
@@ -274,6 +275,15 @@ If missing values, they are replaced with dummy ones."
       ("author"      . ,(-> "author"      (org2jekyll/assoc-default org-metadata "")))
       ("description" . ,(-> "description" (org2jekyll/assoc-default org-metadata ""))))))
 
+(defun org2jekyll/read-metadata-and-execute! (action-fn org-file &optional cur-buffer)
+  (let ((filename-non-dir (file-name-nondirectory org-file)))
+    (if (org2jekyll/article-p! org-file)
+        (let* ((org-metadata (org2jekyll/read-metadata! org-file))
+               (page-or-post (if (org2jekyll/post-p! (assoc-default "layout" org-metadata)) "Post" "Page")))
+          (funcall action-fn org-metadata org-file cur-buffer)
+          (org2jekyll/message "%s '%s' published!" page-or-post filename-non-dir))
+      (org2jekyll/message "'%s' is not an article, publication skipped!" filename-non-dir))))
+
 (defun org2jekyll/message (&rest args)
   "Log formatted ARGS."
   (apply 'message (format "org2jekyll - %s" (car args)) (cdr args)))
@@ -281,38 +291,37 @@ If missing values, they are replaced with dummy ones."
 (defun org2jekyll/publish-post! (org-file &optional cur-buffer)
   "Publish ORG-FILE as a post.
 CUR-BUFFER is not used here."
-  (let ((filename-non-dir (file-name-nondirectory org-file)))
-    (if (org2jekyll/article-p! org-file)
-        (let* ((org-metadata    (org2jekyll/read-metadata! org-file))
-               (date            (assoc-default "date" org-metadata))
-               (blog-project    (assoc-default "layout" org-metadata))
-               (jekyll-filename (org2jekyll/--copy-org-file-to-jekyll-org-file date org-file org-metadata)))
-          (org-publish-file jekyll-filename (assoc blog-project org-publish-project-alist)) ;; publish the file with the right projects
-          (delete-file jekyll-filename)
-          (org2jekyll/message "Post '%s' published!" filename-non-dir))
-      (org2jekyll/message "'%s' not an article, publication skipped!" filename-non-dir))))
+  (org2jekyll/read-metadata-and-execute!
+   (lambda (org-metadata org-file cur-buffer)
+     (let ((blog-project    (assoc-default "layout" org-metadata))
+           (jekyll-filename (org2jekyll/--copy-org-file-to-jekyll-org-file (assoc-default "date" org-metadata) org-file org-metadata)))
+       (org-publish-file jekyll-filename (assoc blog-project org-publish-project-alist)) ;; publish the file with the right projects
+       (delete-file jekyll-filename)))
+   org-file
+   cur-buffer))
 
 (defun org2jekyll/publish-page! (org-file &optional cur-buffer)
   "Publish ORG-FILE as a page.
 Use CUR-BUFFER to eventually modify content."
-  (let ((filename-non-dir (file-name-nondirectory org-file)))
-    (if (org2jekyll/article-p! org-file)
-        (let* ((org-metadata    (org2jekyll/read-metadata! org-file))
-               (date            (assoc-default "date" org-metadata))
-               (blog-project    (assoc-default "layout" org-metadata)))
-          (undo-boundary)
-          (save-excursion
-            (with-current-buffer cur-buffer
-              (goto-char (point-min))
-              (insert (org2jekyll/--to-yaml-header org-metadata))
-              (save-buffer)))
-          (org-publish-file org-file (assoc blog-project org-publish-project-alist)) ;; publish the file with the right projects
-          (undo-boundary)
-          (undo)
-          (with-current-buffer cur-buffer
-            (save-buffer))
-          (org2jekyll/message "Page '%s' published!" filename-non-dir))
-      (org2jekyll/message "'%s' is not an article, publication skipped!" filename-non-dir))))
+  (org2jekyll/read-metadata-and-execute!
+   (lambda (org-metadata org-file cur-buffer)
+     (let ((blog-project (assoc-default "layout" org-metadata)))
+       (undo-boundary)
+       (save-excursion
+         (with-current-buffer cur-buffer
+           (goto-char (point-min))
+           (insert (org2jekyll/--to-yaml-header org-metadata))
+           (save-buffer)))
+       (org-publish-file org-file (assoc blog-project org-publish-project-alist)) ;; publish the file with the right projects
+       (undo-boundary)
+       (undo)
+       (with-current-buffer cur-buffer
+         (save-buffer))))
+   org-file
+   cur-buffer))
+
+(defun org2jekyll/post-p! (layout)
+  (string= "post" layout))
 
 ;;;###autoload
 (defun org2jekyll/publish! ()
@@ -320,13 +329,16 @@ Use CUR-BUFFER to eventually modify content."
 Layout `'post`' is a jekyll post.
 Layout `'default`' is a page."
   (interactive)
-  (let* ((cur-buffer (current-buffer))
-         (orgfile (buffer-file-name cur-buffer)))
-    (if (org2jekyll/article-p! orgfile)
-        (call-interactively (if (string= "post" (org2jekyll/get-option-at-point! "layout"))
-                                'org2jekyll/publish-post!
-                              'org2jekyll/publish-page!))
-      (org2jekyll/message "This is not an article, publication skipped!"))))
+  (lexical-let* ((cur-buffer (current-buffer))
+                 (org-file (buffer-file-name cur-buffer)))
+    (deferred:$  (deferred:call
+                   (lambda ()
+                     (-> "layout"
+                       org2jekyll/get-option-at-point!
+                       org2jekyll/post-p!
+                       (if 'org2jekyll/publish-post! 'org2jekyll/publish-page!))))
+      (deferred:nextc it
+        (lambda (publish-fn) (funcall publish-fn org-file cur-buffer))))))
 
 (defvar org2jekyll-mode-map nil "Default Bindings map for org2jekyll minor mode.")
 
