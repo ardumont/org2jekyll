@@ -195,10 +195,10 @@ POST-CATEGORIES is the categories."
                   (cons option (org2jekyll/get-option-at-point! option))))
               options))))
 
-(defun org2jekyll/article-p! (orgfile)
-  "Determine if the current ORGFILE is an article or not.
+(defun org2jekyll/article-p! (org-file)
+  "Determine if the current ORG-FILE is an article or not.
 Depends on the metadata header layout."
-  (org2jekyll/get-option-from-file! orgfile "layout"))
+  (org2jekyll/get-option-from-file! org-file "layout"))
 
 (defvar org2jekyll/map-keys '(("title"       . "title")
                               ("categories"  . "categories")
