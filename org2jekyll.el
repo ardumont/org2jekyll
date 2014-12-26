@@ -278,29 +278,26 @@ If missing values, they are replaced with dummy ones."
   "Log formatted ARGS."
   (apply 'message (format "org2jekyll - %s" (car args)) (cdr args)))
 
-;;;###autoload
-(defun org2jekyll/publish-post! ()
-  "Publish a post ready for jekyll to render it."
-  (interactive)
-  (let ((orgfile (buffer-file-name (current-buffer))))
-    (if (org2jekyll/article-p! orgfile)
-        (let* ((org-metadata    (org2jekyll/read-metadata! orgfile))
+(defun org2jekyll/publish-post! (org-file &optional cur-buffer)
+  "Publish ORG-FILE as a post.
+CUR-BUFFER is not used here."
+  (let ((filename-non-dir (file-name-nondirectory org-file)))
+    (if (org2jekyll/article-p! org-file)
+        (let* ((org-metadata    (org2jekyll/read-metadata! org-file))
                (date            (assoc-default "date" org-metadata))
                (blog-project    (assoc-default "layout" org-metadata))
-               (jekyll-filename (org2jekyll/--copy-org-file-to-jekyll-org-file date orgfile org-metadata)))
+               (jekyll-filename (org2jekyll/--copy-org-file-to-jekyll-org-file date org-file org-metadata)))
           (org-publish-file jekyll-filename (assoc blog-project org-publish-project-alist)) ;; publish the file with the right projects
           (delete-file jekyll-filename)
-          (org2jekyll/message "Post '%s' published!" (file-name-nondirectory orgfile)))
-      (org2jekyll/message "This is not an article, publication skipped!"))))
+          (org2jekyll/message "Post '%s' published!" filename-non-dir))
+      (org2jekyll/message "'%s' not an article, publication skipped!" filename-non-dir))))
 
-;;;###autoload
-(defun org2jekyll/publish-page! ()
-  "Publish the current org file to an org ready page for jekyll to render it."
-  (interactive)
-  (let* ((cur-buffer (current-buffer))
-         (orgfile (buffer-file-name cur-buffer)))
-    (if (org2jekyll/article-p! orgfile)
-        (let* ((org-metadata    (org2jekyll/read-metadata! orgfile))
+(defun org2jekyll/publish-page! (org-file &optional cur-buffer)
+  "Publish ORG-FILE as a page.
+Use CUR-BUFFER to eventually modify content."
+  (let ((filename-non-dir (file-name-nondirectory org-file)))
+    (if (org2jekyll/article-p! org-file)
+        (let* ((org-metadata    (org2jekyll/read-metadata! org-file))
                (date            (assoc-default "date" org-metadata))
                (blog-project    (assoc-default "layout" org-metadata)))
           (undo-boundary)
@@ -309,13 +306,13 @@ If missing values, they are replaced with dummy ones."
               (goto-char (point-min))
               (insert (org2jekyll/--to-yaml-header org-metadata))
               (save-buffer)))
-          (org-publish-file orgfile (assoc blog-project org-publish-project-alist)) ;; publish the file with the right projects
+          (org-publish-file org-file (assoc blog-project org-publish-project-alist)) ;; publish the file with the right projects
           (undo-boundary)
           (undo)
           (with-current-buffer cur-buffer
             (save-buffer))
-          (org2jekyll/message "Page '%s' published!" (file-name-nondirectory orgfile)))
-      (org2jekyll/message "This is not an article, publication skipped!"))))
+          (org2jekyll/message "Page '%s' published!" filename-non-dir))
+      (org2jekyll/message "'%s' is not an article, publication skipped!" filename-non-dir))))
 
 ;;;###autoload
 (defun org2jekyll/publish! ()

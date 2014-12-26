@@ -5,7 +5,10 @@
 - [X] Create backlog
 - [X] Update version
 - [X] Fix default binding in org2jekyll-mode
-- [ ] Make the publish! action asynchronous.
+- [-] Make the publish! action asynchronous [1/3]
+  - [X] Close not-needed interactive command and make them function
+  - [ ] Render asynchronous the main command
+  - [ ] Ensure everything is ok
 - [ ] Add headers on an existing org file
 - [ ] Update headers when already present on file
 * DONE 0.0.9 [60%]
