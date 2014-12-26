@@ -1,10 +1,11 @@
 #+title: Backlog
 #+author: ardumont
 
-* IN-PROGRESS 0.1.0 [40%]
+* IN-PROGRESS 0.1.0 [50%]
 - [X] Create backlog
 - [X] Update version
-- [ ] Make the publish! action non blocking.
+- [X] Fix default binding in org2jekyll-mode
+- [ ] Make the publish! action asynchronous.
 - [ ] Add headers on an existing org file
 - [ ] Update headers when already present on file
 * DONE 0.0.9 [60%]
