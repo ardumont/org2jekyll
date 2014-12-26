@@ -351,6 +351,7 @@ Use CUR-BUFFER to eventually modify content."
    cur-buffer))
 
 (defun org2jekyll/post-p! (layout)
+  "Determine if the LAYOUT corresponds to a post."
   (string= "post" layout))
 
 ;;;###autoload
