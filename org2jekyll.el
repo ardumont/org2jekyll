@@ -4,8 +4,8 @@
 
 ;; Author: Antoine R. Dumont <eniotna.t AT gmail.com>
 ;; Maintainer: Antoine R. Dumont <eniotna.t AT gmail.com>
-;; Version: 0.0.9
 ;; Package-Requires: ((dash "2.10.0") (s "1.9.0"))
+;; Version: 0.1.0
 ;; Keywords: org-mode jekyll blog publish
 ;; URL: https://github.com/ardumont/org2jekyll
 

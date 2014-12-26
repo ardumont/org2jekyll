@@ -1,9 +1,9 @@
 #+title: Backlog
 #+author: ardumont
 
-* IN-PROGRESS 0.1.0 [20%]
+* IN-PROGRESS 0.1.0 [40%]
 - [X] Create backlog
-- [ ] Update version
+- [X] Update version
 - [ ] Make the publish! action non blocking.
 - [ ] Add headers on an existing org file
 - [ ] Update headers when already present on file
