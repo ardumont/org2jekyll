@@ -225,11 +225,11 @@ Publication skipped!"
                  (mocklet (((org2jekyll/article-p! "org-file") => t)
                            ((file-name-nondirectory "org-file") => "some-org-file")
                            ((org2jekyll/read-metadata! "org-file") => '(("layout" . "post"))))
-                   (org2jekyll/read-metadata-and-execute! (lambda (org-metadata org-file cur-buffer) 2) "org-file" "cur-buffer"))))
+                   (org2jekyll/read-metadata-and-execute! (lambda (org-metadata org-file) 2) "org-file"))))
   (should (equal "org2jekyll - 'some-org-file' is not an article, publication skipped!"
                  (mocklet (((org2jekyll/article-p! "org-file") => nil)
                            ((file-name-nondirectory "org-file") => "some-org-file"))
-                   (org2jekyll/read-metadata-and-execute! (lambda (org-metadata org-file cur-buffer) 2) "org-file" "cur-buffer")))))
+                   (org2jekyll/read-metadata-and-execute! (lambda (org-metadata org-file) 2) "org-file")))))
 
 (ert-deftest test-org2jekyll/post-p! ()
   (should (org2jekyll/post-p! "post"))
