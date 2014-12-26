@@ -1,9 +1,9 @@
 #+title: Backlog
 #+author: ardumont
 
-* TODO 0.1.1 [16%]
+* TODO 0.1.1 [33%]
 - [X] Create backlog
-- [ ] Update version
+- [X] Update version
 - [ ] Permit the publication of all the posts
 - [ ] Permit the publication of all the pages
 - [ ] Add headers on an existing org file
