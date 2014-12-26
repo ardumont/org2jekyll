@@ -195,10 +195,12 @@ POST-CATEGORIES is the categories."
                   (cons option (org2jekyll/get-option-at-point! option))))
               options))))
 
-(defun org2jekyll/article-p! (org-file)
-  "Determine if the current ORG-FILE is an article or not.
-Depends on the metadata header layout."
+(defun org2jekyll/layout! (org-file)
+  "Determine if the current ORG-FILE's layout.
+Depends on the metadata header #+LAYOUT."
   (org2jekyll/get-option-from-file! org-file "layout"))
+
+(defalias 'org2jekyll/article-p! 'org2jekyll/layout!)
 
 (defvar org2jekyll/map-keys '(("title"       . "title")
                               ("categories"  . "categories")
@@ -303,14 +305,15 @@ Otherwise, display the error messages about the missing mandatory values."
         ("author"      . ,(-> "author"      (org2jekyll/assoc-default org-metadata "")))
         ("description" . ,(-> "description" (org2jekyll/assoc-default org-metadata "")))))))
 
-(defun org2jekyll/read-metadata-and-execute! (action-fn org-file &optional cur-buffer)
+(defun org2jekyll/read-metadata-and-execute! (action-fn org-file)
+  "Execute ACTION-FN function after checking metadata from the ORG-FILE."
   (let ((filename-non-dir (file-name-nondirectory org-file)))
     (if (org2jekyll/article-p! org-file)
         (let ((org-metadata (org2jekyll/read-metadata! org-file)))
           (if (stringp org-metadata)
               (org2jekyll/message org-metadata)
             (let ((page-or-post (if (org2jekyll/post-p! (assoc-default "layout" org-metadata)) "Post" "Page")))
-              (funcall action-fn org-metadata org-file cur-buffer)
+              (funcall action-fn org-metadata org-file)
               (org2jekyll/message "%s '%s' published!" page-or-post filename-non-dir))))
       (org2jekyll/message "'%s' is not an article, publication skipped!" filename-non-dir))))
 
@@ -318,41 +321,39 @@ Otherwise, display the error messages about the missing mandatory values."
   "Log formatted ARGS."
   (apply 'message (format "org2jekyll - %s" (car args)) (cdr args)))
 
-(defun org2jekyll/publish-post! (org-file &optional cur-buffer)
-  "Publish ORG-FILE as a post.
-CUR-BUFFER is not used here."
+(defun org2jekyll/publish-post! (org-file)
+  "Publish ORG-FILE as a post."
   (org2jekyll/read-metadata-and-execute!
-   (lambda (org-metadata org-file cur-buffer)
+   (lambda (org-metadata org-file)
      (let ((blog-project    (assoc-default "layout" org-metadata))
            (jekyll-filename (org2jekyll/--copy-org-file-to-jekyll-org-file (assoc-default "date" org-metadata) org-file org-metadata)))
-       (org-publish-file jekyll-filename (assoc blog-project org-publish-project-alist)) ;; publish the file with the right projects
+       (org-publish-file jekyll-filename (assoc blog-project org-publish-project-alist))
        (delete-file jekyll-filename)))
-   org-file
-   cur-buffer))
+   org-file))
 
-(defun org2jekyll/publish-page! (org-file &optional cur-buffer)
-  "Publish ORG-FILE as a page.
-Use CUR-BUFFER to eventually modify content."
+(defun org2jekyll/publish-page! (org-file)
+  "Publish ORG-FILE as a page."
   (org2jekyll/read-metadata-and-execute!
-   (lambda (org-metadata org-file cur-buffer)
-     (let ((blog-project (assoc-default "layout" org-metadata)))
-       (undo-boundary)
-       (save-excursion
-         (with-current-buffer cur-buffer
-           (goto-char (point-min))
-           (insert (org2jekyll/--to-yaml-header org-metadata))
-           (save-buffer)))
-       (org-publish-file org-file (assoc blog-project org-publish-project-alist)) ;; publish the file with the right projects
-       (undo-boundary)
-       (undo)
-       (with-current-buffer cur-buffer
-         (save-buffer))))
-   org-file
-   cur-buffer))
+   (lambda (org-metadata org-file)
+     (let ((blog-project (assoc-default "layout" org-metadata))
+           (backup-file (format "%s.org2jekyll" org-file)))
+       (copy-file org-file backup-file t t t)
+       (with-temp-file org-file
+         (insert-file-contents org-file)
+         (goto-char (point-min))
+         (insert (org2jekyll/--to-yaml-header org-metadata))
+         (org-publish-file org-file (assoc blog-project org-publish-project-alist)))
+       (copy-file backup-file org-file t t t)
+       (delete-file backup-file)))
+   org-file))
 
 (defun org2jekyll/post-p! (layout)
   "Determine if the LAYOUT corresponds to a post."
   (string= "post" layout))
+
+(defun org2jekyll/page-p! (layout)
+  "Determine if the LAYOUT corresponds to a page."
+  (string= "default" layout))
 
 ;;;###autoload
 (defun org2jekyll/publish! ()
@@ -360,16 +361,15 @@ Use CUR-BUFFER to eventually modify content."
 Layout `'post`' is a jekyll post.
 Layout `'default`' is a page."
   (interactive)
-  (lexical-let* ((cur-buffer (current-buffer))
-                 (org-file (buffer-file-name cur-buffer)))
-    (deferred:$  (deferred:call
-                   (lambda ()
-                     (-> "layout"
-                       org2jekyll/get-option-at-point!
-                       org2jekyll/post-p!
-                       (if 'org2jekyll/publish-post! 'org2jekyll/publish-page!))))
+  (lexical-let ((org-file (buffer-file-name (current-buffer))))
+    (deferred:$ (deferred:call
+                  (lambda ()
+                    (-> "layout"
+                      org2jekyll/get-option-at-point!
+                      org2jekyll/post-p!
+                      (if 'org2jekyll/publish-post! 'org2jekyll/publish-page!))))
       (deferred:nextc it
-        (lambda (publish-fn) (funcall publish-fn org-file cur-buffer))))))
+        (lambda (publish-fn) (funcall publish-fn org-file))))))
 
 (defvar org2jekyll-mode-map nil "Default Bindings map for org2jekyll minor mode.")
 
@@ -377,9 +377,36 @@ Layout `'default`' is a page."
       (let ((map (make-sparse-keymap)))
         (define-key map (kbd "C-c . n") 'org2jekyll/create-draft!)
         (define-key map (kbd "C-c . p") 'org2jekyll/publish!)
+        (define-key map (kbd "C-c . P") 'org2jekyll/publish-posts!)
         (define-key map (kbd "C-c . l") 'org2jekyll/list-posts)
         (define-key map (kbd "C-c . d") 'org2jekyll/list-drafts)
         map))
+
+;;;###autoload
+(defun org2jekyll/publish-posts! ()
+  "Publish all the posts."
+  (interactive)
+  (deferred:$
+    (deferred:next
+      (lambda () (->> (assoc "post" org-publish-project-alist)
+              org-publish-get-base-files
+              (--filter (org2jekyll/post-p! (org2jekyll/article-p! it))))))
+    (deferred:nextc it
+      (lambda (posts)
+        (mapc #'org2jekyll/publish-post! posts)))))
+
+;;;###autoload
+(defun org2jekyll/publish-pages! ()
+  "Publish all the pages."
+  (interactive)
+  (deferred:$
+    (deferred:next
+      (lambda () (->> (assoc "default" org-publish-project-alist)
+              org-publish-get-base-files
+              (--filter (org2jekyll/page-p! (org2jekyll/article-p! it))))))
+    (deferred:nextc it
+      (lambda (pages)
+        (mapc #'org2jekyll/publish-page! pages)))))
 
 ;;;###autoload
 (define-minor-mode org2jekyll-mode

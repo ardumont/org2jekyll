@@ -235,6 +235,10 @@ Publication skipped!"
   (should (org2jekyll/post-p! "post"))
   (should-not (org2jekyll/post-p! "default")))
 
+(ert-deftest test-org2jekyll/page-p! ()
+  (should (org2jekyll/page-p! "default"))
+  (should-not (org2jekyll/page-p! "post")))
+
 (ert-deftest test-org2jekyll/check-metadata ()
   (should (equal "- The title is mandatory, please add '#+TITLE' at the top of your org buffer.
 - The categories is mandatory, please add '#+CATEGORIES' at the top of your org buffer.
