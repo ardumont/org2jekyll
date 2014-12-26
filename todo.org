@@ -1,15 +1,18 @@
 #+title: Backlog
 #+author: ardumont
 
-* IN-PROGRESS 0.1.0 [66%]
+* TODO 0.1.1 [%]
+- [ ] Add headers on an existing org file
+- [ ] Update headers when already present on file
+* DONE 0.1.0 [100%]
+CLOSED: [2014-12-26 Fri 16:25]
 - [X] Create backlog
 - [X] Update version
 - [X] Fix default binding in org2jekyll-mode
 - [X] Make the publish! action asynchronous [2/2]
   - [X] Close not-needed interactive command and make them function
   - [X] Render asynchronous the main org2jekyll/publish! command
-- [ ] Add headers on an existing org file
-- [ ] Update headers when already present on file
+- [X] Add checks on header and explain what's missing if problems.
 * DONE 0.0.9 [60%]
 CLOSED: [2014-12-26 Fri 09:26]
 - [X] Create backlog

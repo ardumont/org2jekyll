@@ -5,7 +5,7 @@
 ;; Author: Antoine R. Dumont <eniotna.t AT gmail.com>
 ;; Maintainer: Antoine R. Dumont <eniotna.t AT gmail.com>
 ;; Version: 0.1.0
-;; Package-Requires: ((dash "2.10.0") (s "1.9.0") (deferred "0.3.2"))
+;; Package-Requires: ((dash "2.10.0") (dash-functional "1.2.0") (s "1.9.0") (deferred "0.3.2"))
 ;; Keywords: org-mode jekyll blog publish
 ;; URL: https://github.com/ardumont/org2jekyll
 
@@ -264,24 +264,54 @@ Return DEFAULT-VALUE if not found."
       data
     default-value))
 
+(defvar org2jekyll/header-metadata! nil
+  "The needed headers for org buffer for org2jekyll to work.")
+
+(setq org2jekyll/header-metadata! '(("title" . 'mandatory)
+                                    ("date")
+                                    ("categories" . 'mandatory)
+                                    ("description" . 'mandatory)
+                                    ("author")
+                                    ("layout" . 'mandatory)))
+
+(require 'dash-functional)
+
+(defun org2jekyll/check-metadata (org-metadata)
+  "Check that the mandatory header metadata in ORG-METADATA are provided.
+Return the error messages if any or nil if everything is alright."
+  (let ((mandatory-values (funcall (-compose (lambda (l) (mapcar #'car l))
+                                             (lambda (l) (-filter #'cdr l))) org2jekyll/header-metadata!)))
+    (-when-let (error-messages (->> mandatory-values
+                                 (--map (when (null (assoc-default it org-metadata))
+                                          (format "- The %s is mandatory, please add '#+%s' at the top of your org buffer." it (upcase it))))
+                                 (s-join "\n")
+                                 s-trim))
+      (if (string= "" error-messages) nil error-messages))))
+
 (defun org2jekyll/read-metadata! (org-file)
   "Given an ORG-FILE, return its org metadata.
-If missing values, they are replaced with dummy ones."
-  (let ((org-metadata (org2jekyll/get-options-from-file! org-file '("title" "date" "categories" "description" "author" "layout"))))
-    `(("layout"      . ,(-> "layout"      (org2jekyll/assoc-default org-metadata "post")))
-      ("title"       . ,(-> "title"       (org2jekyll/assoc-default org-metadata "dummy-title-should-be-replaced")))
-      ("date"        . ,(-> "date"        (org2jekyll/assoc-default org-metadata (org2jekyll/now!)) org2jekyll/--convert-timestamp-to-yyyy-dd-mm))
-      ("categories"  . ,(-> "categories"  (org2jekyll/assoc-default org-metadata "dummy-category-should-be-replaced") org2jekyll/--categories-csv-to-yaml))
-      ("author"      . ,(-> "author"      (org2jekyll/assoc-default org-metadata "")))
-      ("description" . ,(-> "description" (org2jekyll/assoc-default org-metadata ""))))))
+If non-mandatory values are missing, they are replaced with dummy ones.
+Otherwise, display the error messages about the missing mandatory values."
+  (let* ((org-metadata-list (mapcar #'car org2jekyll/header-metadata!))
+         (org-metadata (org2jekyll/get-options-from-file! org-file org-metadata-list)))
+    (-if-let (error-messages (org2jekyll/check-metadata org-metadata))
+        (format "This org-mode file is missing mandatory header(s):\n%s\nPublication skipped!" error-messages)
+      `(("layout"      . ,(-> "layout"      (org2jekyll/assoc-default org-metadata "post")))
+        ("title"       . ,(-> "title"       (org2jekyll/assoc-default org-metadata "dummy-title-should-be-replaced")))
+        ("date"        . ,(-> "date"        (org2jekyll/assoc-default org-metadata (org2jekyll/now!)) org2jekyll/--convert-timestamp-to-yyyy-dd-mm))
+        ("categories"  . ,(-> "categories"  (org2jekyll/assoc-default org-metadata "dummy-category-should-be-replaced") org2jekyll/--categories-csv-to-yaml))
+        ("author"      . ,(-> "author"      (org2jekyll/assoc-default org-metadata "")))
+        ("description" . ,(-> "description" (org2jekyll/assoc-default org-metadata "")))))))
 
 (defun org2jekyll/read-metadata-and-execute! (action-fn org-file &optional cur-buffer)
   (let ((filename-non-dir (file-name-nondirectory org-file)))
     (if (org2jekyll/article-p! org-file)
-        (let* ((org-metadata (org2jekyll/read-metadata! org-file))
-               (page-or-post (if (org2jekyll/post-p! (assoc-default "layout" org-metadata)) "Post" "Page")))
-          (funcall action-fn org-metadata org-file cur-buffer)
-          (org2jekyll/message "%s '%s' published!" page-or-post filename-non-dir))
+        (let ((org-metadata (org2jekyll/read-metadata! org-file)))
+          (if (stringp org-metadata)
+              (org2jekyll/message org-metadata)
+            (let ((page-or-post (if (org2jekyll/post-p! (assoc-default "layout" org-metadata)) "Post" "Page")))
+              (funcall action-fn org-metadata org-file cur-buffer)
+              (org2jekyll/message "%s '%s' published!" page-or-post filename-non-dir))))
       (org2jekyll/message "'%s' is not an article, publication skipped!" filename-non-dir))))
 
 (defun org2jekyll/message (&rest args)
