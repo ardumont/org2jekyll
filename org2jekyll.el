@@ -36,7 +36,13 @@
 ;;
 ;; M-x org2jekyll/create-draft! create a draft with the necessary metadata
 ;;
-;; M-x org2jekyll/publish! publish the post (or page) to the jekyll folder
+;; M-x org2jekyll/publish! publish the current post (or page) to the jekyll folder
+;;
+;; M-x org2jekyll/publish-pages! to publish all pages
+;;
+;; M-x org2jekyll/publish-posts! to publish all post pages
+;;
+;; M-x org2jekyll-mode to activate org2jekyll minor mode
 ;;
 ;; You can customize using M-x customize-group RET org2jekyll RET
 ;;

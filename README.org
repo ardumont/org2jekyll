@@ -17,6 +17,8 @@ Blogging with org-mode and jekyll without alien yaml headers.
      - [[#post][Post]]
      - [[#page][Page]]
      - [[#whats-going-on][What's going on?]]
+     - [[#publish-all-posts][Publish all posts]]
+     - [[#publish-all-pages][Publish all pages]]
  - [[#minor-mode][Minor mode]]
 
 * Description
@@ -196,6 +198,13 @@ This will be published as page article.
 This will generate another org-mode with the necessary yaml and publish to the jekyll directory (according to your org-publish setup).
 Then your jekyll will be in charge of rendering accordingly.
 
+** Publish all posts
+
+*M-x org2jekyll/publish-posts!*
+
+** Publish all pages
+
+*M-x org2jekyll/publish-pages!*
 * Minor mode
 
 org2jekyll proposes you a minor with the following default binding:
@@ -204,6 +213,7 @@ org2jekyll proposes you a minor with the following default binding:
       (let ((map (make-sparse-keymap)))
         (define-key map (kbd "C-c . n") 'org2jekyll/create-draft!)
         (define-key map (kbd "C-c . p") 'org2jekyll/publish-post!)
+        (define-key map (kbd "C-c . P") 'org2jekyll/publish-posts!)
         (define-key map (kbd "C-c . l") 'org2jekyll/list-posts)
         (define-key map (kbd "C-c . d") 'org2jekyll/list-drafts)
         map))

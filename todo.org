@@ -1,13 +1,15 @@
 #+title: Backlog
 #+author: ardumont
 
-* TODO 0.1.1 [66%]
+* 0.1.2 [%]
+- [ ] Add headers on an existing org file
+- [ ] Update headers when already present on file
+* TODO 0.1.1 [100%]
 - [X] Create backlog
 - [X] Update version
 - [X] Permit the publication of all the posts + binding
 - [X] Permit the publication of all the pages
-- [ ] Add headers on an existing org file
-- [ ] Update headers when already present on file
+- [X] Update docs
 * DONE 0.1.0 [100%]
 CLOSED: [2014-12-26 Fri 16:25]
 - [X] Create backlog
