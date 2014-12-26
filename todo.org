@@ -1,12 +1,14 @@
 #+title: Backlog
 #+author: ardumont
 
-* IN-PROGRESS 0.0.9 [60%]
+* TODO 0.1.0 [%]
+- [ ] Add headers on an existing org file
+- [ ] Update headers when already present on file
+* DONE 0.0.9 [60%]
+CLOSED: [2014-12-26 Fri 09:26]
 - [X] Create backlog
 - [X] Update version
 - [X] Ask for desired layout when creating a draft
-- [ ] Add headers on an existing org file
-- [ ] Update headers when already present on file
 * DONE 0.0.8 [100%]
 CLOSED: [2014-12-24 Wed 18:24]
 - [X] Create backlog
