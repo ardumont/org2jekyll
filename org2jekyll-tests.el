@@ -185,14 +185,14 @@ excerpt: some-fake-description with spaces and all
 #+STARTUP: hidestars
 #+OPTIONS: H:2 num:nil tags:nil toc:nil timestamps:t
 #+LAYOUT: post
-#+AUTHOR: blog-author
-#+DATE: post-date
-#+TITLE: post title with spaces
-#+DESCRIPTION: post some description
-#+CATEGORIES: post-category, other-category
+#+AUTHOR: some-layout
+#+DATE: blog-author
+#+TITLE: post-date
+#+DESCRIPTION: post title with spaces
+#+CATEGORIES: post some description
 
 "
-                 (org2jekyll/default-headers-template "blog-author" "post-date" "post title with spaces" "post some description" "post-category, other-category"))))
+                 (org2jekyll/default-headers-template "some-layout" "blog-author" "post-date" "post title with spaces" "post some description" "post-category, other-category"))))
 
 (ert-deftest test-org2jekyll/--optional-folder ()
   (should (equal "hello/there" (org2jekyll/--optional-folder "hello" "there")))
