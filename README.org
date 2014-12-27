@@ -5,7 +5,7 @@
 
 Blogging with org-mode and jekyll without alien yaml headers.
 
-* Table of Contents                                                     :TOC:
+* Table of Contents                                                     :TOC_4:
  - [[#description][Description]]
      - [[#rationale][Rationale]]
      - [[#pre-requisite][Pre-requisite]]
@@ -15,8 +15,15 @@ Blogging with org-mode and jekyll without alien yaml headers.
      - [[#a-working-example][A working example]]
  - [[#use][Use]]
      - [[#post][Post]]
+         - [[#headers][Headers]]
+         - [[#publish][Publish]]
+         - [[#how][How]]
      - [[#page][Page]]
-     - [[#whats-going-on][What's going on?]]
+         - [[#headers][Headers]]
+         - [[#publish][Publish]]
+         - [[#how][How]]
+     - [[#publish-all-posts][Publish all posts]]
+     - [[#publish-all-pages][Publish all pages]]
  - [[#minor-mode][Minor mode]]
 
 * Description
@@ -45,8 +52,9 @@ Enters org2jekyll.
 ** Pre-requisite
 
 You have:
-- your [[http://orgmode.org/worg/org-tutorials/org-publish-html-tutorial.html][*org-publish*]] setup ready.
+- your [[http://orgmode.org/worg/org-tutorials/org-publish-html-tutorial.html][*org-publish*]] setup ready ([[https://github.com/ardumont/blog-pack/blob/master/blog-pack.el#L13-L71][mine for example]])
 - a running [[http://github.com/mojombo/jekyll][jekyll]] installation
+
 * Install/Setup
 
 ** Install
@@ -71,11 +79,11 @@ Here is an example of my configuration for my [[http://ardumont.github.io/][blog
 (require 'org)
 (require 'org2jekyll)
 
-(custom-set-variables '(org2jekyll/blog-author       "ardumont")
-                      '(org2jekyll/source-directory  (expand-file-name "~/org/"))
-                      '(org2jekyll/jekyll-directory  (expand-file-name "~/public_html/"))
-                      '(org2jekyll/jekyll-drafts-dir "_drafts/")
-                      '(org2jekyll/jekyll-posts-dir  "_posts/")
+(custom-set-variables '(org2jekyll/blog-author "ardumont")
+                      '(org2jekyll/source-directory (expand-file-name "~/org/"))
+                      '(org2jekyll/jekyll-directory (expand-file-name "~/public_html/"))
+                      '(org2jekyll/jekyll-drafts-dir "")
+                      '(org2jekyll/jekyll-posts-dir "_posts/")
                       '(org-publish-project-alist
                         `(("default"
                            :base-directory ,(org2jekyll/input-directory)
@@ -85,12 +93,12 @@ Here is an example of my configuration for my [[http://ardumont.github.io/][blog
                            :headline-levels 4
                            :section-numbers nil
                            :with-toc nil
+                           :html-head "<link rel=\"stylesheet\" href=\"./css/style.css\" type=\"text/css\"/>"
                            :html-preamble t
                            :recursive t
                            :make-index t
                            :html-extension "html"
                            :body-only t)
-
                           ("post"
                            :base-directory ,(org2jekyll/input-directory)
                            :base-extension "org"
@@ -99,35 +107,35 @@ Here is an example of my configuration for my [[http://ardumont.github.io/][blog
                            :headline-levels 4
                            :section-numbers nil
                            :with-toc nil
+                           :html-head "<link rel=\"stylesheet\" href=\"./css/style.css\" type=\"text/css\"/>"
                            :html-preamble t
                            :recursive t
                            :make-index t
                            :html-extension "html"
                            :body-only t)
-
                           ("images"
                            :base-directory ,(org2jekyll/input-directory "img")
                            :base-extension "jpg\\|gif\\|png"
                            :publishing-directory ,(org2jekyll/output-directory "img")
-                           :publishing-function org-publish-attachment)
-
+                           :publishing-function org-publish-attachment
+                           :recursive t)
                           ("js"
                            :base-directory ,(org2jekyll/input-directory "js")
                            :base-extension "js"
                            :publishing-directory ,(org2jekyll/output-directory "js")
-                           :publishing-function org-publish-attachment)
-
+                           :publishing-function org-publish-attachment
+                           :recursive t)
                           ("other"
                            :base-directory ,(org2jekyll/input-directory "css")
                            :base-extension "css\\|el"
                            :publishing-directory ,(org2jekyll/output-directory "css")
-                           :publishing-function org-publish-attachment)
-
+                           :publishing-function org-publish-attachment
+                           :recursive t)
                           ("website" :components ("default" "post" "images" "js" "css")))))
 #+end_src
+source: https://github.com/ardumont/blog-pack/blob/master/blog-pack.el#L13-L71
 
-*default* and *post* are important entries which represent the possible jekyll layout you use in your jekyll installation.
-Name it as you want, just refer to it in your #+LAYOUT entry after that.
+*default* and *post* are important entries which represent the possible jekyll layouts you use in your jekyll installation.
 
 ** A working example
 
@@ -141,11 +149,13 @@ Name it as you want, just refer to it in your #+LAYOUT entry after that.
 
 * Use
 
-Add some org headers to your org files.
+For a post (layout 'post') or page (layout 'default'), add org headers (layout, title, author, date, description, categories) to your org files.
 
 ** Post
 
-Add some org headers in your org-mode file for a blog post:
+*** Headers
+
+For a post (layout 'post'):
 
 #+begin_src org
 #+STARTUP: showall
@@ -156,22 +166,30 @@ Add some org headers in your org-mode file for a blog post:
 #+DATE: 2014-12-19 Fri 23:49
 #+TITLE: hello
 #+DESCRIPTION: some description
-#+CATEGORIES: some-category
+#+CATEGORIES: category0, category1
 #+end_src
 
+*Note*
 To easily do that, /M-x org2jekyll/create-draft!/, this will ask you for everything needed and create a file with such metadata.
 
-Now create your article and publish it when ready /M-x org2jekyll/publish!/.
+*** Publish
+
+Now write your article in org-mode.
+
+When ready, /M-x org2jekyll/publish!/ to publish it.
 
 This will be published as post article.
 
-*Note* the *#+LAYOUT* entry refers to the *post* entry in *org-publish-project-alist*.
+*** How
+
+- The *#+LAYOUT* entry refers to the *post* entry in *org-publish-project-alist*.
+- This will create another temporary org-mode file based on the current one with the right naming convention, transform the org headers into yaml, publish to the jekyll directory (according to your org-publish setup) and delete the temporary file.
 
 ** Page
 
-A simple page.
+*** Headers
 
-Add some org headers in your org-mode file for a blog post:
+For a page (layout 'default').
 
 #+begin_src org
 #+STARTUP: showall
@@ -185,16 +203,32 @@ Add some org headers in your org-mode file for a blog post:
 #+CATEGORIES: some-category
 #+end_src
 
+*Note*
+To easily do that, /M-x org2jekyll/create-draft!/, this will ask you for everything needed and create a file with such metadata.
+
 Now create your article and publish it when ready /M-x org2jekyll/publish!/.
 
-This will be published as page article.
+*** Publish
 
-*Note* the *#+LAYOUT* entry refers to the *default* entry in *org-publish-project-alist*.
+Write your page.
+When ready, /M-x org2jekyll/publish!/ to publish it.
 
-** What's going on?
+*** How
 
-This will generate another org-mode with the necessary yaml and publish to the jekyll directory (according to your org-publish setup).
-Then your jekyll will be in charge of rendering accordingly.
+- The *#+LAYOUT* entry refers to the *default* entry in *org-publish-project-alist*.
+- This will update the current org-mode with the necessary yaml and publish to the jekyll directory (according to your org-publish setup), then revert back to your normal org-mode file.
+
+** Publish all posts
+
+/M-x org2jekyll/publish-posts!/
+
+Depending on your org-publish configuration and org2jekll, this will compulse the list of org-mode posts (*#+LAYOUT* with 'post' value) and publish them.
+
+** Publish all pages
+
+/M-x org2jekyll/publish-pages!/
+
+Depending on your org-publish configuration and org2jekll, this will compulse the list of org-mode pages (*#+LAYOUT* with 'default value) and publish them.
 
 * Minor mode
 
@@ -204,6 +238,7 @@ org2jekyll proposes you a minor with the following default binding:
       (let ((map (make-sparse-keymap)))
         (define-key map (kbd "C-c . n") 'org2jekyll/create-draft!)
         (define-key map (kbd "C-c . p") 'org2jekyll/publish-post!)
+        (define-key map (kbd "C-c . P") 'org2jekyll/publish-posts!)
         (define-key map (kbd "C-c . l") 'org2jekyll/list-posts)
         (define-key map (kbd "C-c . d") 'org2jekyll/list-drafts)
         map))
