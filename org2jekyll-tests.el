@@ -196,12 +196,12 @@ Publication skipped!"
   (should (equal "#+STARTUP: showall
 #+STARTUP: hidestars
 #+OPTIONS: H:2 num:nil tags:nil toc:nil timestamps:t
-#+LAYOUT: post
-#+AUTHOR: some-layout
-#+DATE: blog-author
-#+TITLE: post-date
-#+DESCRIPTION: post title with spaces
-#+CATEGORIES: post some description
+#+LAYOUT: some-layout
+#+AUTHOR: blog-author
+#+DATE: post-date
+#+TITLE: post title with spaces
+#+DESCRIPTION: post some description
+#+CATEGORIES: post-category, other-category
 
 "
                  (org2jekyll/default-headers-template "some-layout" "blog-author" "post-date" "post title with spaces" "post some description" "post-category, other-category"))))
