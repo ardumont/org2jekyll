@@ -4,7 +4,8 @@
 * TODO 0.1.x [%]
 - [ ] Add headers on an existing org file
 - [ ] Update headers when already present on file
-* IN-PROGRESS 0.1.2 [100%]
+* DONE 0.1.2 [100%]
+CLOSED: [2015-01-24 Sat 21:24]
 - [X] Fix error on draft header creation - https://github.com/ardumont/org2jekyll/pull/12
 - [X] Update version
 * DONE 0.1.1 [100%]
