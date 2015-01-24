@@ -1,9 +1,13 @@
 #+title: Backlog
 #+author: ardumont
 
-* 0.1.2 [%]
+* TODO 0.1.x [%]
 - [ ] Add headers on an existing org file
 - [ ] Update headers when already present on file
+* DONE 0.1.2 [100%]
+CLOSED: [2015-01-24 Sat 21:24]
+- [X] Fix error on draft header creation - https://github.com/ardumont/org2jekyll/pull/12
+- [X] Update version
 * DONE 0.1.1 [100%]
 CLOSED: [2014-12-27 Sat 00:32]
 - [X] Create backlog
@@ -20,7 +24,7 @@ CLOSED: [2014-12-26 Fri 16:25]
   - [X] Close not-needed interactive command and make them function
   - [X] Render asynchronous the main org2jekyll/publish! command
 - [X] Add checks on header and explain what's missing if problems.
-* DONE 0.0.9 [60%]
+* DONE 0.0.9 [100%]
 CLOSED: [2014-12-26 Fri 09:26]
 - [X] Create backlog
 - [X] Update version
