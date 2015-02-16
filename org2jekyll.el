@@ -68,11 +68,15 @@
   :require 'org2jekyll
   :group 'org2jekyll)
 
+(defalias 'org2jekyll/blog-author 'org2jekyll-blog-author) ;; for compatibility
+
 (defcustom org2jekyll-source-directory nil
   "Path to the source directory."
   :type 'string
   :require 'org2jekyll
   :group 'org2jekyll)
+
+(defalias 'org2jekyll/source-directory 'org2jekyll-source-directory)
 
 (defcustom org2jekyll-jekyll-directory nil
   "Path to Jekyll blog."
@@ -80,17 +84,23 @@
   :require 'org2jekyll
   :group 'org2jekyll)
 
+(defalias 'org2jekyll/jekyll-directory 'org2jekyll-jekyll-directory)
+
 (defcustom org2jekyll-jekyll-drafts-dir nil
   "Relative path to drafts directory."
   :type 'string
   :require 'org2jekyll
   :group 'org2jekyll)
 
+(defalias 'org2jekyll/jekyll-drafts-dir 'org2jekyll-jekyll-drafts-dir)
+
 (defcustom org2jekyll-jekyll-posts-dir nil
   "Relative path to posts directory."
   :type 'string
   :require 'org2jekyll
   :group 'org2jekyll)
+
+(defalias 'org2jekyll/jekyll-posts-dir 'org2jekyll-jekyll-posts-dir)
 
 (defvar org2jekyll-jekyll-post-ext ".org"
   "File extension of Jekyll posts.")
@@ -162,17 +172,23 @@ POST-CATEGORIES is the categories."
                (insert (org2jekyll-default-headers-template layout author date title description categories))
                (insert "* "))))))
 
+(defalias 'org2jekyll/create-draft! 'org2jekyll-create-draft!)
+
 ;;;###autoload
 (defun org2jekyll-list-posts ()
   "Lists the posts folder."
   (interactive)
   (find-file (org2jekyll-output-directory org2jekyll-jekyll-posts-dir)))
 
+(defalias 'org2jekyll/list-posts 'org2jekyll-list-posts!)
+
 ;;;###autoload
 (defun org2jekyll-list-drafts ()
   "Lists the drafts folder."
   (interactive)
   (find-file (org2jekyll-output-directory org2jekyll-jekyll-drafts-dir)))
+
+(defalias 'org2jekyll/list-drafts 'org2jekyll-list-drafts)
 
 (defun org2jekyll-get-option-at-point! (opt)
   "Gets the header value of the option OPT from a buffer."
@@ -401,6 +417,8 @@ Layout `'default`' is a page."
       (lambda (posts)
         (mapc #'org2jekyll-publish-post! posts)))))
 
+(defalias 'org2jekyll/publish-posts! 'org2jekyll-publish-posts!)
+
 ;;;###autoload
 (defun org2jekyll-publish-pages! ()
   "Publish all the pages."
@@ -413,6 +431,8 @@ Layout `'default`' is a page."
     (deferred:nextc it
       (lambda (pages)
         (mapc #'org2jekyll-publish-page! pages)))))
+
+(defalias 'org2jekyll/publish-pages! 'org2jekyll-publish-pages!)
 
 ;;;###autoload
 (define-minor-mode org2jekyll-mode
