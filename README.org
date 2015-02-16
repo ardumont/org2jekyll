@@ -7,7 +7,7 @@ Blogging with org-mode and jekyll without alien yaml headers.
 
 * Table of Contents                                                     :TOC_4:
  - [[#upgrade][Upgrade]]
-     - [[#012---013][0.1.2 -> 0.1.3]]
+     - [[#012---014][0.1.2 -> 0.1.4]]
  - [[#description][Description]]
      - [[#rationale][Rationale]]
      - [[#pre-requisite][Pre-requisite]]
@@ -30,7 +30,7 @@ Blogging with org-mode and jekyll without alien yaml headers.
 
 * Upgrade
 
-** 0.1.2 -> 0.1.3
+** 0.1.2 -> 0.1.4
 
 It occured to me that I did not respect the [elisp coding convention](https://www.gnu.org/software/emacs/manual/html_node/elisp/Coding-Conventions.html).
 So between the 0.1.2 and 0.1.3 version, I changed the names and variables. Sorry about that.
