@@ -180,13 +180,13 @@ For a post (layout 'post'):
 #+end_src
 
 *Note*
-To easily do that, /M-x org2jekyll-create-draft!/, this will ask you for everything needed and create a file with such metadata.
+To easily do that, /M-x org2jekyll-create-draft/, this will ask you for everything needed and create a file with such metadata.
 
 *** Publish
 
 Now write your article in org-mode.
 
-When ready, /M-x org2jekyll-publish!/ to publish it.
+When ready, /M-x org2jekyll-publish/ to publish it.
 
 This will be published as post article.
 
@@ -214,14 +214,14 @@ For a page (layout 'default').
 #+end_src
 
 *Note*
-To easily do that, /M-x org2jekyll-create-draft!/, this will ask you for everything needed and create a file with such metadata.
+To easily do that, /M-x org2jekyll-create-draft/, this will ask you for everything needed and create a file with such metadata.
 
-Now create your article and publish it when ready /M-x org2jekyll-publish!/.
+Now create your article and publish it when ready /M-x org2jekyll-publish/.
 
 *** Publish
 
 Write your page.
-When ready, /M-x org2jekyll-publish!/ to publish it.
+When ready, /M-x org2jekyll-publish/ to publish it.
 
 *** How
 
@@ -230,13 +230,13 @@ When ready, /M-x org2jekyll-publish!/ to publish it.
 
 ** Publish all posts
 
-/M-x org2jekyll-publish-posts!/
+/M-x org2jekyll-publish-posts/
 
 Depending on your org-publish configuration and org2jekll, this will compulse the list of org-mode posts (*#+LAYOUT* with 'post' value) and publish them.
 
 ** Publish all pages
 
-/M-x org2jekyll-publish-pages!/
+/M-x org2jekyll-publish-pages/
 
 Depending on your org-publish configuration and org2jekll, this will compulse the list of org-mode pages (*#+LAYOUT* with 'default value) and publish them.
 
@@ -246,9 +246,9 @@ org2jekyll proposes you a minor with the following default binding:
 #+begin_src emacs-lisp
 (setq org2jekyll-mode-map
       (let ((map (make-sparse-keymap)))
-        (define-key map (kbd "C-c . n") 'org2jekyll-create-draft!)
-        (define-key map (kbd "C-c . p") 'org2jekyll-publish-post!)
-        (define-key map (kbd "C-c . P") 'org2jekyll-publish-posts!)
+        (define-key map (kbd "C-c . n") 'org2jekyll-create-draft)
+        (define-key map (kbd "C-c . p") 'org2jekyll-publish-post)
+        (define-key map (kbd "C-c . P") 'org2jekyll-publish-posts)
         (define-key map (kbd "C-c . l") 'org2jekyll-list-posts)
         (define-key map (kbd "C-c . d") 'org2jekyll-list-drafts)
         map))
