@@ -244,22 +244,22 @@ Depends on the metadata header #+LAYOUT."
 (defun org2jekyll--to-yaml-header (org-metadata)
   "Given a list of ORG-METADATA, compute the yaml header string."
   (--> org-metadata
-    org2jekyll--org-to-yaml-metadata
-    (--map (format "%s: %s" (car it) (cdr it)) it)
-    (cons "---" it)
-    (cons "#+BEGIN_HTML" it)
-    (-snoc it "---")
-    (-snoc it "#+END_HTML\n")
-    (s-join "\n" it)))
+       org2jekyll--org-to-yaml-metadata
+       (--map (format "%s: %s" (car it) (cdr it)) it)
+       (cons "---" it)
+       (cons "#+BEGIN_HTML" it)
+       (-snoc it "---")
+       (-snoc it "#+END_HTML\n")
+       (s-join "\n" it)))
 
 (defun org2jekyll--categories-csv-to-yaml (categories-csv)
   "Transform a CATEGORIES-CSV entries into a yaml entries."
   (->> categories-csv
-    (concat ",")
-    (s-replace ", " ",")
-    (s-replace "," "\n- ")
-    s-trim
-    (concat "\n")))
+       (concat ",")
+       (s-replace ", " ",")
+       (s-replace "," "\n- ")
+       s-trim
+       (concat "\n")))
 
 (defun org2jekyll--compute-ready-jekyll-file-name (date org-file)
   "Given a DATE and an ORG-FILE, compute a ready jekyll file name.
@@ -267,9 +267,9 @@ If the current path contains the `'org2jekyll-jekyll-drafts-dir`', removes it."
   (let ((temp-org-jekyll-filename  (format "%s-%s" date (file-name-nondirectory org-file)))
         (temp-org-jekyll-directory (file-name-directory org-file)))
     (->> temp-org-jekyll-filename
-      (format "%s%s" temp-org-jekyll-directory)
-      (replace-regexp-in-string (format "%s" org2jekyll-jekyll-drafts-dir) "")
-      (replace-regexp-in-string "//" "/"))))
+         (format "%s%s" temp-org-jekyll-directory)
+         (replace-regexp-in-string (format "%s" org2jekyll-jekyll-drafts-dir) "")
+         (replace-regexp-in-string "//" "/"))))
 
 (defun org2jekyll--copy-org-file-to-jekyll-org-file (date org-file yaml-headers)
   "Given DATE, ORG-FILE and YAML-HEADERS, copy content as org-jekyll ready file.
@@ -306,10 +306,10 @@ Return the error messages if any or nil if everything is alright."
   (let ((mandatory-values (funcall (-compose (lambda (l) (mapcar #'car l))
                                              (lambda (l) (-filter #'cdr l))) org2jekyll-header-metadata!)))
     (-when-let (error-messages (->> mandatory-values
-                                 (--map (when (null (assoc-default it org-metadata))
-                                          (format "- The %s is mandatory, please add '#+%s' at the top of your org buffer." it (upcase it))))
-                                 (s-join "\n")
-                                 s-trim))
+                                    (--map (when (null (assoc-default it org-metadata))
+                                             (format "- The %s is mandatory, please add '#+%s' at the top of your org buffer." it (upcase it))))
+                                    (s-join "\n")
+                                    s-trim))
       (if (string= "" error-messages) nil error-messages))))
 
 (defun org2jekyll-read-metadata! (org-file)
@@ -387,11 +387,12 @@ Layout `'default`' is a page."
     (deferred:$ (deferred:call
                   (lambda ()
                     (-> "layout"
-                      org2jekyll-get-option-at-point!
-                      org2jekyll-post-p!
-                      (if 'org2jekyll-publish-post! 'org2jekyll-publish-page!))))
+                        org2jekyll-get-option-at-point!
+                        org2jekyll-post-p!
+                        (if 'org2jekyll-publish-post! 'org2jekyll-publish-page!))))
       (deferred:nextc it
         (lambda (publish-fn) (funcall publish-fn org-file))))))
+(defalias 'org2jekyll/publish! 'org2jekyll-publish!)
 
 (defvar org2jekyll-mode-map nil "Default Bindings map for org2jekyll minor mode.")
 
@@ -411,8 +412,8 @@ Layout `'default`' is a page."
   (deferred:$
     (deferred:next
       (lambda () (->> (assoc "post" org-publish-project-alist)
-              org-publish-get-base-files
-              (--filter (org2jekyll-post-p! (org2jekyll-article-p! it))))))
+                 org-publish-get-base-files
+                 (--filter (org2jekyll-post-p! (org2jekyll-article-p! it))))))
     (deferred:nextc it
       (lambda (posts)
         (mapc #'org2jekyll-publish-post! posts)))))
