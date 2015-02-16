@@ -4,54 +4,54 @@
 (require 'cl)
 (require 'org2jekyll)
 
-(ert-deftest test-org2jekyll-get-option-from-file! ()
+(ert-deftest test-org2jekyll-get-option-from-file ()
   (let ((temp-filename "/tmp/test-publish-article-p"))
     (with-temp-file temp-filename  (insert "#+BLOG: tony's blog\n#+DATE: some-date"))
-    (should (equal "tony's blog" (org2jekyll-get-option-from-file! temp-filename "BLOG")))
-    (should (equal "some-date" (org2jekyll-get-option-from-file! temp-filename "DATE")))
-    (should-not (org2jekyll-get-option-from-file! temp-filename "some-other-non-existing-option"))))
+    (should (equal "tony's blog" (org2jekyll-get-option-from-file temp-filename "BLOG")))
+    (should (equal "some-date" (org2jekyll-get-option-from-file temp-filename "DATE")))
+    (should-not (org2jekyll-get-option-from-file temp-filename "some-other-non-existing-option"))))
 
-(ert-deftest test-org2jekyll-get-option-from-file! ()
+(ert-deftest test-org2jekyll-get-option-from-file ()
   (let ((temp-filename "/tmp/test-publish-article-p"))
     (with-temp-file temp-filename  (insert "#+LAYOUT: post\n#+DATE: some-date"))
     (should (equal '(("layout" . "post")
                      ("date" . "some-date"))
-                   (org2jekyll-get-options-from-file! temp-filename '("layout" "date"))))
+                   (org2jekyll-get-options-from-file temp-filename '("layout" "date"))))
     (should (equal '(("date" . "some-date"))
-                   (org2jekyll-get-options-from-file! temp-filename '("date"))))
+                   (org2jekyll-get-options-from-file temp-filename '("date"))))
     (should (equal '(("unknown"))
-                   (org2jekyll-get-options-from-file! temp-filename '("unknown"))))
-    (should-not (org2jekyll-get-options-from-file! temp-filename '()))))
+                   (org2jekyll-get-options-from-file temp-filename '("unknown"))))
+    (should-not (org2jekyll-get-options-from-file temp-filename '()))))
 
-(ert-deftest test-org2jekyll-get-option-at-point! ()
+(ert-deftest test-org2jekyll-get-option-at-point ()
   (should (equal "hello"
                  (with-temp-buffer
                    (org-mode)
                    (insert "#+HEADING: hello
 #+DATE: some-date")
                    (goto-char (point-min))
-                   (org2jekyll-get-option-at-point! "HEADING"))))
+                   (org2jekyll-get-option-at-point "HEADING"))))
   (should (equal "some-date"
                  (with-temp-buffer
                    (org-mode)
                    (insert "#+HEADING: hello
 #+DATE: some-date")
                    (goto-char (point-min))
-                   (org2jekyll-get-option-at-point! "DATE"))))
+                   (org2jekyll-get-option-at-point "DATE"))))
   (should-not (with-temp-buffer
                 (org-mode)
                 (insert "#+HEADING: hello
 #+DATE: some-date")
                 (goto-char (point-min))
-                (org2jekyll-get-option-at-point! "UNKNOWN"))))
+                (org2jekyll-get-option-at-point "UNKNOWN"))))
 
-(ert-deftest test-org2jekyll-article-p! ()
+(ert-deftest test-org2jekyll-article-p ()
   (should (let ((temp-filename "/tmp/test-publish-article-p"))
             (with-temp-file temp-filename  (insert "#+LAYOUT: post\n#+DATE: some-date"))
-            (org2jekyll-article-p! temp-filename)))
+            (org2jekyll-article-p temp-filename)))
   (should-not (let ((temp-filename "/tmp/test-publish-article-p"))
                 (with-temp-file temp-filename  (insert "#+NOT-AN-ARTICLE: tony's blog\n#+DATE: some-date"))
-                (org2jekyll-article-p! temp-filename))))
+                (org2jekyll-article-p temp-filename))))
 
 (ert-deftest test-org2jekyll--categories-csv-to-yaml ()
   (should (equal "\n- jabber\n- emacs\n- gtalk\n- tools\n- authentication"  (org2jekyll--categories-csv-to-yaml "jabber, emacs, gtalk, tools, authentication")))
@@ -150,7 +150,7 @@ excerpt: some-fake-description with spaces and all
   (should (equal "original-value" (org2jekyll-assoc-default "key" '(("key". "original-value")) "default-value")))
   (should (equal "default-value"  (org2jekyll-assoc-default "key" '(("key")) "default-value"))))
 
-(ert-deftest test-org2jekyll-read-metadata! ()
+(ert-deftest test-org2jekyll-read-metadata ()
   (should (equal '(("layout" . "default")
                    ("title" . "some-title")
                    ("date" . "2015-12-23")
@@ -158,14 +158,14 @@ excerpt: some-fake-description with spaces and all
 - cat0")
                    ("author" . "me")
                    ("description" . "desc"))
-                 (mocklet (((org2jekyll-get-options-from-file! "org-file" '("title" "date" "categories" "description" "author" "layout"))
+                 (mocklet (((org2jekyll-get-options-from-file "org-file" '("title" "date" "categories" "description" "author" "layout"))
                             => `(("layout"      . "default")
                                  ("title"       . "some-title")
                                  ("date"        . "2015-12-23 Sat 14:20")
                                  ("categories"  . "cat0")
                                  ("author"      . "me")
                                  ("description" . "desc"))))
-                   (org2jekyll-read-metadata! "org-file"))))
+                   (org2jekyll-read-metadata "org-file"))))
 
   (should (equal '(("layout" . "post")
                    ("title" . "dummy-title")
@@ -174,23 +174,23 @@ excerpt: some-fake-description with spaces and all
 - cat0")
                    ("author" . "me")
                    ("description" . "desc"))
-                 (mocklet (((org2jekyll-get-options-from-file! "org-file-2" '("title" "date" "categories" "description" "author" "layout"))
+                 (mocklet (((org2jekyll-get-options-from-file "org-file-2" '("title" "date" "categories" "description" "author" "layout"))
                             => `(("layout"      . "post")
                                  ("title"       . "dummy-title")
                                  ("categories"  . "cat0")
                                  ("author"      . "me")
                                  ("description" . "desc")))
-                           ((org2jekyll-now!)
+                           ((org2jekyll-now)
                             => "2015-01-01 Sat 14:20"))
-                   (org2jekyll-read-metadata! "org-file-2"))))
+                   (org2jekyll-read-metadata "org-file-2"))))
   (should (equal "This org-mode file is missing mandatory header(s):
 - The title is mandatory, please add '#+TITLE' at the top of your org buffer.
 - The categories is mandatory, please add '#+CATEGORIES' at the top of your org buffer.
-Publication skipped!"
-                 (mocklet (((org2jekyll-get-options-from-file! "org-file-2" '("title" "date" "categories" "description" "author" "layout"))
+Publication skipped"
+                 (mocklet (((org2jekyll-get-options-from-file "org-file-2" '("title" "date" "categories" "description" "author" "layout"))
                             => `(("layout"      . "post")
                                  ("description" . "desc"))))
-                   (org2jekyll-read-metadata! "org-file-2")))))
+                   (org2jekyll-read-metadata "org-file-2")))))
 
 (ert-deftest test-org2jekyll-default-headers-template ()
   (should (equal "#+STARTUP: showall
@@ -220,24 +220,24 @@ Publication skipped!"
     (should (equal "out-directory/there" (org2jekyll-output-directory "there")))
     (should (equal "out-directory/" (org2jekyll-output-directory)))))
 
-(ert-deftest test-org2jekyll-read-metadata-and-execute! ()
+(ert-deftest test-org2jekyll-read-metadata-and-execute ()
   (should (equal "org2jekyll - Post 'some-org-file' published!"
-                 (mocklet (((org2jekyll-article-p! "org-file") => t)
+                 (mocklet (((org2jekyll-article-p "org-file") => t)
                            ((file-name-nondirectory "org-file") => "some-org-file")
-                           ((org2jekyll-read-metadata! "org-file") => '(("layout" . "post"))))
-                   (org2jekyll-read-metadata-and-execute! (lambda (org-metadata org-file) 2) "org-file"))))
+                           ((org2jekyll-read-metadata "org-file") => '(("layout" . "post"))))
+                   (org2jekyll-read-metadata-and-execute (lambda (org-metadata org-file) 2) "org-file"))))
   (should (equal "org2jekyll - 'some-org-file' is not an article, publication skipped!"
-                 (mocklet (((org2jekyll-article-p! "org-file") => nil)
+                 (mocklet (((org2jekyll-article-p "org-file") => nil)
                            ((file-name-nondirectory "org-file") => "some-org-file"))
-                   (org2jekyll-read-metadata-and-execute! (lambda (org-metadata org-file) 2) "org-file")))))
+                   (org2jekyll-read-metadata-and-execute (lambda (org-metadata org-file) 2) "org-file")))))
 
-(ert-deftest test-org2jekyll-post-p! ()
-  (should (org2jekyll-post-p! "post"))
-  (should-not (org2jekyll-post-p! "default")))
+(ert-deftest test-org2jekyll-post-p ()
+  (should (org2jekyll-post-p "post"))
+  (should-not (org2jekyll-post-p "default")))
 
-(ert-deftest test-org2jekyll-page-p! ()
-  (should (org2jekyll-page-p! "default"))
-  (should-not (org2jekyll-page-p! "post")))
+(ert-deftest test-org2jekyll-page-p ()
+  (should (org2jekyll-page-p "default"))
+  (should-not (org2jekyll-page-p "post")))
 
 (ert-deftest test-org2jekyll-check-metadata ()
   (should (equal "- The title is mandatory, please add '#+TITLE' at the top of your org buffer.
