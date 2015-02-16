@@ -57,7 +57,7 @@
 (require 's)
 (require 'deferred)
 
-(defgroup org2jekyll nil " Org2jekyll customisation group."
+(defgroup org2jekyll nil "Publish org-mode posts to jekyll"
   :tag "org2jekyll"
   :version "0.0.3"
   :group 'org)
@@ -437,7 +437,7 @@ Layout `'default`' is a page."
 
 ;;;###autoload
 (define-minor-mode org2jekyll-mode
-  "Toggle org2jekyll-mode mode.
+  "Functionality for publishing the current org-mode post to jekyll.
 With no argument, the mode is toggled on/off.
 Non-nil argument turns mode on.
 Nil argument turns mode off.
