@@ -34,10 +34,7 @@ test: clean
 			-l ./org2jekyll-tests.el \
 			-f ert-run-tests-batch-and-exit
 
-pkg-file:
-	cask pkg-file
-
-pkg-el: pkg-file
+pkg-el:
 	cask package
 
 package: clean pkg-el

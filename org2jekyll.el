@@ -4,7 +4,7 @@
 
 ;; Author: Antoine R. Dumont <eniotna.t AT gmail.com>
 ;; Maintainer: Antoine R. Dumont <eniotna.t AT gmail.com>
-;; Version: 0.1.3
+;; Version: 0.1.4
 ;; Package-Requires: ((dash "2.10.0") (dash-functional "1.2.0") (s "1.9.0") (deferred "0.3.1"))
 ;; Keywords: org-mode jekyll blog publish
 ;; URL: https://github.com/ardumont/org2jekyll
@@ -34,13 +34,13 @@
 ;; This will permit you to simply export an org-mode file with the right jekyll
 ;; format to the right folder
 ;;
-;; M-x org2jekyll-create-draft! create a draft with the necessary metadata
+;; M-x org2jekyll-create-draft create a draft with the necessary metadata
 ;;
-;; M-x org2jekyll-publish! publish the current post (or page) to the jekyll folder
+;; M-x org2jekyll-publish publish the current post (or page) to the jekyll folder
 ;;
-;; M-x org2jekyll-publish-pages! to publish all pages (layout 'default')
+;; M-x org2jekyll-publish-pages to publish all pages (layout 'default')
 ;;
-;; M-x org2jekyll-publish-posts! to publish all post pages (layout 'post')
+;; M-x org2jekyll-publish-posts to publish all post pages (layout 'post')
 ;;
 ;; M-x org2jekyll-mode to activate org2jekyll's minor mode
 ;;
@@ -138,7 +138,7 @@ The `'%s`' will be replaced respectively by name, the author, the generated date
       (concat "\"" (replace-regexp-in-string "\"" "\\\\\"" s) "\"")
     s))
 
-(defun org2jekyll-now! ()
+(defun org2jekyll-now ()
   "Generate a formatted now date."
   (format-time-string "%Y-%m-%d %a %H:%M"))
 
@@ -153,12 +153,12 @@ POST-CATEGORIES is the categories."
   (format org2jekyll-jekyll-org-post-template blog-layout blog-author post-date (org2jekyll--yaml-escape post-title) post-description post-categories))
 
 ;;;###autoload
-(defun org2jekyll-create-draft! ()
+(defun org2jekyll-create-draft ()
   "Create a new Jekyll blog post with TITLE."
   (interactive)
   "The `'%s`' will be replaced respectively by the blog entry name, the author, the generated date, the title, the description and the categories."
   (let ((author      org2jekyll-blog-author)
-        (date        (org2jekyll-now!))
+        (date        (org2jekyll-now))
         (layout      (read-string "Layout (post, default, ...): "))
         (title       (read-string "Title: "))
         (description (read-string "Description: "))
@@ -172,7 +172,7 @@ POST-CATEGORIES is the categories."
                (insert (org2jekyll-default-headers-template layout author date title description categories))
                (insert "* "))))))
 
-(defalias 'org2jekyll/create-draft! 'org2jekyll-create-draft!)
+(defalias 'org2jekyll/create-draft! 'org2jekyll-create-draft)
 
 ;;;###autoload
 (defun org2jekyll-list-posts ()
@@ -180,7 +180,7 @@ POST-CATEGORIES is the categories."
   (interactive)
   (find-file (org2jekyll-output-directory org2jekyll-jekyll-posts-dir)))
 
-(defalias 'org2jekyll/list-posts 'org2jekyll-list-posts!)
+(defalias 'org2jekyll/list-posts 'org2jekyll-list-posts)
 
 ;;;###autoload
 (defun org2jekyll-list-drafts ()
@@ -190,7 +190,7 @@ POST-CATEGORIES is the categories."
 
 (defalias 'org2jekyll/list-drafts 'org2jekyll-list-drafts)
 
-(defun org2jekyll-get-option-at-point! (opt)
+(defun org2jekyll-get-option-at-point (opt)
   "Gets the header value of the option OPT from a buffer."
   (let* ((regexp (org-make-options-regexp (list (upcase opt) (downcase opt)))))
     (save-excursion
@@ -198,15 +198,15 @@ POST-CATEGORIES is the categories."
       (if (re-search-forward regexp nil t 1)
           (match-string-no-properties 2)))))
 
-(defun org2jekyll-get-option-from-file! (orgfile option)
+(defun org2jekyll-get-option-from-file (orgfile option)
   "Return the ORGFILE's OPTION."
   (with-temp-buffer
     (when (file-exists-p orgfile)
       (insert-file-contents orgfile)
       (goto-char (point-min))
-      (org2jekyll-get-option-at-point! option))))
+      (org2jekyll-get-option-at-point option))))
 
-(defun org2jekyll-get-options-from-file! (orgfile options)
+(defun org2jekyll-get-options-from-file (orgfile options)
   "Return the ORGFILE's OPTIONS."
   (with-temp-buffer
     (when (file-exists-p orgfile)
@@ -214,15 +214,15 @@ POST-CATEGORIES is the categories."
       (mapcar (lambda (option)
                 (save-excursion
                   (goto-char (point-min))
-                  (cons option (org2jekyll-get-option-at-point! option))))
+                  (cons option (org2jekyll-get-option-at-point option))))
               options))))
 
-(defun org2jekyll-layout! (org-file)
+(defun org2jekyll-layout (org-file)
   "Determine if the current ORG-FILE's layout.
 Depends on the metadata header #+LAYOUT."
-  (org2jekyll-get-option-from-file! org-file "layout"))
+  (org2jekyll-get-option-from-file org-file "layout"))
 
-(defalias 'org2jekyll-article-p! 'org2jekyll-layout!)
+(defalias 'org2jekyll-article-p 'org2jekyll-layout)
 
 (defvar org2jekyll-map-keys '(("title"       . "title")
                               ("categories"  . "categories")
@@ -288,10 +288,10 @@ Return DEFAULT-VALUE if not found."
       data
     default-value))
 
-(defvar org2jekyll-header-metadata! nil
+(defvar org2jekyll-header-metadata nil
   "The needed headers for org buffer for org2jekyll to work.")
 
-(setq org2jekyll-header-metadata! '(("title" . 'mandatory)
+(setq org2jekyll-header-metadata '(("title" . 'mandatory)
                                     ("date")
                                     ("categories" . 'mandatory)
                                     ("description" . 'mandatory)
@@ -304,7 +304,7 @@ Return DEFAULT-VALUE if not found."
   "Check that the mandatory header metadata in ORG-METADATA are provided.
 Return the error messages if any or nil if everything is alright."
   (let ((mandatory-values (funcall (-compose (lambda (l) (mapcar #'car l))
-                                             (lambda (l) (-filter #'cdr l))) org2jekyll-header-metadata!)))
+                                             (lambda (l) (-filter #'cdr l))) org2jekyll-header-metadata)))
     (-when-let (error-messages (->> mandatory-values
                                     (--map (when (null (assoc-default it org-metadata))
                                              (format "- The %s is mandatory, please add '#+%s' at the top of your org buffer." it (upcase it))))
@@ -312,29 +312,29 @@ Return the error messages if any or nil if everything is alright."
                                     s-trim))
       (if (string= "" error-messages) nil error-messages))))
 
-(defun org2jekyll-read-metadata! (org-file)
+(defun org2jekyll-read-metadata (org-file)
   "Given an ORG-FILE, return its org metadata.
 If non-mandatory values are missing, they are replaced with dummy ones.
 Otherwise, display the error messages about the missing mandatory values."
-  (let* ((org-metadata-list (mapcar #'car org2jekyll-header-metadata!))
-         (org-metadata (org2jekyll-get-options-from-file! org-file org-metadata-list)))
+  (let* ((org-metadata-list (mapcar #'car org2jekyll-header-metadata))
+         (org-metadata (org2jekyll-get-options-from-file org-file org-metadata-list)))
     (-if-let (error-messages (org2jekyll-check-metadata org-metadata))
-        (format "This org-mode file is missing mandatory header(s):\n%s\nPublication skipped!" error-messages)
+        (format "This org-mode file is missing mandatory header(s):\n%s\nPublication skipped" error-messages)
       `(("layout"      . ,(-> "layout"      (org2jekyll-assoc-default org-metadata "post")))
         ("title"       . ,(-> "title"       (org2jekyll-assoc-default org-metadata "dummy-title-should-be-replaced")))
-        ("date"        . ,(-> "date"        (org2jekyll-assoc-default org-metadata (org2jekyll-now!)) org2jekyll--convert-timestamp-to-yyyy-dd-mm))
+        ("date"        . ,(-> "date"        (org2jekyll-assoc-default org-metadata (org2jekyll-now)) org2jekyll--convert-timestamp-to-yyyy-dd-mm))
         ("categories"  . ,(-> "categories"  (org2jekyll-assoc-default org-metadata "dummy-category-should-be-replaced") org2jekyll--categories-csv-to-yaml))
         ("author"      . ,(-> "author"      (org2jekyll-assoc-default org-metadata "")))
         ("description" . ,(-> "description" (org2jekyll-assoc-default org-metadata "")))))))
 
-(defun org2jekyll-read-metadata-and-execute! (action-fn org-file)
+(defun org2jekyll-read-metadata-and-execute (action-fn org-file)
   "Execute ACTION-FN function after checking metadata from the ORG-FILE."
   (let ((filename-non-dir (file-name-nondirectory org-file)))
-    (if (org2jekyll-article-p! org-file)
-        (let ((org-metadata (org2jekyll-read-metadata! org-file)))
+    (if (org2jekyll-article-p org-file)
+        (let ((org-metadata (org2jekyll-read-metadata org-file)))
           (if (stringp org-metadata)
               (org2jekyll-message org-metadata)
-            (let ((page-or-post (if (org2jekyll-post-p! (assoc-default "layout" org-metadata)) "Post" "Page")))
+            (let ((page-or-post (if (org2jekyll-post-p (assoc-default "layout" org-metadata)) "Post" "Page")))
               (funcall action-fn org-metadata org-file)
               (org2jekyll-message "%s '%s' published!" page-or-post filename-non-dir))))
       (org2jekyll-message "'%s' is not an article, publication skipped!" filename-non-dir))))
@@ -343,9 +343,9 @@ Otherwise, display the error messages about the missing mandatory values."
   "Log formatted ARGS."
   (apply 'message (format "org2jekyll - %s" (car args)) (cdr args)))
 
-(defun org2jekyll-publish-post! (org-file)
+(defun org2jekyll-publish-post (org-file)
   "Publish ORG-FILE as a post."
-  (org2jekyll-read-metadata-and-execute!
+  (org2jekyll-read-metadata-and-execute
    (lambda (org-metadata org-file)
      (let ((blog-project    (assoc-default "layout" org-metadata))
            (jekyll-filename (org2jekyll--copy-org-file-to-jekyll-org-file (assoc-default "date" org-metadata) org-file org-metadata)))
@@ -353,9 +353,9 @@ Otherwise, display the error messages about the missing mandatory values."
        (delete-file jekyll-filename)))
    org-file))
 
-(defun org2jekyll-publish-page! (org-file)
+(defun org2jekyll-publish-page (org-file)
   "Publish ORG-FILE as a page."
-  (org2jekyll-read-metadata-and-execute!
+  (org2jekyll-read-metadata-and-execute
    (lambda (org-metadata org-file)
      (let ((blog-project (assoc-default "layout" org-metadata))
            (backup-file (format "%s.org2jekyll" org-file)))
@@ -369,16 +369,16 @@ Otherwise, display the error messages about the missing mandatory values."
        (delete-file backup-file)))
    org-file))
 
-(defun org2jekyll-post-p! (layout)
+(defun org2jekyll-post-p (layout)
   "Determine if the LAYOUT corresponds to a post."
   (string= "post" layout))
 
-(defun org2jekyll-page-p! (layout)
+(defun org2jekyll-page-p (layout)
   "Determine if the LAYOUT corresponds to a page."
   (string= "default" layout))
 
 ;;;###autoload
-(defun org2jekyll-publish! ()
+(defun org2jekyll-publish ()
   "Publish the current org file as post or page depending on the chosen layout.
 Layout `'post`' is a jekyll post.
 Layout `'default`' is a page."
@@ -387,53 +387,53 @@ Layout `'default`' is a page."
     (deferred:$ (deferred:call
                   (lambda ()
                     (-> "layout"
-                        org2jekyll-get-option-at-point!
-                        org2jekyll-post-p!
-                        (if 'org2jekyll-publish-post! 'org2jekyll-publish-page!))))
+                        org2jekyll-get-option-at-point
+                        org2jekyll-post-p
+                        (if 'org2jekyll-publish-post 'org2jekyll-publish-page))))
       (deferred:nextc it
         (lambda (publish-fn) (funcall publish-fn org-file))))))
-(defalias 'org2jekyll/publish! 'org2jekyll-publish!)
+(defalias 'org2jekyll/publish! 'org2jekyll-publish)
 
 (defvar org2jekyll-mode-map nil "Default Bindings map for org2jekyll minor mode.")
 
 (setq org2jekyll-mode-map
       (let ((map (make-sparse-keymap)))
-        (define-key map (kbd "C-c . n") 'org2jekyll-create-draft!)
-        (define-key map (kbd "C-c . p") 'org2jekyll-publish!)
-        (define-key map (kbd "C-c . P") 'org2jekyll-publish-posts!)
+        (define-key map (kbd "C-c . n") 'org2jekyll-create-draft)
+        (define-key map (kbd "C-c . p") 'org2jekyll-publish)
+        (define-key map (kbd "C-c . P") 'org2jekyll-publish-posts)
         (define-key map (kbd "C-c . l") 'org2jekyll-list-posts)
         (define-key map (kbd "C-c . d") 'org2jekyll-list-drafts)
         map))
 
 ;;;###autoload
-(defun org2jekyll-publish-posts! ()
+(defun org2jekyll-publish-posts ()
   "Publish all the posts."
   (interactive)
   (deferred:$
     (deferred:next
       (lambda () (->> (assoc "post" org-publish-project-alist)
                  org-publish-get-base-files
-                 (--filter (org2jekyll-post-p! (org2jekyll-article-p! it))))))
+                 (--filter (org2jekyll-post-p (org2jekyll-article-p it))))))
     (deferred:nextc it
       (lambda (posts)
-        (mapc #'org2jekyll-publish-post! posts)))))
+        (mapc #'org2jekyll-publish-post posts)))))
 
-(defalias 'org2jekyll/publish-posts! 'org2jekyll-publish-posts!)
+(defalias 'org2jekyll/publish-posts! 'org2jekyll-publish-posts)
 
 ;;;###autoload
-(defun org2jekyll-publish-pages! ()
+(defun org2jekyll-publish-pages ()
   "Publish all the pages."
   (interactive)
   (deferred:$
     (deferred:next
       (lambda () (->> (assoc "default" org-publish-project-alist)
                  org-publish-get-base-files
-                 (--filter (org2jekyll-page-p! (org2jekyll-article-p! it))))))
+                 (--filter (org2jekyll-page-p (org2jekyll-article-p it))))))
     (deferred:nextc it
       (lambda (pages)
-        (mapc #'org2jekyll-publish-page! pages)))))
+        (mapc #'org2jekyll-publish-page pages)))))
 
-(defalias 'org2jekyll/publish-pages! 'org2jekyll-publish-pages!)
+(defalias 'org2jekyll/publish-pages! 'org2jekyll-publish-pages)
 
 ;;;###autoload
 (define-minor-mode org2jekyll-mode
