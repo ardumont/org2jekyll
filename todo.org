@@ -4,9 +4,9 @@
 * TODO 0.1.x [%]
 - [ ] Add headers on an existing org file
 - [ ] Update headers when already present on file
-* IN-PROGRESS 0.1.3 [20%]
+* IN-PROGRESS 0.1.3 [40%]
 - [X] Update version
-- [ ] Respect elisp coding convention
+- [X] Respect elisp coding convention
 - [ ] Alias old function name
 - [ ] Create melpa recipe and propose PR
 - [ ] Release version
