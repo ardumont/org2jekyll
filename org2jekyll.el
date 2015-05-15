@@ -4,7 +4,7 @@
 
 ;; Author: Antoine R. Dumont <eniotna.t AT gmail.com>
 ;; Maintainer: Antoine R. Dumont <eniotna.t AT gmail.com>
-;; Version: 0.1.4
+;; Version: 0.1.5
 ;; Package-Requires: ((dash "2.10.0") (dash-functional "1.2.0") (s "1.9.0") (deferred "0.3.1"))
 ;; Keywords: org-mode jekyll blog publish
 ;; URL: https://github.com/ardumont/org2jekyll
@@ -336,8 +336,8 @@ Otherwise, display the error messages about the missing mandatory values."
               (org2jekyll-message org-metadata)
             (let ((page-or-post (if (org2jekyll-post-p (assoc-default "layout" org-metadata)) "Post" "Page")))
               (funcall action-fn org-metadata org-file)
-              (org2jekyll-message "%s '%s' published!" page-or-post filename-non-dir))))
-      (org2jekyll-message "'%s' is not an article, publication skipped!" filename-non-dir))))
+              (format "%s '%s' published!" page-or-post filename-non-dir))))
+      (format "'%s' is not an article, publication skipped!" filename-non-dir))))
 
 (defun org2jekyll-message (&rest args)
   "Log formatted ARGS."
@@ -377,6 +377,11 @@ Otherwise, display the error messages about the missing mandatory values."
   "Determine if the LAYOUT corresponds to a page."
   (string= "default" layout))
 
+(defun org2jekyll-publish-web-project ()
+  "Publish the 'web' project."
+  (org2jekyll-message "Publish `'web`' project (images, css, js, etc...).")
+  (org-publish-project "web"))
+
 ;;;###autoload
 (defun org2jekyll-publish ()
   "Publish the current org file as post or page depending on the chosen layout.
@@ -384,14 +389,19 @@ Layout `'post`' is a jekyll post.
 Layout `'default`' is a page."
   (interactive)
   (lexical-let ((org-file (buffer-file-name (current-buffer))))
-    (deferred:$ (deferred:call
-                  (lambda ()
-                    (-> "layout"
-                        org2jekyll-get-option-at-point
-                        org2jekyll-post-p
-                        (if 'org2jekyll-publish-post 'org2jekyll-publish-page))))
-      (deferred:nextc it
-        (lambda (publish-fn) (funcall publish-fn org-file))))))
+    (deferred:$
+      (deferred:next (lambda ()
+                       (-> "layout"
+                           org2jekyll-get-option-at-point
+                           org2jekyll-post-p
+                           (if 'org2jekyll-publish-post 'org2jekyll-publish-page))))
+      (deferred:nextc it (lambda (publish-fn) (funcall publish-fn org-file)))
+      (deferred:nextc it (lambda (final-message)
+                           (org2jekyll-publish-web-project)
+                           final-message))
+      (deferred:nextc it (lambda (final-message)
+                           (org2jekyll-message final-message))))))
+
 (defalias 'org2jekyll/publish! 'org2jekyll-publish)
 
 (defvar org2jekyll-mode-map nil "Default Bindings map for org2jekyll minor mode.")

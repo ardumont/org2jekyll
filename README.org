@@ -135,17 +135,20 @@ Here is an example of my configuration for my [[http://ardumont.github.io/][blog
                            :publishing-directory ,(org2jekyll-output-directory "js")
                            :publishing-function org-publish-attachment
                            :recursive t)
-                          ("other"
+                          ("css"
                            :base-directory ,(org2jekyll-input-directory "css")
                            :base-extension "css\\|el"
                            :publishing-directory ,(org2jekyll-output-directory "css")
                            :publishing-function org-publish-attachment
                            :recursive t)
-                          ("website" :components ("default" "post" "images" "js" "css")))))
+                          ("web" :components ("images" "js" "css")))))
 #+end_src
 source: https://github.com/ardumont/blog-pack/blob/master/blog-pack.el#L13-L71
 
-*default* and *post* are important entries which represent the possible jekyll layouts you use in your jekyll installation.
+The previous sample contains important information:
+- *default* and *post* represent the possible jekyll layouts you can use in your org2jekyll buffer `#+LAYOUT: default|post` (do not name those differently)
+- *images*, *js*, *css* represent where you choose to store those kinds of files (you can name these as you wish)
+- *web* is a composition of web files you may need to create a full post or page, typically, css, images, html, js, etc... (do not name this one differently either)
 
 ** A working example
 

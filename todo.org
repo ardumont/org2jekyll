@@ -2,8 +2,12 @@
 #+author: ardumont
 
 * TODO 0.1.x [%]
-- [ ] Add headers on an existing org file
-- [ ] Update headers when already present on file
+* DONE 0.1.5 [100%]
+CLOSED: [2015-05-15 Fri 17:11]
+- [X] Update version
+- [X] org2jekyll must publish images, js, css - #18
+- [X] Fix release.sh regarding version not initialized
+- [X] Automate marmalade deploy
 * DONE 0.1.4 [100%]
 CLOSED: [2015-02-16 Mon 22:22]
 - [X] Internal - Fix docstring (thanks @purcell)
