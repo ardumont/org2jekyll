@@ -12,6 +12,8 @@ fi
 
 WDIR=$(dirname $0)
 
+VERSION=$1
+
 # launched from the current dev branch
 
 git fetch -p --all

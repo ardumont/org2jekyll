@@ -2,10 +2,11 @@
 #+author: ardumont
 
 * TODO 0.1.x [%]
-* IN-PROGRESS 0.1.5 [33%]
-- [X] update version
-- [ ] org2jekyll must publish images, js, css - #18
-- [ ] release notes
+* IN-PROGRESS 0.1.5 [75%]
+- [X] Update version
+- [X] org2jekyll must publish images, js, css - #18
+- [X] Fix release.sh regarding version not initialized
+- [ ] Automate marmalade deploy
 * DONE 0.1.4 [100%]
 CLOSED: [2015-02-16 Mon 22:22]
 - [X] Internal - Fix docstring (thanks @purcell)
