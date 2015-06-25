@@ -53,6 +53,12 @@
                 (with-temp-file temp-filename  (insert "#+NOT-AN-ARTICLE: tony's blog\n#+DATE: some-date"))
                 (org2jekyll-article-p temp-filename))))
 
+(ert-deftest test-org2jekyll--draft-filename ()
+  (should (equal "/some/path/test.org"
+                 (org2jekyll--draft-filename "/some/path/" "你好test")))
+  (should (equal "/some/path/forbiddensymbol.org"
+                 (org2jekyll--draft-filename "/some/path/" "forbidden-symbol^$#"))))
+
 (ert-deftest test-org2jekyll--categories-csv-to-yaml ()
   (should (equal "\n- jabber\n- emacs\n- gtalk\n- tools\n- authentication"  (org2jekyll--categories-csv-to-yaml "jabber, emacs, gtalk, tools, authentication")))
   (should (equal "\n- jabber\n- emacs\n- gtalk\n- tools\n- authentication"  (org2jekyll--categories-csv-to-yaml "jabber,emacs,gtalk,tools,authentication"))))
@@ -73,11 +79,11 @@ excerpt: Installing jabber and using it from emacs + authentication tips and tri
 #+END_HTML
 "
                    (org2jekyll--to-yaml-header '(("layout" . "post")
-                                                  ("title" . "gtalk in emacs using jabber mode")
-                                                  ("date" . "2013-01-13")
-                                                  ("author" . "Antoine R. Dumont")
-                                                  ("categories" . "\n- jabber\n- emacs\n- tools\n- gtalk")
-                                                  ("description" . "Installing jabber and using it from emacs + authentication tips and tricks"))))))
+                                                 ("title" . "gtalk in emacs using jabber mode")
+                                                 ("date" . "2013-01-13")
+                                                 ("author" . "Antoine R. Dumont")
+                                                 ("categories" . "\n- jabber\n- emacs\n- tools\n- gtalk")
+                                                 ("description" . "Installing jabber and using it from emacs + authentication tips and tricks"))))))
 
 (ert-deftest test-org2jekyll--org-to-yaml-metadata ()
   (should (equal '(("layout" . "post")
