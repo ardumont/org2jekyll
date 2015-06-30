@@ -129,7 +129,7 @@ The `'%s`' will be replaced respectively by name, the author, the generated date
   (replace-regexp-in-string
    " " "-" (downcase
             (replace-regexp-in-string
-             "[^A-Za-z0-9 ]" "" s))))
+             "[\]\[(){}!#$~^\\]" "" s))))
 
 (defun org2jekyll--yaml-escape (s)
   "Escape a string S for YAML."

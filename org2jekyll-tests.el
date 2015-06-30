@@ -53,11 +53,25 @@
                 (with-temp-file temp-filename  (insert "#+NOT-AN-ARTICLE: tony's blog\n#+DATE: some-date"))
                 (org2jekyll-article-p temp-filename))))
 
+(ert-deftest test-org2jekyll-make-slug ()
+  (should (string= "this-is-a-test"
+                   (org2jekyll--make-slug "this-is-a-test")))
+  (should (string= "forbidden-symbol"
+                   (org2jekyll--make-slug "forb~idd^en-symbol![](){}$#")))
+  (should (string= "你好-test"
+                   (org2jekyll--make-slug "你好-test")))
+  (should (string= "你好-большие-test"
+                   (org2jekyll--make-slug "你好-большие-test"))))
+
+
 (ert-deftest test-org2jekyll--draft-filename ()
-  (should (equal "/some/path/test.org"
-                 (org2jekyll--draft-filename "/some/path/" "你好test")))
-  (should (equal "/some/path/forbiddensymbol.org"
-                 (org2jekyll--draft-filename "/some/path/" "forbidden-symbol^$#"))))
+  (let ((org2jekyll-jekyll-post-ext ".ext"))
+    (should (string= "/some/path/你好-test.ext"
+                     (org2jekyll--draft-filename "/some/path/" "你好-test")))
+    (should (string= "/some/path/你好-большие-test.ext"
+                     (org2jekyll--draft-filename "/some/path/" "你好-Большие-test")))
+    (should (string= "/some/path/forbidden-symbol.ext"
+                     (org2jekyll--draft-filename "/some/path/" "forbidden-symbol\\![](){}^$#")))))
 
 (ert-deftest test-org2jekyll--categories-csv-to-yaml ()
   (should (equal "\n- jabber\n- emacs\n- gtalk\n- tools\n- authentication"  (org2jekyll--categories-csv-to-yaml "jabber, emacs, gtalk, tools, authentication")))
