@@ -2,10 +2,10 @@
 #+author: ardumont
 
 * TODO 0.1.x [%]
-* IN-PROGRESS 0.1.6 [66%]
+* IN-PROGRESS 0.1.6 [100%]
 - [X] Update version
 - [X] Fix org2jekyll-create-draft limits for international characters #20
-- [ ] Release notes
+- [X] Release notes
 * DONE 0.1.5 [100%]
 CLOSED: [2015-05-15 Fri 17:11]
 - [X] Update version
