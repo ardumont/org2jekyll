@@ -84,7 +84,7 @@
   :require 'org2jekyll
   :group 'org2jekyll)
 
-(defalias 'org2jekyll/jekylldirectory 'org2jekyll-jekyll-directory)
+(defalias 'org2jekyll/jekyll-directory 'org2jekyll-jekyll-directory)
 
 (defcustom org2jekyll-jekyll-drafts-dir nil
   "Relative path to drafts directory."
