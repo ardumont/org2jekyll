@@ -4,7 +4,7 @@
 
 ;; Author: Antoine R. Dumont <eniotna.t AT gmail.com>
 ;; Maintainer: Antoine R. Dumont <eniotna.t AT gmail.com>
-;; Version: 0.1.5
+;; Version: 0.1.6
 ;; Package-Requires: ((dash "2.10.0") (dash-functional "1.2.0") (s "1.9.0") (deferred "0.3.1"))
 ;; Keywords: org-mode jekyll blog publish
 ;; URL: https://github.com/ardumont/org2jekyll
@@ -129,7 +129,7 @@ The `'%s`' will be replaced respectively by name, the author, the generated date
   (replace-regexp-in-string
    " " "-" (downcase
             (replace-regexp-in-string
-             "[^A-Za-z0-9 ]" "" s))))
+             "[\]\[(){}!#$~^\\]" "" s))))
 
 (defun org2jekyll--yaml-escape (s)
   "Escape a string S for YAML."
@@ -152,6 +152,10 @@ POST-DESCRIPTION is the description.
 POST-CATEGORIES is the categories."
   (format org2jekyll-jekyll-org-post-template blog-layout blog-author post-date (org2jekyll--yaml-escape post-title) post-description post-categories))
 
+(defun org2jekyll--draft-filename (draft-dir title)
+  "Compute the draft's filename from the DRAFT-DIR and TITLE."
+  (concat draft-dir (org2jekyll--make-slug title) org2jekyll-jekyll-post-ext))
+
 ;;;###autoload
 (defun org2jekyll-create-draft ()
   "Create a new Jekyll blog post with TITLE."
@@ -163,9 +167,7 @@ POST-CATEGORIES is the categories."
         (title       (read-string "Title: "))
         (description (read-string "Description: "))
         (categories  (read-string "Categories (comma separated entries): ")))
-    (let ((draft-file (concat (org2jekyll-input-directory org2jekyll-jekyll-drafts-dir)
-                              (org2jekyll--make-slug title)
-                              org2jekyll-jekyll-post-ext)))
+    (let ((draft-file (org2jekyll--draft-filename (org2jekyll-input-directory org2jekyll-jekyll-drafts-dir) title)))
       (if (file-exists-p draft-file)
           (find-file draft-file)
         (progn (find-file draft-file)
