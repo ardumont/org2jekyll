@@ -1,12 +1,12 @@
 #+title: Backlog
 #+author: ardumont
 
-* TODO 0.1.7 [80%]
+* DONE 0.1.7 [100%]
+CLOSED: [2015-07-14 Tue 16:35]
 - [X] Update version
 - [X] Update org2jekyll dependencies
 - [X] #22 - Add tags feature
 - [X] Improve completion for post/default type
-- [ ] Release notes
 * DONE 0.1.6 [100%]
 CLOSED: [2015-06-30 Tue 13:35]
 - [X] Update version
