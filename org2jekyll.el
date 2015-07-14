@@ -56,6 +56,7 @@
 (require 'dash-functional)
 (require 's)
 (require 'deferred)
+(require 'ido)
 
 (defgroup org2jekyll nil "Publish org-mode posts to jekyll"
   :tag "org2jekyll"
@@ -169,7 +170,7 @@ The `'%s`' will be replaced respectively by the blog entry name, the author, the
   (interactive)
   (let ((author      org2jekyll-blog-author)
         (date        (org2jekyll-now))
-        (layout      (read-string "Layout (post, default, ...): "))
+        (layout      (ido-completing-read "Layout: " '("post" "default") nil 'require-match))
         (title       (read-string "Title: "))
         (description (read-string "Description: "))
         (tags        (read-string "Tags (comma separated entries): "))
