@@ -4,8 +4,8 @@
 
 ;; Author: Antoine R. Dumont <eniotna.t AT gmail.com>
 ;; Maintainer: Antoine R. Dumont <eniotna.t AT gmail.com>
-;; Version: 0.1.6
-;; Package-Requires: ((dash "2.10.0") (dash-functional "1.2.0") (s "1.9.0") (deferred "0.3.1"))
+;; Version: 0.1.7
+;; Package-Requires: ((dash "2.11.0") (dash-functional "2.11.0") (s "1.9.0") (deferred "0.3.1"))
 ;; Keywords: org-mode jekyll blog publish
 ;; URL: https://github.com/ardumont/org2jekyll
 
@@ -53,9 +53,10 @@
 (require 'org)
 (require (if (version< emacs-version "24.4") 'org-publish 'ox-publish))
 
-(require 'dash)
+(require 'dash-functional)
 (require 's)
 (require 'deferred)
+(require 'ido)
 
 (defgroup org2jekyll nil "Publish org-mode posts to jekyll"
   :tag "org2jekyll"
@@ -110,7 +111,7 @@
 The `'%s`' will be replaced respectively by name, the author, the generated date, the title, the description and the categories.")
 
 (setq org2jekyll-jekyll-org-post-template
-      "#+STARTUP: showall\n#+STARTUP: hidestars\n#+OPTIONS: H:2 num:nil tags:nil toc:nil timestamps:t\n#+LAYOUT: %s\n#+AUTHOR: %s\n#+DATE: %s\n#+TITLE: %s\n#+DESCRIPTION: %s\n#+CATEGORIES: %s\n\n")
+      "#+STARTUP: showall\n#+STARTUP: hidestars\n#+OPTIONS: H:2 num:nil tags:nil toc:nil timestamps:t\n#+LAYOUT: %s\n#+AUTHOR: %s\n#+DATE: %s\n#+TITLE: %s\n#+DESCRIPTION: %s\n#+TAGS: %s\n#+CATEGORIES: %s\n\n")
 
 (defun org2jekyll--optional-folder (folder-source &optional folder-name)
   "Compute the folder name from a FOLDER-SOURCE and an optional FOLDER-NAME."
@@ -142,15 +143,20 @@ The `'%s`' will be replaced respectively by name, the author, the generated date
   "Generate a formatted now date."
   (format-time-string "%Y-%m-%d %a %H:%M"))
 
-(defun org2jekyll-default-headers-template (blog-layout blog-author post-date post-title post-description post-categories)
+(defun org2jekyll-default-headers-template (blog-layout blog-author post-date post-title post-description post-tags post-categories)
   "Compute default headers.
 BLOG-LAYOUT is the layout of the post.
 BLOG-AUTHOR is the author.
 POST-DATE is the date of the post.
 POST-TITLE is the title.
 POST-DESCRIPTION is the description.
+POST-TAGS is the tags
 POST-CATEGORIES is the categories."
-  (format org2jekyll-jekyll-org-post-template blog-layout blog-author post-date (org2jekyll--yaml-escape post-title) post-description post-categories))
+  (format org2jekyll-jekyll-org-post-template blog-layout blog-author post-date (org2jekyll--yaml-escape post-title) post-description post-tags post-categories))
+
+(defun org2jekyll--draft-filename (draft-dir title)
+  "Compute the draft's filename from the DRAFT-DIR and TITLE."
+  (concat draft-dir (org2jekyll--make-slug title) org2jekyll-jekyll-post-ext))
 
 (defun org2jekyll--draft-filename (draft-dir title)
   "Compute the draft's filename from the DRAFT-DIR and TITLE."
@@ -158,21 +164,24 @@ POST-CATEGORIES is the categories."
 
 ;;;###autoload
 (defun org2jekyll-create-draft ()
-  "Create a new Jekyll blog post with TITLE."
+  "Create a new Jekyll blog post with TITLE.
+The `'%s`' will be replaced respectively by the blog entry name, the author, the
+ generated date, the title, the description, the tags and the categories."
   (interactive)
-  "The `'%s`' will be replaced respectively by the blog entry name, the author, the generated date, the title, the description and the categories."
   (let ((author      org2jekyll-blog-author)
         (date        (org2jekyll-now))
-        (layout      (read-string "Layout (post, default, ...): "))
+        (layout      (ido-completing-read "Layout: " '("post" "default") nil 'require-match))
         (title       (read-string "Title: "))
         (description (read-string "Description: "))
-        (categories  (read-string "Categories (comma separated entries): ")))
+        (tags        (read-string "Tags (csv): "))
+        (categories  (read-string "Categories (csv): ")))
     (let ((draft-file (org2jekyll--draft-filename (org2jekyll-input-directory org2jekyll-jekyll-drafts-dir) title)))
       (if (file-exists-p draft-file)
           (find-file draft-file)
-        (progn (find-file draft-file)
-               (insert (org2jekyll-default-headers-template layout author date title description categories))
-               (insert "* "))))))
+        (progn
+          (find-file draft-file)
+          (insert (org2jekyll-default-headers-template layout author date title description tags categories))
+          (insert "* "))))))
 
 (defalias 'org2jekyll/create-draft! 'org2jekyll-create-draft)
 
@@ -228,6 +237,7 @@ Depends on the metadata header #+LAYOUT."
 
 (defvar org2jekyll-map-keys '(("title"       . "title")
                               ("categories"  . "categories")
+                              ("tags"        . "tags")
                               ("date"        . "date")
                               ("description" . "excerpt")
                               ("author"      . "author")
@@ -254,9 +264,9 @@ Depends on the metadata header #+LAYOUT."
        (-snoc it "#+END_HTML\n")
        (s-join "\n" it)))
 
-(defun org2jekyll--categories-csv-to-yaml (categories-csv)
-  "Transform a CATEGORIES-CSV entries into a yaml entries."
-  (->> categories-csv
+(defun org2jekyll--csv-to-yaml (str-csv)
+  "Transform a STR-CSV entries into a yaml entries."
+  (->> str-csv
        (concat ",")
        (s-replace ", " ",")
        (s-replace "," "\n- ")
@@ -293,14 +303,13 @@ Return DEFAULT-VALUE if not found."
 (defvar org2jekyll-header-metadata nil
   "The needed headers for org buffer for org2jekyll to work.")
 
-(setq org2jekyll-header-metadata '(("title" . 'mandatory)
-                                    ("date")
-                                    ("categories" . 'mandatory)
-                                    ("description" . 'mandatory)
-                                    ("author")
-                                    ("layout" . 'mandatory)))
-
-(require 'dash-functional)
+(setq org2jekyll-header-metadata '(("title"       . 'mandatory)
+                                   ("date")
+                                   ("categories"  . 'mandatory)
+                                   ("tags")
+                                   ("description" . 'mandatory)
+                                   ("author")
+                                   ("layout"      . 'mandatory)))
 
 (defun org2jekyll-check-metadata (org-metadata)
   "Check that the mandatory header metadata in ORG-METADATA are provided.
@@ -325,7 +334,8 @@ Otherwise, display the error messages about the missing mandatory values."
       `(("layout"      . ,(-> "layout"      (org2jekyll-assoc-default org-metadata "post")))
         ("title"       . ,(-> "title"       (org2jekyll-assoc-default org-metadata "dummy-title-should-be-replaced")))
         ("date"        . ,(-> "date"        (org2jekyll-assoc-default org-metadata (org2jekyll-now)) org2jekyll--convert-timestamp-to-yyyy-dd-mm))
-        ("categories"  . ,(-> "categories"  (org2jekyll-assoc-default org-metadata "dummy-category-should-be-replaced") org2jekyll--categories-csv-to-yaml))
+        ("categories"  . ,(-> "categories"  (org2jekyll-assoc-default org-metadata "dummy-category-should-be-replaced") org2jekyll--csv-to-yaml))
+        ("tags"        . ,(-> "tags"        (org2jekyll-assoc-default org-metadata "dummy-tags-should-be-replaced") org2jekyll--csv-to-yaml))
         ("author"      . ,(-> "author"      (org2jekyll-assoc-default org-metadata "")))
         ("description" . ,(-> "description" (org2jekyll-assoc-default org-metadata "")))))))
 

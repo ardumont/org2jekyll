@@ -73,9 +73,9 @@
     (should (string= "/some/path/forbidden-symbol.ext"
                      (org2jekyll--draft-filename "/some/path/" "forbidden-symbol\\![](){}^$#")))))
 
-(ert-deftest test-org2jekyll--categories-csv-to-yaml ()
-  (should (equal "\n- jabber\n- emacs\n- gtalk\n- tools\n- authentication"  (org2jekyll--categories-csv-to-yaml "jabber, emacs, gtalk, tools, authentication")))
-  (should (equal "\n- jabber\n- emacs\n- gtalk\n- tools\n- authentication"  (org2jekyll--categories-csv-to-yaml "jabber,emacs,gtalk,tools,authentication"))))
+(ert-deftest test-org2jekyll--csv-to-yaml ()
+  (should (equal "\n- jabber\n- emacs\n- gtalk\n- tools\n- authentication"  (org2jekyll--csv-to-yaml "jabber, emacs, gtalk, tools, authentication")))
+  (should (equal "\n- jabber\n- emacs\n- gtalk\n- tools\n- authentication"  (org2jekyll--csv-to-yaml "jabber,emacs,gtalk,tools,authentication"))))
 
 (ert-deftest test-org2jekyll--to-yaml-header ()
   (should (string= "#+BEGIN_HTML
@@ -84,10 +84,8 @@ layout: post
 title: gtalk in emacs using jabber mode
 date: 2013-01-13
 author: Antoine R. Dumont
-categories: \n- jabber
-- emacs
-- tools
-- gtalk
+categories: \n- jabber\n- emacs\n- tools\n- gtalk
+tags: \n- tag0\n- tag1\n- tag2
 excerpt: Installing jabber and using it from emacs + authentication tips and tricks
 ---
 #+END_HTML
@@ -97,6 +95,7 @@ excerpt: Installing jabber and using it from emacs + authentication tips and tri
                                                  ("date" . "2013-01-13")
                                                  ("author" . "Antoine R. Dumont")
                                                  ("categories" . "\n- jabber\n- emacs\n- tools\n- gtalk")
+                                                 ("tags"  . "\n- tag0\n- tag1\n- tag2")
                                                  ("description" . "Installing jabber and using it from emacs + authentication tips and tricks"))))))
 
 (ert-deftest test-org2jekyll--org-to-yaml-metadata ()
@@ -174,15 +173,16 @@ excerpt: some-fake-description with spaces and all
   (should (equal '(("layout" . "default")
                    ("title" . "some-title")
                    ("date" . "2015-12-23")
-                   ("categories" . "
-- cat0")
+                   ("categories" . "\n- cat0\n- cat1")
+                   ("tags" . "\n- tag0\n- tag1")
                    ("author" . "me")
                    ("description" . "desc"))
-                 (mocklet (((org2jekyll-get-options-from-file "org-file" '("title" "date" "categories" "description" "author" "layout"))
+                 (mocklet (((org2jekyll-get-options-from-file "org-file" '("title" "date" "categories" "tags" "description" "author" "layout"))
                             => `(("layout"      . "default")
                                  ("title"       . "some-title")
                                  ("date"        . "2015-12-23 Sat 14:20")
-                                 ("categories"  . "cat0")
+                                 ("categories"  . "cat0, cat1")
+                                 ("tags"        . "tag0, tag1")
                                  ("author"      . "me")
                                  ("description" . "desc"))))
                    (org2jekyll-read-metadata "org-file"))))
@@ -190,14 +190,15 @@ excerpt: some-fake-description with spaces and all
   (should (equal '(("layout" . "post")
                    ("title" . "dummy-title")
                    ("date" . "2015-01-01")
-                   ("categories" . "
-- cat0")
+                   ("categories" . "\n- cat1\n- cat2")
+                   ("tags" . "\n- tag1\n- tag2")
                    ("author" . "me")
                    ("description" . "desc"))
-                 (mocklet (((org2jekyll-get-options-from-file "org-file-2" '("title" "date" "categories" "description" "author" "layout"))
+                 (mocklet (((org2jekyll-get-options-from-file "org-file-2" '("title" "date" "categories" "tags" "description" "author" "layout"))
                             => `(("layout"      . "post")
                                  ("title"       . "dummy-title")
-                                 ("categories"  . "cat0")
+                                 ("categories"  . "cat1, cat2")
+                                 ("tags"        . "tag1, tag2")
                                  ("author"      . "me")
                                  ("description" . "desc")))
                            ((org2jekyll-now)
@@ -207,7 +208,7 @@ excerpt: some-fake-description with spaces and all
 - The title is mandatory, please add '#+TITLE' at the top of your org buffer.
 - The categories is mandatory, please add '#+CATEGORIES' at the top of your org buffer.
 Publication skipped"
-                 (mocklet (((org2jekyll-get-options-from-file "org-file-2" '("title" "date" "categories" "description" "author" "layout"))
+                 (mocklet (((org2jekyll-get-options-from-file "org-file-2" '("title" "date" "categories" "tags" "description" "author" "layout"))
                             => `(("layout"      . "post")
                                  ("description" . "desc"))))
                    (org2jekyll-read-metadata "org-file-2")))))
@@ -221,10 +222,17 @@ Publication skipped"
 #+DATE: post-date
 #+TITLE: post title with spaces
 #+DESCRIPTION: post some description
+#+TAGS: post-tag0, post-tag1
 #+CATEGORIES: post-category, other-category
 
 "
-                 (org2jekyll-default-headers-template "some-layout" "blog-author" "post-date" "post title with spaces" "post some description" "post-category, other-category"))))
+                 (org2jekyll-default-headers-template "some-layout"
+                                                      "blog-author"
+                                                      "post-date"
+                                                      "post title with spaces"
+                                                      "post some description"
+                                                      "post-tag0, post-tag1"
+                                                      "post-category, other-category"))))
 
 (ert-deftest test-org2jekyll--optional-folder ()
   (should (equal "hello/there" (org2jekyll--optional-folder "hello" "there")))
@@ -270,9 +278,8 @@ Publication skipped"
 - The description is mandatory, please add '#+DESCRIPTION' at the top of your org buffer."
                  (org2jekyll-check-metadata '(("title" . "some-title")
                                               ("layout" . "some-layout")))))
-  (should (equal nil
-                 (org2jekyll-check-metadata '(("title" . "some-title")
-                                              ("layout" . "some-layout")
-                                              ("author" . "some-author")
-                                              ("categories" . "some-categories")
-                                              ("description" . "some-description"))))))
+  (should-not (org2jekyll-check-metadata '(("title" . "some-title")
+                                           ("layout" . "some-layout")
+                                           ("author" . "some-author")
+                                           ("categories" . "some-categories")
+                                           ("description" . "some-description")))))
