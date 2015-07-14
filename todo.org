@@ -1,7 +1,12 @@
 #+title: Backlog
 #+author: ardumont
 
-* TODO 0.1.x [%]
+* TODO 0.1.7 [20%]
+- [X] Update version
+- [ ] Update org2jekyll dependencies
+- [ ] #22 - Add tags feature
+- [ ] Improve draft creation using autocompletion
+- [ ] Release notes
 * DONE 0.1.6 [100%]
 CLOSED: [2015-06-30 Tue 13:35]
 - [X] Update version
