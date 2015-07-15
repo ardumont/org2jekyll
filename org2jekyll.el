@@ -158,10 +158,6 @@ POST-CATEGORIES is the categories."
   "Compute the draft's filename from the DRAFT-DIR and TITLE."
   (concat draft-dir (org2jekyll--make-slug title) org2jekyll-jekyll-post-ext))
 
-(defun org2jekyll--draft-filename (draft-dir title)
-  "Compute the draft's filename from the DRAFT-DIR and TITLE."
-  (concat draft-dir (org2jekyll--make-slug title) org2jekyll-jekyll-post-ext))
-
 ;;;###autoload
 (defun org2jekyll-create-draft ()
   "Create a new Jekyll blog post with TITLE.
