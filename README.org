@@ -33,8 +33,8 @@ Blogging with org-mode and jekyll without alien yaml headers.
 
 ** 0.1.2 -> 0.1.4
 
-It occured to me that I did not respect the [elisp coding convention](https://www.gnu.org/software/emacs/manual/html_node/elisp/Coding-Conventions.html).
-So between the 0.1.2 and 0.1.3 version, I changed the names and variables. Sorry about that.
+It occured to me that the [[https://www.gnu.org/software/emacs/manual/html_node/elisp/Coding-Conventions.html][elisp coding convention]] were not respected in the first place.
+So between the 0.1.2 and 0.1.3 version, the names and variables were updated to respect them.
 Now every command and variables uses `org2jekyll-` and no longer `org2jekyll/` prefix.
 
 * Description
