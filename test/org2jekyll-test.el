@@ -291,3 +291,31 @@ Publication skipped"
                    (org2jekyll--yaml-escape "title:")))
   (should (string= "\"\\\"title:\\\"\""
                    (org2jekyll--yaml-escape "\"title:\""))))
+
+(ert-deftest test-org2jekyll-list-posts ()
+  (should (equal :found
+                 (let ((org2jekyll-jekyll-posts-dir ""))
+                   (with-mock (mock (org2jekyll-output-directory "") => "found-file")
+                              (mock (find-file "found-file") => :found)
+                              (org2jekyll-list-posts)))))
+  (should-not (let ((org2jekyll-jekyll-posts-dir ""))
+                (with-mock (mock (org2jekyll-output-directory "") => "found-file")
+                           (mock (find-file "found-file") => nil)
+                           (org2jekyll-list-posts)))))
+
+(ert-deftest test-org2jekyll-list-drafts ()
+  (should (equal :found
+                 (let ((org2jekyll-jekyll-drafts-dir ""))
+                   (with-mock (mock (org2jekyll-output-directory "") => "found-file")
+                              (mock (find-file "found-file") => :found)
+                              (org2jekyll-list-drafts)))))
+  (should-not (let ((org2jekyll-jekyll-drafts-dir ""))
+                (with-mock (mock (org2jekyll-output-directory "") => "found-file")
+                           (mock (find-file "found-file") => nil)
+                           (org2jekyll-list-drafts)))))
+
+(ert-deftest test-org2jekyll-message ()
+  (should (equal "org2jekyll - this is a message"
+                 (org2jekyll-message "this is a %s" "message")))
+  (should (equal "org2jekyll - this is another message!"
+                 (org2jekyll-message "this is %s %s!" "another" "message"))))
