@@ -174,10 +174,9 @@ The `'%s`' will be replaced respectively by the blog entry name, the author, the
     (let ((draft-file (org2jekyll--draft-filename (org2jekyll-input-directory org2jekyll-jekyll-drafts-dir) title)))
       (if (file-exists-p draft-file)
           (find-file draft-file)
-        (progn
-          (find-file draft-file)
-          (insert (org2jekyll-default-headers-template layout author date title description tags categories))
-          (insert "* "))))))
+        (find-file draft-file)
+        (insert (org2jekyll-default-headers-template layout author date title description tags categories))
+        (insert "* ")))))
 
 (defalias 'org2jekyll/create-draft! 'org2jekyll-create-draft)
 
