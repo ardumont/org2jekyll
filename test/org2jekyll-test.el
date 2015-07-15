@@ -283,3 +283,11 @@ Publication skipped"
                                            ("author" . "some-author")
                                            ("categories" . "some-categories")
                                            ("description" . "some-description")))))
+
+(ert-deftest test-org2jekyll--yaml-escape ()
+  (should (string= "this is a title"
+                   (org2jekyll--yaml-escape "this is a title")))
+  (should (string= "\"title:\""
+                   (org2jekyll--yaml-escape "title:")))
+  (should (string= "\"\\\"title:\\\"\""
+                   (org2jekyll--yaml-escape "\"title:\""))))
