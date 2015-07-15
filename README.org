@@ -1,8 +1,8 @@
 #+title: org2jekyll
 #+author: ardumont
 
-[[https://travis-ci.org/ardumont/org2jekyll][https://travis-ci.org/ardumont/org2jekyll.svg]]
-https://coveralls.io/repos/ardumont/org2jekyll/badge.svg?branch=master&service=github
+[[https://travis-ci.org/ardumont/org2jekyll][file:https://travis-ci.org/ardumont/org2jekyll.svg]]
+[[https://coveralls.io/r/ardumont/org2jekyll][file:https://coveralls.io/repos/ardumont/org2jekyll/badge.svg]]
 
 Blogging with org-mode and jekyll without alien yaml headers.
 
