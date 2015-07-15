@@ -28,11 +28,7 @@ install:
 	cask install
 
 test: clean
-	cask exec $(EMACS) --batch \
-			-l ert \
-			-l ./org2jekyll.el \
-			-l ./org2jekyll-tests.el \
-			-f ert-run-tests-batch-and-exit
+	cask exec ert-runner
 
 pkg-el:
 	cask package
