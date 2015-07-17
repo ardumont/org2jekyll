@@ -94,7 +94,11 @@
   :group 'org2jekyll)
 
 (defcustom org2jekyll-jekyll-draft-user-types '()
-  "User types of drafts. Customize to include collections."
+  "User types of drafts. Customize to include collections.
+
+Note that if a corresponding project has been defined for the
+collection in `org-publish-project-alist', there is NO need to
+add it here again."
   :type 'list
   :require 'org2jekyll
   :group 'org2jekyll)
@@ -174,6 +178,17 @@ POST-CATEGORIES is the categories."
   "Compute the draft's filename from the DRAFT-DIR and TITLE."
   (concat draft-dir (org2jekyll--make-slug title) org2jekyll-jekyll-post-ext))
 
+(defsubst org2jekyll--get-post-types ()
+  "Return a list of post types.
+
+3 sources are queried, the result is uniqfied."
+  (let ((predefined-types '("page" "post"))
+        (prj-types (--keep (when (string= (plist-get (cdr it) :base-extension)
+                                          "org")
+                             (car it))
+                           org-publish-project-alist)))
+    (-uniq (append predefined-types prj-types org2jekyll-jekyll-draft-user-types))))
+
 ;;;###autoload
 (defun org2jekyll-create-draft ()
   "Create a new Jekyll blog post with TITLE.
@@ -182,23 +197,27 @@ The `'%s`' will be replaced respectively by the blog entry name, the author, the
   (interactive)
   (let* ((author      org2jekyll-blog-author)
          (date        (org2jekyll-now))
-         (type      (ido-completing-read "Type: "
-                                         (append '("page" "post")
-                                                 org2jekyll-jekyll-draft-user-types)
-                                         nil 'require-match))
+         (type        (ido-completing-read "Type: "
+                                           (org2jekyll--get-post-types)
+                                           nil 'require-match))
          ;; hard-coded layouts, the general idea is that the user need to
          ;; customize it on their own.
-         (layout    (if (string= type "page") "default" "post"))
+         (layout      (if (string= type "page") "default" "post"))
          (title       (read-string "Title: "))
          (description (read-string "Description: "))
          (tags        (read-string "Tags (csv): "))
-         (categories  (read-string "Categories (csv): ")))
-    (let ((draft-file (org2jekyll--draft-filename (org2jekyll-input-directory org2jekyll-jekyll-drafts-dir) title)))
-      (if (file-exists-p draft-file)
-          (find-file draft-file)
+         (categories  (read-string "Categories (csv): "))
+         (draft-dir   (file-name-as-directory
+                       (or
+                        (plist-get (cdr (assoc type org-publish-project-alist))
+                                   :base-directory)
+                        (org2jekyll-input-directory org2jekyll-jekyll-drafts-dir))))
+         (draft-file (org2jekyll--draft-filename draft-dir title)))
+    (if (file-exists-p draft-file)
         (find-file draft-file)
-        (insert (org2jekyll-default-headers-template layout author date title description tags categories))
-        (insert "* ")))))
+      (find-file draft-file)
+      (insert (org2jekyll-default-headers-template type layout author date title description tags categories))
+      (insert "* "))))
 
 (defalias 'org2jekyll/create-draft! 'org2jekyll-create-draft)
 
@@ -214,7 +233,7 @@ The `'%s`' will be replaced respectively by the blog entry name, the author, the
 (defun org2jekyll-list-drafts ()
   "Lists the drafts folder."
   (interactive)
-  (find-file (org2jekyll-output-directory org2jekyll-jekyll-drafts-dir)))
+  (find-file (org2jekyll-input-directory org2jekyll-jekyll-drafts-dir)))
 
 (defalias 'org2jekyll/list-drafts 'org2jekyll-list-drafts)
 
@@ -292,13 +311,11 @@ Depends on the metadata header #+LAYOUT."
        (concat "\n")))
 
 (defun org2jekyll--compute-ready-jekyll-file-name (date org-file)
-  "Given a DATE and an ORG-FILE, compute a ready jekyll file name.
-If the current path contains the `'org2jekyll-jekyll-drafts-dir`', removes it."
+  "Given a DATE and an ORG-FILE, compute a ready jekyll file name. "
   (let ((temp-org-jekyll-filename  (format "%s-%s" date (file-name-nondirectory org-file)))
         (temp-org-jekyll-directory (file-name-directory org-file)))
     (->> temp-org-jekyll-filename
          (format "%s%s" temp-org-jekyll-directory)
-         (replace-regexp-in-string (format "%s" org2jekyll-jekyll-drafts-dir) "")
          (replace-regexp-in-string "//" "/"))))
 
 (defun org2jekyll--copy-org-file-to-jekyll-org-file (date org-file yaml-headers)
@@ -416,9 +433,7 @@ Otherwise, display the error messages about the missing mandatory values."
 
 ;;;###autoload
 (defun org2jekyll-publish ()
-  "Publish the current org file as post or page depending on the chosen layout.
-Layout `'post`' is a jekyll post.
-Layout `'default`' is a page."
+  "Publish the current org file according to the chosen TYPE. "
   (interactive)
   (lexical-let ((org-file (buffer-file-name (current-buffer))))
     (deferred:$
@@ -468,7 +483,7 @@ Layout `'default`' is a page."
   (interactive)
   (deferred:$
     (deferred:next
-      (lambda () (->> (assoc "default" org-publish-project-alist)
+      (lambda () (->> (assoc "page" org-publish-project-alist)
                  org-publish-get-base-files
                  (--filter (org2jekyll-page-p (org2jekyll-article-p it))))))
     (deferred:nextc it
