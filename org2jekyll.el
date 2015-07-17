@@ -158,33 +158,54 @@ POST-CATEGORIES is the categories."
   "Compute the draft's filename from the DRAFT-DIR and TITLE."
   (concat draft-dir (org2jekyll--make-slug title) org2jekyll-jekyll-post-ext))
 
+(defun org2jekyll--read-title ()
+  "Read the title."
+  (read-string "Title: "))
+
+(defun org2jekyll--read-description ()
+  "Read the description."
+  (read-string "Description: "))
+
+(defun org2jekyll--read-tags ()
+  "Read the tags."
+  (read-string "Tags (csv): "))
+
+(defun org2jekyll--read-categories ()
+  "Read the categories."
+  (read-string "Categories (csv): "))
+
 ;;;###autoload
 (defun org2jekyll-create-draft ()
   "Create a new Jekyll blog post with TITLE.
 The `'%s`' will be replaced respectively by the blog entry name, the author, the
  generated date, the title, the description, the tags and the categories."
   (interactive)
-  (let ((author      org2jekyll-blog-author)
-        (date        (org2jekyll-now))
-        (layout      (ido-completing-read "Layout: " '("post" "default") nil 'require-match))
-        (title       (read-string "Title: "))
-        (description (read-string "Description: "))
-        (tags        (read-string "Tags (csv): "))
-        (categories  (read-string "Categories (csv): ")))
-    (let ((draft-file (org2jekyll--draft-filename (org2jekyll-input-directory org2jekyll-jekyll-drafts-dir) title)))
-      (if (file-exists-p draft-file)
-          (find-file draft-file)
+  (let* ((author      org2jekyll-blog-author)
+         (date        (org2jekyll-now))
+         (layout      (ido-completing-read "Layout: " '("post" "default") nil 'require-match))
+         (title       (org2jekyll--read-title))
+         (description (org2jekyll--read-description))
+         (tags        (org2jekyll--read-tags))
+         (categories  (org2jekyll--read-categories))
+         (draft-file  (org2jekyll--draft-filename (org2jekyll-input-directory org2jekyll-jekyll-drafts-dir) title)))
+    (if (file-exists-p draft-file)
         (find-file draft-file)
+      (with-temp-file draft-file
         (insert (org2jekyll-default-headers-template layout author date title description tags categories))
-        (insert "* ")))))
+        (insert "* ")))
+    (find-file draft-file)))
 
 (defalias 'org2jekyll/create-draft! 'org2jekyll-create-draft)
+
+(defun org2jekyll--list-dir (dir)
+  "Lists the content of the folder DIR."
+  (find-file (org2jekyll-output-directory dir)))
 
 ;;;###autoload
 (defun org2jekyll-list-posts ()
   "Lists the posts folder."
   (interactive)
-  (find-file (org2jekyll-output-directory org2jekyll-jekyll-posts-dir)))
+  (org2jekyll--list-dir org2jekyll-jekyll-posts-dir))
 
 (defalias 'org2jekyll/list-posts 'org2jekyll-list-posts)
 
@@ -192,7 +213,7 @@ The `'%s`' will be replaced respectively by the blog entry name, the author, the
 (defun org2jekyll-list-drafts ()
   "Lists the drafts folder."
   (interactive)
-  (find-file (org2jekyll-output-directory org2jekyll-jekyll-drafts-dir)))
+  (org2jekyll--list-dir org2jekyll-jekyll-drafts-dir))
 
 (defalias 'org2jekyll/list-drafts 'org2jekyll-list-drafts)
 

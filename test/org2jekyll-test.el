@@ -11,7 +11,7 @@
     (should (equal "some-date" (org2jekyll-get-option-from-file temp-filename "DATE")))
     (should-not (org2jekyll-get-option-from-file temp-filename "some-other-non-existing-option"))))
 
-(ert-deftest test-org2jekyll-get-option-from-file ()
+(ert-deftest test-org2jekyll-get-options-from-file ()
   (let ((temp-filename "/tmp/test-publish-article-p"))
     (with-temp-file temp-filename  (insert "#+LAYOUT: post\n#+DATE: some-date"))
     (should (equal '(("layout" . "post")
@@ -292,30 +292,116 @@ Publication skipped"
   (should (string= "\"\\\"title:\\\"\""
                    (org2jekyll--yaml-escape "\"title:\""))))
 
+(ert-deftest test-org2jekyll--list-dir ()
+  (should (equal :found
+                 (with-mock (mock (org2jekyll-output-directory "/some/dir") => "found-file")
+                            (mock (find-file "found-file") => :found)
+                            (org2jekyll--list-dir "/some/dir"))))
+  (should-not (with-mock (mock (org2jekyll-output-directory "/some/unknown") => "something")
+                         (mock (find-file "something") => nil)
+                         (org2jekyll--list-dir "/some/unknown"))))
+
 (ert-deftest test-org2jekyll-list-posts ()
   (should (equal :found
-                 (let ((org2jekyll-jekyll-posts-dir ""))
-                   (with-mock (mock (org2jekyll-output-directory "") => "found-file")
-                              (mock (find-file "found-file") => :found)
-                              (org2jekyll-list-posts)))))
-  (should-not (let ((org2jekyll-jekyll-posts-dir ""))
-                (with-mock (mock (org2jekyll-output-directory "") => "found-file")
-                           (mock (find-file "found-file") => nil)
-                           (org2jekyll-list-posts)))))
+                 (let ((org2jekyll-jekyll-posts-dir "some-posts-dir"))
+                   (with-mock (mock (org2jekyll--list-dir "some-posts-dir") => :found)
+                              (org2jekyll-list-posts))))))
 
 (ert-deftest test-org2jekyll-list-drafts ()
   (should (equal :found
-                 (let ((org2jekyll-jekyll-drafts-dir ""))
-                   (with-mock (mock (org2jekyll-output-directory "") => "found-file")
-                              (mock (find-file "found-file") => :found)
-                              (org2jekyll-list-drafts)))))
-  (should-not (let ((org2jekyll-jekyll-drafts-dir ""))
-                (with-mock (mock (org2jekyll-output-directory "") => "found-file")
-                           (mock (find-file "found-file") => nil)
-                           (org2jekyll-list-drafts)))))
+                 (let ((org2jekyll-jekyll-drafts-dir "some-drafts-dir"))
+                   (with-mock (mock (org2jekyll--list-dir "some-drafts-dir") => :found)
+                              (org2jekyll-list-drafts))))))
 
 (ert-deftest test-org2jekyll-message ()
   (should (equal "org2jekyll - this is a message"
                  (org2jekyll-message "this is a %s" "message")))
   (should (equal "org2jekyll - this is another message!"
                  (org2jekyll-message "this is %s %s!" "another" "message"))))
+
+(ert-deftest test-org2jekyll-now ()
+  (should (equal :date
+                 (with-mock (mock (format-time-string "%Y-%m-%d %a %H:%M") => :date)
+                            (org2jekyll-now)))))
+
+(ert-deftest test-org2jekyll-create-draft ()
+  (should (string= "#+STARTUP: showall
+#+STARTUP: hidestars
+#+OPTIONS: H:2 num:nil tags:nil toc:nil timestamps:t
+#+LAYOUT: post
+#+AUTHOR: tony
+#+DATE: some date
+#+TITLE: some title
+#+DESCRIPTION: some description
+#+TAGS: tag0, tag1
+#+CATEGORIES: cat0, cat1, catn
+
+* "
+                   (progn
+                     ;; clean up
+                     (when (file-exists-p "/tmp/some-title.org")
+                       (delete-file "/tmp/some-title.org"))
+                     ;; execute draft creation
+                     (save-excursion
+                       (let ((org2jekyll-source-directory "/tmp")
+                             (org2jekyll-jekyll-drafts-dir "")
+                             (org2jekyll-blog-author "tony"))
+                         (with-mock
+                           (mock (org2jekyll-now)                                                        => "some date")
+                           (mock (ido-completing-read "Layout: " '("post" "default") nil 'require-match) => "post")
+                           (mock (org2jekyll--read-title)                                                => "some title")
+                           (mock (org2jekyll--read-description)                                          => "some description")
+                           (mock (org2jekyll--read-tags)                                                 => "tag0, tag1")
+                           (mock (org2jekyll--read-categories)                                           => "cat0, cat1, catn")
+                           (mock (org2jekyll-input-directory "")                                         => "/tmp")
+                           ;; (mock (org2jekyll--draft-filename "/tmp" "some title")                     => "/tmp/some-title.org")
+                           (mock (org2jekyll--draft-filename * *)                                        => "/tmp/some-title.org")
+                           (mock (find-file "/tmp/some-title.org") => nil)
+                           (call-interactively #'org2jekyll-create-draft))))
+                     ;; read the created file
+                     (with-temp-buffer
+                       (insert-file-contents "/tmp/some-title.org")
+                       (buffer-substring-no-properties (point-min) (point-max)))))))
+
+
+(ert-deftest test-org2jekyll--read-title ()
+  (should (equal "some super title"
+                 (with-mock
+                   (mock (read-string "Title: ") => "some super title")
+                   (org2jekyll--read-title))))
+  (should-not (with-mock
+                (mock (read-string "Title: "))
+                (org2jekyll--read-title))))
+
+(ert-deftest test-org2jekyll--read-description ()
+  (should (equal "some super description"
+                 (with-mock
+                   (mock (read-string "Description: ") => "some super description")
+                   (org2jekyll--read-description))))
+  (should-not (with-mock
+                (mock (read-string "Description: "))
+                (org2jekyll--read-description))))
+
+(ert-deftest test-org2jekyll--read-tags ()
+  (should (equal "tag0, tag10"
+                 (with-mock
+                   (mock (read-string "Tags (csv): ") => "tag0, tag10")
+                   (org2jekyll--read-tags))))
+  (should-not (with-mock
+                (mock (read-string "Tags (csv): "))
+                (org2jekyll--read-tags))))
+
+(ert-deftest test-org2jekyll--read-categories ()
+  (should (equal "cat0, cat10"
+                 (with-mock
+                   (mock (read-string "Categories (csv): ") => "cat0, cat10")
+                   (org2jekyll--read-categories))))
+  (should-not (with-mock
+                (mock (read-string "Categories (csv): "))
+                (org2jekyll--read-categories))))
+
+(ert-deftest test-org2jekyll-layout ()
+  (should (equal :layout
+                 (with-mock
+                   (mock (org2jekyll-get-option-from-file "some-org-file" "layout") => :layout)
+                   (org2jekyll-layout "some-org-file")))))
