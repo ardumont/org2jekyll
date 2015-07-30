@@ -294,23 +294,23 @@ Publication skipped"
 
 (ert-deftest test-org2jekyll--list-dir ()
   (should (equal :found
-                 (with-mock (mock (org2jekyll-output-directory "/some/dir") => "found-file")
-                            (mock (find-file "found-file") => :found)
-                            (org2jekyll--list-dir "/some/dir"))))
-  (should-not (with-mock (mock (org2jekyll-output-directory "/some/unknown") => "something")
-                         (mock (find-file "something") => nil)
-                         (org2jekyll--list-dir "/some/unknown"))))
+                 (with-mock (mock (find-file "found-file") => :found)
+                            (org2jekyll--list-dir "found-file"))))
+  (should-not (with-mock (mock (find-file "unknown") => nil)
+                         (org2jekyll--list-dir "unknown"))))
 
 (ert-deftest test-org2jekyll-list-posts ()
   (should (equal :found
-                 (let ((org2jekyll-jekyll-posts-dir "some-posts-dir"))
-                   (with-mock (mock (org2jekyll--list-dir "some-posts-dir") => :found)
+                 (let ((org2jekyll-jekyll-directory "path-to-jekyll-root")
+                       (org2jekyll-jekyll-posts-dir "some-posts-dir"))
+                   (with-mock (mock (find-file "path-to-jekyll-root/some-posts-dir") => :found)
                               (org2jekyll-list-posts))))))
 
 (ert-deftest test-org2jekyll-list-drafts ()
   (should (equal :found
-                 (let ((org2jekyll-jekyll-drafts-dir "some-drafts-dir"))
-                   (with-mock (mock (org2jekyll--list-dir "some-drafts-dir") => :found)
+                 (let ((org2jekyll-source-directory "path-to-org-source-root")
+                       (org2jekyll-jekyll-drafts-dir "some-drafts-dir"))
+                   (with-mock (mock (find-file "path-to-org-source-root/some-drafts-dir") => :found)
                               (org2jekyll-list-drafts))))))
 
 (ert-deftest test-org2jekyll-message ()
