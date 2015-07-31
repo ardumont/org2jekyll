@@ -111,7 +111,17 @@
 The `'%s`' will be replaced respectively by name, the author, the generated date, the title, the description and the categories.")
 
 (setq org2jekyll-jekyll-org-post-template
-      "#+STARTUP: showall\n#+STARTUP: hidestars\n#+OPTIONS: H:2 num:nil tags:nil toc:nil timestamps:t\n#+LAYOUT: %s\n#+AUTHOR: %s\n#+DATE: %s\n#+TITLE: %s\n#+DESCRIPTION: %s\n#+TAGS: %s\n#+CATEGORIES: %s\n\n")
+"#+STARTUP: showall
+#+STARTUP: hidestars
+#+OPTIONS: H:2 num:nil tags:nil toc:nil timestamps:t
+#+LAYOUT: %s
+#+AUTHOR: %s
+#+DATE: %s
+#+TITLE: %s
+#+DESCRIPTION: %s
+#+TAGS: %s
+#+CATEGORIES: %s
+\n")
 
 (defun org2jekyll--optional-folder (folder-source &optional folder-name)
   "Compute the folder name from a FOLDER-SOURCE and an optional FOLDER-NAME."
@@ -198,22 +208,22 @@ The `'%s`' will be replaced respectively by the blog entry name, the author, the
 (defalias 'org2jekyll/create-draft! 'org2jekyll-create-draft)
 
 (defun org2jekyll--list-dir (dir)
-  "Lists the content of the folder DIR."
-  (find-file (org2jekyll-output-directory dir)))
+  "List the content of DIR."
+  (find-file dir))
 
 ;;;###autoload
 (defun org2jekyll-list-posts ()
   "Lists the posts folder."
   (interactive)
-  (org2jekyll--list-dir org2jekyll-jekyll-posts-dir))
+  (org2jekyll--list-dir (org2jekyll-output-directory org2jekyll-jekyll-posts-dir)))
 
 (defalias 'org2jekyll/list-posts 'org2jekyll-list-posts)
 
 ;;;###autoload
 (defun org2jekyll-list-drafts ()
-  "Lists the drafts folder."
+  "List the drafts folder."
   (interactive)
-  (org2jekyll--list-dir org2jekyll-jekyll-drafts-dir))
+  (org2jekyll--list-dir (org2jekyll-input-directory org2jekyll-jekyll-drafts-dir)))
 
 (defalias 'org2jekyll/list-drafts 'org2jekyll-list-drafts)
 
