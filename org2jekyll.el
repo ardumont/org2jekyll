@@ -406,16 +406,23 @@ Otherwise, display the error messages about the missing mandatory values."
   "Publish ORG-FILE as a page."
   (org2jekyll-read-metadata-and-execute
    (lambda (org-metadata org-file)
-     (let ((blog-project (assoc-default "layout" org-metadata))
-           (backup-file (format "%s.org2jekyll" org-file)))
-       (copy-file org-file backup-file t t t)
-       (with-temp-file org-file
+     (let ((blog-project (assoc-default "type" org-metadata))
+           (jekyll-file (format "%s.org2jekyll" (file-name-sans-extension org-file))))
+       (with-temp-file jekyll-file
          (insert-file-contents org-file)
          (goto-char (point-min))
-         (insert (org2jekyll--to-yaml-header org-metadata))
-         (org-publish-file org-file (assoc blog-project org-publish-project-alist)))
-       (copy-file backup-file org-file t t t)
-       (delete-file backup-file)))
+         (insert (org2jekyll--to-yaml-header org-metadata)))
+       (org-publish-file jekyll-file
+                         (append
+                          ;; Redefine `:base-extension' to have correct exported
+                          ;; file name
+                          ;;
+                          ;; TODO `org2jekyll-create-draft' doesn't deal with
+                          ;; page correctly (due to the incompleteness of
+                          ;; collection support)
+                          `(,blog-project :base-extension "org2jekyll")
+                          (cdr (assoc blog-project org-publish-project-alist))))
+       (delete-file jekyll-file)))
    org-file))
 
 (defun org2jekyll-post-p (layout)
