@@ -1,18 +1,19 @@
 #!/usr/bin/env bash
 
-if [ $# -ne 1 ]; then
+if [ $# -ne 2 ]; then
     cat <<EOF
 Use: $0 <VERSION>"
 - VERSION    version to release (0.1.6 for example)
+- PACKAGE    package to release
 
 To install the token, execute the install-marmalade-token.sh.
 EOF
     exit 1;
 fi
+VERSION=$1
+PACKAGE=$2
 
 WDIR=$(dirname $0)
-
-VERSION=$1
 
 # launched from the current dev branch
 
@@ -28,4 +29,4 @@ git push origin --tag
 
 make package
 
-./upload-to-marmalade.sh
+./upload-to-marmalade.sh $VERSION $PACKAGE

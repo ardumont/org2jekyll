@@ -110,11 +110,11 @@ excerpt: Installing jabber and using it from emacs + authentication tips and tri
 - gtalk")
                    ("excerpt" . "Installing jabber and using it from emacs + authentication tips and tricks"))
                  (org2jekyll--org-to-yaml-metadata '(("layout" . "post")
-                                                      ("title" . "gtalk in emacs using jabber mode")
-                                                      ("date" . "2013-01-13")
-                                                      ("author" . "Antoine R. Dumont")
-                                                      ("categories" . "\n- jabber\n- emacs\n- tools\n- gtalk")
-                                                      ("description" . "Installing jabber and using it from emacs + authentication tips and tricks"))))))
+                                                     ("title" . "gtalk in emacs using jabber mode")
+                                                     ("date" . "2013-01-13")
+                                                     ("author" . "Antoine R. Dumont")
+                                                     ("categories" . "\n- jabber\n- emacs\n- tools\n- gtalk")
+                                                     ("description" . "Installing jabber and using it from emacs + authentication tips and tricks"))))))
 
 (ert-deftest test-org2jekyll--compute-ready-jekyll-file-name ()
   (should (equal "/home/tony/org/2012-10-10-scratch.org"
@@ -151,14 +151,14 @@ excerpt: some-fake-description with spaces and all
                        (insert "#+fake-meta: some fake meta\n* some content"))
                      ;; create the fake jekyll file with jekyll metadata
                      (--> fake-org-file
-                       (org2jekyll--copy-org-file-to-jekyll-org-file fake-date it `(("layout"      . "post")
-                                                                                     ("title"       . "some fake title")
-                                                                                     ("date"        . ,fake-date)
-                                                                                     ("categories"  . "\n- some-fake-category1\n- some-fake-category2")
-                                                                                     ("author"      . "some-fake-author")
-                                                                                     ("description" . "some-fake-description with spaces and all")))
-                       (insert-file-contents it)
-                       (with-temp-buffer it (buffer-string))))))))
+                          (org2jekyll--copy-org-file-to-jekyll-org-file fake-date it `(("layout"      . "post")
+                                                                                       ("title"       . "some fake title")
+                                                                                       ("date"        . ,fake-date)
+                                                                                       ("categories"  . "\n- some-fake-category1\n- some-fake-category2")
+                                                                                       ("author"      . "some-fake-author")
+                                                                                       ("description" . "some-fake-description with spaces and all")))
+                          (insert-file-contents it)
+                          (with-temp-buffer it (buffer-string))))))))
 
 (ert-deftest test-org2jekyll--convert-timestamp-to-yyyy-dd-mm ()
   (should (equal "2013-04-29" (org2jekyll--convert-timestamp-to-yyyy-dd-mm "2013-04-29 lun. 00:46"))))
@@ -257,7 +257,22 @@ Publication skipped"
   (should (equal "'some-org-file' is not an article, publication skipped!"
                  (mocklet (((org2jekyll-article-p "org-file") => nil)
                            ((file-name-nondirectory "org-file") => "some-org-file"))
+                   (org2jekyll-read-metadata-and-execute (lambda (org-metadata org-file) 2) "org-file"))))
+  (should (equal "org2jekyll - some message"
+                 (mocklet (((org2jekyll-article-p "org-file") => t)
+                           ((org2jekyll-read-metadata "org-file") => "some message"))
                    (org2jekyll-read-metadata-and-execute (lambda (org-metadata org-file) 2) "org-file")))))
+
+(ert-deftest test-org2jekyll--publish-post-org-file-with-metadata ()
+  (should (eq :file-deleted
+              (let ((org-publish-project-alist '((:post :project))))
+                (with-mock
+                  (mock (org2jekyll--copy-org-file-to-jekyll-org-file :date :org-file '(("layout" . :post)
+                                                                                        ("date" . :date))) => :jekyll-file)
+                  (mock (org-publish-file :jekyll-file '(:post :project)) => :published-file)
+                  (mock (delete-file :jekyll-file) => :file-deleted)
+                  (org2jekyll--publish-post-org-file-with-metadata '(("layout" . :post)
+                                                                     ("date" . :date)) :org-file))))))
 
 (ert-deftest test-org2jekyll-post-p ()
   (should (org2jekyll-post-p "post"))
@@ -363,6 +378,35 @@ Publication skipped"
                        (insert-file-contents "/tmp/some-title.org")
                        (buffer-substring-no-properties (point-min) (point-max)))))))
 
+(ert-deftest test-org2jekyll-init-current-buffer ()
+  (should (string= "#+STARTUP: showall
+#+STARTUP: hidestars
+#+OPTIONS: H:2 num:nil tags:nil toc:nil timestamps:t
+#+LAYOUT: some-layout
+#+AUTHOR: dude
+#+DATE: some-date
+#+TITLE: some-title
+#+DESCRIPTION: some-desc
+#+TAGS: some-tags
+#+CATEGORIES: some-cat
+
+* some blog
+* already present
+"
+                   (org2jekyll-tests-with-temp-buffer-and-return-content
+                    "* some blog
+* already present
+"
+                    (with-mock
+                      (mock (org2jekyll--init-buffer-metadata) => '(:author "dude"
+                                                                            :date "some-date"
+                                                                            :layout "some-layout"
+                                                                            :title "some-title"
+                                                                            :description "some-desc"
+                                                                            :tags "some-tags"
+                                                                            :categories "some-cat"))
+                      (call-interactively #'org2jekyll-init-current-buffer))))))
+
 
 (ert-deftest test-org2jekyll--read-title ()
   (should (equal "some super title"
@@ -405,3 +449,53 @@ Publication skipped"
                  (with-mock
                    (mock (org2jekyll-get-option-from-file "some-org-file" "layout") => :layout)
                    (org2jekyll-layout "some-org-file")))))
+
+(ert-deftest test-org2jekyll--input-read ()
+  (should (eq :input-done
+              (with-mock
+                (mock (ido-completing-read :prompt
+                                           :collection
+                                           nil
+                                           'require-match) => :input-done)
+                (org2jekyll--input-read :prompt :collection)))))
+
+(ert-deftest test-org2jekyll--init-buffer-metadata ()
+  (should (equal '(:author "dude"
+                           :date :some-date
+                           :layout :some-layout
+                           :title :some-title
+                           :description :some-desc
+                           :tags :some-tags
+                           :categories :some-cat)
+                 (let ((org2jekyll-blog-author "dude"))
+                   (with-mock
+                     (mock (org2jekyll-now) => :some-date)
+                     (mock (org2jekyll--input-read "Layout: " '("post" "default")) => :some-layout)
+                     (mock (org2jekyll--read-title) => :some-title)
+                     (mock (org2jekyll--read-description) => :some-desc)
+                     (mock (org2jekyll--read-tags) => :some-tags)
+                     (mock (org2jekyll--read-categories) => :some-cat)
+                     (org2jekyll--init-buffer-metadata))))))
+
+(ert-deftest test-org2jekyll-publish-web-project ()
+  (should (eq 'publish-done
+              (with-mock
+                (mock (org-publish-project "web") => 'publish-done)
+                (org2jekyll-publish-web-project)))))
+
+(ert-deftest test-org2jekyll-publish-post ()
+  (should (eq :publish-post-done
+              (with-mock
+                (mock (org2jekyll-read-metadata-and-execute
+                       'org2jekyll--publish-post-org-file-with-metadata
+                       :org-file) => :publish-post-done)
+                (org2jekyll-publish-post :org-file)))))
+
+
+(ert-deftest test-org2jekyll-publish-page ()
+  (should (eq :publish-page-done
+              (with-mock
+                (mock (org2jekyll-read-metadata-and-execute
+                       'org2ekyll--publish-page-org-file-with-metadata
+                       :org-file) => :publish-page-done)
+                (org2jekyll-publish-page :org-file)))))

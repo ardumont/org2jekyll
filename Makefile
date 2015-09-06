@@ -1,8 +1,8 @@
-MODE_NAME=org2jekyll
-VERSION=$$(grep "^;; Version: " $(MODE_NAME).el | cut -f3 -d' ')
-PACKAGE_FOLDER=$(MODE_NAME)-$(VERSION)
-ARCHIVE=$(PACKAGE_FOLDER).tar
-EMACS=emacs
+PACKAGE = org2jekyll
+VERSION = $$(grep "^;; Version: " $(PACKAGE).el | cut -f3 -d' ')
+ARCHIVE = $(PACKAGE)-$(VERSION).tar
+EMACS ?= emacs
+CASK ?= cask
 
 pr:
 	hub pull-request -b ardumont:master
@@ -10,10 +10,10 @@ pr:
 .PHONY: clean
 
 deps:
-	cask
+	${CASK}
 
 build:
-	cask build
+	${CASK} build
 
 
 clean-dist:
@@ -22,26 +22,29 @@ clean-dist:
 
 clean: clean-dist
 	rm -rf *.tar
-	cask clean-elc
+	${CASK} clean-elc
 
 install:
-	cask install
+	${CASK} install
 
 test: clean
-	cask exec ert-runner
+	${CASK} exec ert-runner
 
 pkg-el:
-	cask package
+	${CASK} package
 
 package: clean pkg-el
 	cp dist/$(ARCHIVE) .
 	make clean-dist
 
 info:
-	cask info
+	${CASK} info
 
 release:
-	./release.sh $(VERSION)
+	./release.sh $(VERSION) $(PACKAGE)
+
+version:
+	@echo -e "application $(PACKAGE): $(VERSION)\npackage: $(ARCHIVE)"
 
 emacs-install-clean: package
 	~/bin/emacs/emacs-install-clean.sh ./$(ARCHIVE)
