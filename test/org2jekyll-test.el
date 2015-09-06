@@ -257,7 +257,22 @@ Publication skipped"
   (should (equal "'some-org-file' is not an article, publication skipped!"
                  (mocklet (((org2jekyll-article-p "org-file") => nil)
                            ((file-name-nondirectory "org-file") => "some-org-file"))
+                   (org2jekyll-read-metadata-and-execute (lambda (org-metadata org-file) 2) "org-file"))))
+  (should (equal "org2jekyll - some message"
+                 (mocklet (((org2jekyll-article-p "org-file") => t)
+                           ((org2jekyll-read-metadata "org-file") => "some message"))
                    (org2jekyll-read-metadata-and-execute (lambda (org-metadata org-file) 2) "org-file")))))
+
+(ert-deftest test-org2jekyll--publish-post-org-file-with-metadata ()
+  (should (eq :file-deleted
+              (let ((org-publish-project-alist '((:post :project))))
+                (with-mock
+                  (mock (org2jekyll--copy-org-file-to-jekyll-org-file :date :org-file '(("layout" . :post)
+                                                                                        ("date" . :date))) => :jekyll-file)
+                  (mock (org-publish-file :jekyll-file '(:post :project)) => :published-file)
+                  (mock (delete-file :jekyll-file) => :file-deleted)
+                  (org2jekyll--publish-post-org-file-with-metadata '(("layout" . :post)
+                                                                     ("date" . :date)) :org-file))))))
 
 (ert-deftest test-org2jekyll-post-p ()
   (should (org2jekyll-post-p "post"))
@@ -461,3 +476,26 @@ Publication skipped"
                      (mock (org2jekyll--read-tags) => :some-tags)
                      (mock (org2jekyll--read-categories) => :some-cat)
                      (org2jekyll--init-buffer-metadata))))))
+
+(ert-deftest test-org2jekyll-publish-web-project ()
+  (should (eq 'publish-done
+              (with-mock
+                (mock (org-publish-project "web") => 'publish-done)
+                (org2jekyll-publish-web-project)))))
+
+(ert-deftest test-org2jekyll-publish-post ()
+  (should (eq :publish-post-done
+              (with-mock
+                (mock (org2jekyll-read-metadata-and-execute
+                       'org2jekyll--publish-post-org-file-with-metadata
+                       :org-file) => :publish-post-done)
+                (org2jekyll-publish-post :org-file)))))
+
+
+(ert-deftest test-org2jekyll-publish-page ()
+  (should (eq :publish-page-done
+              (with-mock
+                (mock (org2jekyll-read-metadata-and-execute
+                       'org2ekyll--publish-page-org-file-with-metadata
+                       :org-file) => :publish-page-done)
+                (org2jekyll-publish-page :org-file)))))

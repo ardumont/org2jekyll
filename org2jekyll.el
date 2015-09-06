@@ -475,35 +475,41 @@ Publication skipped" error-messages)
   "Log formatted ARGS."
   (apply 'message (format "org2jekyll - %s" (car args)) (cdr args)))
 
+(defun org2jekyll--publish-post-org-file-with-metadata (org-metadata org-file)
+  "Publish as post with ORG-METADATA the ORG-FILE."
+  (let ((blog-project    (assoc-default "layout" org-metadata))
+        (jekyll-filename (org2jekyll--copy-org-file-to-jekyll-org-file
+                          (assoc-default "date" org-metadata)
+                          org-file org-metadata)))
+    (org-publish-file jekyll-filename
+                      (assoc blog-project org-publish-project-alist))
+    (delete-file jekyll-filename)))
+
 (defun org2jekyll-publish-post (org-file)
   "Publish ORG-FILE as a post."
   (org2jekyll-read-metadata-and-execute
-   (lambda (org-metadata org-file)
-     (let ((blog-project    (assoc-default "layout" org-metadata))
-           (jekyll-filename (org2jekyll--copy-org-file-to-jekyll-org-file
-                             (assoc-default "date" org-metadata)
-                             org-file org-metadata)))
-       (org-publish-file jekyll-filename
-                         (assoc blog-project org-publish-project-alist))
-       (delete-file jekyll-filename)))
+   'org2jekyll--publish-post-org-file-with-metadata
    org-file))
+
+(defun org2ekyll--publish-page-org-file-with-metadata (org-metadata org-file)
+  "Publish as page with ORG-METADATA the ORG-FILE."
+  (let* ((blog-project (assoc-default "layout" org-metadata))
+         (ext (file-name-extension org-file))
+         (temp-file (format "%sorg2jekyll" (s-chop-suffix ext org-file))))
+    (copy-file org-file temp-file t t t)
+    (with-temp-file temp-file
+      (insert-file-contents temp-file)
+      (goto-char (point-min))
+      (insert (org2jekyll--to-yaml-header org-metadata))
+      (write-file temp-file)
+      (org-publish-file temp-file
+                        (assoc blog-project org-publish-project-alist)))
+    (delete-file temp-file)))
 
 (defun org2jekyll-publish-page (org-file)
   "Publish ORG-FILE as a page."
   (org2jekyll-read-metadata-and-execute
-   (lambda (org-metadata org-file)
-     (let* ((blog-project (assoc-default "layout" org-metadata))
-            (ext (file-name-extension org-file))
-            (temp-file (format "%sorg2jekyll" (s-chop-suffix ext org-file))))
-       (copy-file org-file temp-file t t t)
-       (with-temp-file temp-file
-         (insert-file-contents temp-file)
-         (goto-char (point-min))
-         (insert (org2jekyll--to-yaml-header org-metadata))
-         (write-file temp-file)
-         (org-publish-file temp-file
-                           (assoc blog-project org-publish-project-alist)))
-       (delete-file temp-file)))
+   'org2ekyll--publish-page-org-file-with-metadata
    org-file))
 
 (defun org2jekyll-post-p (layout)
