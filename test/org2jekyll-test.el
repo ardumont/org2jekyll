@@ -405,3 +405,12 @@ Publication skipped"
                  (with-mock
                    (mock (org2jekyll-get-option-from-file "some-org-file" "layout") => :layout)
                    (org2jekyll-layout "some-org-file")))))
+
+(ert-deftest test-org2jekyll--input-read ()
+  (should (eq :input-done
+              (with-mock
+                (mock (ido-completing-read :prompt
+                                           :collection
+                                           nil
+                                           'require-match) => :input-done)
+                (org2jekyll--input-read :prompt :collection)))))

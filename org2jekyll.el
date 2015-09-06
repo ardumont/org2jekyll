@@ -198,6 +198,13 @@ POST-CATEGORIES is the categories."
   "Read the categories."
   (read-string "Categories (csv): "))
 
+(defun org2jekyll--input-read (prompt collection)
+  "Input PROMPT with possibilities limited to COLLECTION."
+  (ido-completing-read prompt
+                       collection
+                       nil
+                       'require-match))
+
 ;;;###autoload
 (defun org2jekyll-create-draft ()
   "Create a new Jekyll blog post with TITLE.
@@ -206,8 +213,7 @@ The `'%s`' will be replaced respectively by the blog entry name, the author, the
   (interactive)
   (let* ((author      org2jekyll-blog-author)
          (date        (org2jekyll-now))
-         (layout      (ido-completing-read "Layout: " '("post" "default") nil
-                                           'require-match))
+         (layout      (org2jekyll--input-read "Layout: " '("post" "default")))
          (title       (org2jekyll--read-title))
          (description (org2jekyll--read-description))
          (tags        (org2jekyll--read-tags))
@@ -215,8 +221,7 @@ The `'%s`' will be replaced respectively by the blog entry name, the author, the
          (draft-file  (org2jekyll--draft-filename
                        (org2jekyll-input-directory org2jekyll-jekyll-drafts-dir)
                        title)))
-    (if (file-exists-p draft-file)
-        (find-file draft-file)
+    (unless (file-exists-p draft-file)
       (with-temp-file draft-file
         (insert (org2jekyll-default-headers-template layout
                                                      author
