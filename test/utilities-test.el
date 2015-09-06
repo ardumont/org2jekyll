@@ -27,7 +27,17 @@
 (require 'utilities)
 (require 'ert)
 
-(ert-deftest test-orgtrello-tests-with-temp-buffer-and-return-buffer-content ()
+(ert-deftest test-org2jekyll-tests-with-temp-buffer ()
+  (should (string="line 1
+line 2
+line 3"
+                  (org2jekyll-tests-with-temp-buffer
+                   "line 1
+line 2
+line 3"
+                   (buffer-substring-no-properties (point-min) (point-max))))))
+
+(ert-deftest test-org2jekyll-tests-with-temp-buffer-and-return-buffer-content ()
   (should (string= "1
 2
 3

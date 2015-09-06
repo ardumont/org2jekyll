@@ -492,17 +492,18 @@ Publication skipped" error-messages)
   "Publish ORG-FILE as a page."
   (org2jekyll-read-metadata-and-execute
    (lambda (org-metadata org-file)
-     (let ((blog-project (assoc-default "layout" org-metadata))
-           (backup-file (format "%s.org2jekyll" org-file)))
-       (copy-file org-file backup-file t t t)
-       (with-temp-file org-file
-         (insert-file-contents org-file)
+     (let* ((blog-project (assoc-default "layout" org-metadata))
+            (ext (file-name-extension org-file))
+            (temp-file (format "%sorg2jekyll" (s-chop-suffix ext org-file))))
+       (copy-file org-file temp-file t t t)
+       (with-temp-file temp-file
+         (insert-file-contents temp-file)
          (goto-char (point-min))
          (insert (org2jekyll--to-yaml-header org-metadata))
-         (org-publish-file org-file
+         (write-file temp-file)
+         (org-publish-file temp-file
                            (assoc blog-project org-publish-project-alist)))
-       (copy-file backup-file org-file t t t)
-       (delete-file backup-file)))
+       (delete-file temp-file)))
    org-file))
 
 (defun org2jekyll-post-p (layout)

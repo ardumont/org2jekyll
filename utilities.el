@@ -24,6 +24,17 @@
 
 ;;; Code:
 
+(defmacro org2jekyll-tests-with-temp-buffer (text body-test)
+  "A `org-mode' mode buffer helper test on buffer.
+TEXT is the content of the buffer.
+BODY-TEST is the assertion to test on the buffer.
+NB-LINES-FORWARD is the number of lines to get back to."
+  `(with-temp-buffer
+     (org-mode)
+     (org2jekyll-mode)
+     (insert ,text)
+     ,body-test))
+
 (defmacro org2jekyll-tests-with-temp-buffer-and-return-content (text body-test)
   "A `org-mode' mode buffer helper test on buffer.
 TEXT is the content of the buffer.
