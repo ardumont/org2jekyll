@@ -1,10 +1,11 @@
 #+title: Backlog
 #+author: ardumont
 
-* IN-PROGRESS 0.1.8 [66%]
+* IN-PROGRESS 0.1.8 [75%]
 - [X] Update version
 - [X] Improve deployment script
-- [ ] Fix #26
+- [X] Code convention (limit to 80 characters line)
+- [ ] #26 - fix potential page publishing problem
 * DONE 0.1.7 [100%]
 CLOSED: [2015-07-14 Tue 16:35]
 - [X] Update version

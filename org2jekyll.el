@@ -108,10 +108,11 @@
 
 (defvar org2jekyll-jekyll-org-post-template nil
   "Default template for org2jekyll draft posts.
-The `'%s`' will be replaced respectively by name, the author, the generated date, the title, the description and the categories.")
+The `'%s`' will be replaced respectively by name, author, generated date, title,
+ description and categories.")
 
 (setq org2jekyll-jekyll-org-post-template
-"#+STARTUP: showall
+      "#+STARTUP: showall
 #+STARTUP: hidestars
 #+OPTIONS: H:2 num:nil tags:nil toc:nil timestamps:t
 #+LAYOUT: %s
@@ -153,7 +154,13 @@ The `'%s`' will be replaced respectively by name, the author, the generated date
   "Generate a formatted now date."
   (format-time-string "%Y-%m-%d %a %H:%M"))
 
-(defun org2jekyll-default-headers-template (blog-layout blog-author post-date post-title post-description post-tags post-categories)
+(defun org2jekyll-default-headers-template (blog-layout
+                                            blog-author
+                                            post-date
+                                            post-title
+                                            post-description
+                                            post-tags
+                                            post-categories)
   "Compute default headers.
 BLOG-LAYOUT is the layout of the post.
 BLOG-AUTHOR is the author.
@@ -162,7 +169,14 @@ POST-TITLE is the title.
 POST-DESCRIPTION is the description.
 POST-TAGS is the tags
 POST-CATEGORIES is the categories."
-  (format org2jekyll-jekyll-org-post-template blog-layout blog-author post-date (org2jekyll--yaml-escape post-title) post-description post-tags post-categories))
+  (format org2jekyll-jekyll-org-post-template
+          blog-layout
+          blog-author
+          post-date
+          (org2jekyll--yaml-escape post-title)
+          post-description
+          post-tags
+          post-categories))
 
 (defun org2jekyll--draft-filename (draft-dir title)
   "Compute the draft's filename from the DRAFT-DIR and TITLE."
@@ -192,16 +206,25 @@ The `'%s`' will be replaced respectively by the blog entry name, the author, the
   (interactive)
   (let* ((author      org2jekyll-blog-author)
          (date        (org2jekyll-now))
-         (layout      (ido-completing-read "Layout: " '("post" "default") nil 'require-match))
+         (layout      (ido-completing-read "Layout: " '("post" "default") nil
+                                           'require-match))
          (title       (org2jekyll--read-title))
          (description (org2jekyll--read-description))
          (tags        (org2jekyll--read-tags))
          (categories  (org2jekyll--read-categories))
-         (draft-file  (org2jekyll--draft-filename (org2jekyll-input-directory org2jekyll-jekyll-drafts-dir) title)))
+         (draft-file  (org2jekyll--draft-filename
+                       (org2jekyll-input-directory org2jekyll-jekyll-drafts-dir)
+                       title)))
     (if (file-exists-p draft-file)
         (find-file draft-file)
       (with-temp-file draft-file
-        (insert (org2jekyll-default-headers-template layout author date title description tags categories))
+        (insert (org2jekyll-default-headers-template layout
+                                                     author
+                                                     date
+                                                     title
+                                                     description
+                                                     tags
+                                                     categories))
         (insert "* ")))
     (find-file draft-file)))
 
@@ -215,7 +238,8 @@ The `'%s`' will be replaced respectively by the blog entry name, the author, the
 (defun org2jekyll-list-posts ()
   "Lists the posts folder."
   (interactive)
-  (org2jekyll--list-dir (org2jekyll-output-directory org2jekyll-jekyll-posts-dir)))
+  (org2jekyll--list-dir
+   (org2jekyll-output-directory org2jekyll-jekyll-posts-dir)))
 
 (defalias 'org2jekyll/list-posts 'org2jekyll-list-posts)
 
@@ -223,7 +247,8 @@ The `'%s`' will be replaced respectively by the blog entry name, the author, the
 (defun org2jekyll-list-drafts ()
   "List the drafts folder."
   (interactive)
-  (org2jekyll--list-dir (org2jekyll-input-directory org2jekyll-jekyll-drafts-dir)))
+  (org2jekyll--list-dir
+   (org2jekyll-input-directory org2jekyll-jekyll-drafts-dir)))
 
 (defalias 'org2jekyll/list-drafts 'org2jekyll-list-drafts)
 
@@ -272,7 +297,8 @@ Depends on the metadata header #+LAYOUT."
 
 (defun org2jekyll--org-to-yaml-metadata (org-metadata)
   "Given an ORG-METADATA map, return a yaml one with transformed data."
-  (--map `(,(assoc-default (car it) org2jekyll-map-keys) . ,(cdr it)) org-metadata))
+  (--map `(,(assoc-default (car it) org2jekyll-map-keys) . ,(cdr it))
+         org-metadata))
 
 (defun org2jekyll--convert-timestamp-to-yyyy-dd-mm (timestamp)
   "Convert org TIMESTAMP to ."
@@ -302,7 +328,8 @@ Depends on the metadata header #+LAYOUT."
 (defun org2jekyll--compute-ready-jekyll-file-name (date org-file)
   "Given a DATE and an ORG-FILE, compute a ready jekyll file name.
 If the current path contains the `'org2jekyll-jekyll-drafts-dir`', removes it."
-  (let ((temp-org-jekyll-filename  (format "%s-%s" date (file-name-nondirectory org-file)))
+  (let ((temp-org-jekyll-filename (format "%s-%s" date
+                                          (file-name-nondirectory org-file)))
         (temp-org-jekyll-directory (file-name-directory org-file)))
     (->> temp-org-jekyll-filename
          (format "%s%s" temp-org-jekyll-directory)
@@ -312,8 +339,9 @@ If the current path contains the `'org2jekyll-jekyll-drafts-dir`', removes it."
 (defun org2jekyll--copy-org-file-to-jekyll-org-file (date org-file yaml-headers)
   "Given DATE, ORG-FILE and YAML-HEADERS, copy content as org-jekyll ready file.
 This returns the new filename path."
-  (let ((jekyll-filename (org2jekyll--compute-ready-jekyll-file-name date org-file)))
-    (with-temp-file jekyll-filename ;; write temporary file updated with jekyll specifics
+  (let ((jekyll-filename (org2jekyll--compute-ready-jekyll-file-name date
+                                                                     org-file)))
+    (with-temp-file jekyll-filename ;; write file updated with jekyll specifics
       (insert-file-contents org-file)
       (goto-char (point-min))
       (insert (org2jekyll--to-yaml-header yaml-headers)))
@@ -341,12 +369,14 @@ Return DEFAULT-VALUE if not found."
   "Check that the mandatory header metadata in ORG-METADATA are provided.
 Return the error messages if any or nil if everything is alright."
   (let ((mandatory-values (funcall (-compose (lambda (l) (mapcar #'car l))
-                                             (lambda (l) (-filter #'cdr l))) org2jekyll-header-metadata)))
-    (-when-let (error-messages (->> mandatory-values
-                                    (--map (when (null (assoc-default it org-metadata))
-                                             (format "- The %s is mandatory, please add '#+%s' at the top of your org buffer." it (upcase it))))
-                                    (s-join "\n")
-                                    s-trim))
+                                             (lambda (l) (-filter #'cdr l)))
+                                   org2jekyll-header-metadata)))
+    (-when-let (error-messages
+                (->> mandatory-values
+                     (--map (when (null (assoc-default it org-metadata))
+                              (format "- The %s is mandatory, please add '#+%s' at the top of your org buffer." it (upcase it))))
+                     (s-join "\n")
+                     s-trim))
       (if (string= "" error-messages) nil error-messages))))
 
 (defun org2jekyll-read-metadata (org-file)
@@ -354,16 +384,37 @@ Return the error messages if any or nil if everything is alright."
 If non-mandatory values are missing, they are replaced with dummy ones.
 Otherwise, display the error messages about the missing mandatory values."
   (let* ((org-metadata-list (mapcar #'car org2jekyll-header-metadata))
-         (org-metadata (org2jekyll-get-options-from-file org-file org-metadata-list)))
+         (org-metadata (org2jekyll-get-options-from-file org-file
+                                                         org-metadata-list)))
     (-if-let (error-messages (org2jekyll-check-metadata org-metadata))
-        (format "This org-mode file is missing mandatory header(s):\n%s\nPublication skipped" error-messages)
-      `(("layout"      . ,(-> "layout"      (org2jekyll-assoc-default org-metadata "post")))
-        ("title"       . ,(-> "title"       (org2jekyll-assoc-default org-metadata "dummy-title-should-be-replaced")))
-        ("date"        . ,(-> "date"        (org2jekyll-assoc-default org-metadata (org2jekyll-now)) org2jekyll--convert-timestamp-to-yyyy-dd-mm))
-        ("categories"  . ,(-> "categories"  (org2jekyll-assoc-default org-metadata "dummy-category-should-be-replaced") org2jekyll--csv-to-yaml))
-        ("tags"        . ,(-> "tags"        (org2jekyll-assoc-default org-metadata "dummy-tags-should-be-replaced") org2jekyll--csv-to-yaml))
-        ("author"      . ,(-> "author"      (org2jekyll-assoc-default org-metadata "")))
-        ("description" . ,(-> "description" (org2jekyll-assoc-default org-metadata "")))))))
+        (format "This org-mode file is missing mandatory header(s):
+%s
+Publication skipped" error-messages)
+      `(("layout"      . ,(-> "layout"
+                              (org2jekyll-assoc-default org-metadata "post")))
+        ("title"       . ,(-> "title"
+                              (org2jekyll-assoc-default
+                               org-metadata
+                               "dummy-title-should-be-replaced")))
+        ("date"        . ,(-> "date"
+                              (org2jekyll-assoc-default
+                               org-metadata
+                               (org2jekyll-now))
+                              org2jekyll--convert-timestamp-to-yyyy-dd-mm))
+        ("categories"  . ,(-> "categories"
+                              (org2jekyll-assoc-default
+                               org-metadata
+                               "dummy-category-should-be-replaced")
+                              org2jekyll--csv-to-yaml))
+        ("tags"        . ,(-> "tags"
+                              (org2jekyll-assoc-default
+                               org-metadata
+                               "dummy-tags-should-be-replaced")
+                              org2jekyll--csv-to-yaml))
+        ("author"      . ,(-> "author"
+                              (org2jekyll-assoc-default org-metadata "")))
+        ("description" . ,(-> "description"
+                              (org2jekyll-assoc-default org-metadata "")))))))
 
 (defun org2jekyll-read-metadata-and-execute (action-fn org-file)
   "Execute ACTION-FN function after checking metadata from the ORG-FILE."
@@ -372,7 +423,10 @@ Otherwise, display the error messages about the missing mandatory values."
         (let ((org-metadata (org2jekyll-read-metadata org-file)))
           (if (stringp org-metadata)
               (org2jekyll-message org-metadata)
-            (let ((page-or-post (if (org2jekyll-post-p (assoc-default "layout" org-metadata)) "Post" "Page")))
+            (let ((page-or-post (if (org2jekyll-post-p
+                                     (assoc-default "layout" org-metadata))
+                                    "Post"
+                                  "Page")))
               (funcall action-fn org-metadata org-file)
               (format "%s '%s' published!" page-or-post filename-non-dir))))
       (format "'%s' is not an article, publication skipped!" filename-non-dir))))
@@ -386,8 +440,11 @@ Otherwise, display the error messages about the missing mandatory values."
   (org2jekyll-read-metadata-and-execute
    (lambda (org-metadata org-file)
      (let ((blog-project    (assoc-default "layout" org-metadata))
-           (jekyll-filename (org2jekyll--copy-org-file-to-jekyll-org-file (assoc-default "date" org-metadata) org-file org-metadata)))
-       (org-publish-file jekyll-filename (assoc blog-project org-publish-project-alist))
+           (jekyll-filename (org2jekyll--copy-org-file-to-jekyll-org-file
+                             (assoc-default "date" org-metadata)
+                             org-file org-metadata)))
+       (org-publish-file jekyll-filename
+                         (assoc blog-project org-publish-project-alist))
        (delete-file jekyll-filename)))
    org-file))
 
@@ -402,7 +459,8 @@ Otherwise, display the error messages about the missing mandatory values."
          (insert-file-contents org-file)
          (goto-char (point-min))
          (insert (org2jekyll--to-yaml-header org-metadata))
-         (org-publish-file org-file (assoc blog-project org-publish-project-alist)))
+         (org-publish-file org-file
+                           (assoc blog-project org-publish-project-alist)))
        (copy-file backup-file org-file t t t)
        (delete-file backup-file)))
    org-file))
@@ -432,7 +490,8 @@ Layout `'default`' is a page."
                        (-> "layout"
                            org2jekyll-get-option-at-point
                            org2jekyll-post-p
-                           (if 'org2jekyll-publish-post 'org2jekyll-publish-page))))
+                           (if 'org2jekyll-publish-post
+                               'org2jekyll-publish-page))))
       (deferred:nextc it (lambda (publish-fn) (funcall publish-fn org-file)))
       (deferred:nextc it (lambda (final-message)
                            (org2jekyll-publish-web-project)
@@ -442,7 +501,7 @@ Layout `'default`' is a page."
 
 (defalias 'org2jekyll/publish! 'org2jekyll-publish)
 
-(defvar org2jekyll-mode-map nil "Default Bindings map for org2jekyll minor mode.")
+(defvar org2jekyll-mode-map nil "Default Bindings map for org2jekyll mode.")
 
 (setq org2jekyll-mode-map
       (let ((map (make-sparse-keymap)))
