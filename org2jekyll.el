@@ -138,10 +138,10 @@ The `'%s`' will be replaced respectively by name, author, generated date, title,
 
 (defun org2jekyll--make-slug (s)
   "Turn a string S into a slug."
-  (replace-regexp-in-string
-   " " "-" (downcase
-            (replace-regexp-in-string
-             "[\]\[(){}!#$~^\\]" "" s))))
+  (->> s
+       (replace-regexp-in-string "[\]\[(){}!#$~^\\]" "")
+       downcase
+       (replace-regexp-in-string " " "-")))
 
 (defun org2jekyll--yaml-escape (s)
   "Escape a string S for YAML."
