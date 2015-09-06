@@ -1,9 +1,9 @@
 #+title: Backlog
 #+author: ardumont
 
-* IN-PROGRESS 0.1.8 [33%]
+* IN-PROGRESS 0.1.8 [66%]
 - [X] Update version
-- [ ] Improve deployment script
+- [X] Improve deployment script
 - [ ] Fix #26
 * DONE 0.1.7 [100%]
 CLOSED: [2015-07-14 Tue 16:35]
