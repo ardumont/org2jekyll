@@ -205,19 +205,54 @@ POST-CATEGORIES is the categories."
                        nil
                        'require-match))
 
+(defun org2jekyll--init-buffer-metadata ()
+  "Initialize a DRAFT-FILE or current buffer routine.
+:: () -> [(Symbol, String)]"
+  (list :author      org2jekyll-blog-author
+        :date        (org2jekyll-now)
+        :layout      (org2jekyll--input-read "Layout: " '("post" "default"))
+        :title       (org2jekyll--read-title)
+        :description (org2jekyll--read-description)
+        :tags        (org2jekyll--read-tags)
+        :categories  (org2jekyll--read-categories)))
+
+;;;###autoload
+(defun org2jekyll-init-current-buffer ()
+  "Given an existing buffer, add the needed metadata to make it a post or page."
+  (interactive)
+  (let* ((metadata (org2jekyll--init-buffer-metadata))
+         (author      (plist-get metadata :author))
+         (date        (plist-get metadata :date))
+         (layout      (plist-get metadata :layout))
+         (title       (plist-get metadata :title))
+         (description (plist-get metadata :description))
+         (tags        (plist-get metadata :tags))
+         (categories  (plist-get metadata :categories)))
+    (save-excursion
+      (with-current-buffer (buffer-name)
+        (goto-char (point-min))
+        (insert (org2jekyll-default-headers-template layout
+                                                     author
+                                                     date
+                                                     title
+                                                     description
+                                                     tags
+                                                     categories))))))
+
 ;;;###autoload
 (defun org2jekyll-create-draft ()
   "Create a new Jekyll blog post with TITLE.
 The `'%s`' will be replaced respectively by the blog entry name, the author, the
  generated date, the title, the description, the tags and the categories."
   (interactive)
-  (let* ((author      org2jekyll-blog-author)
-         (date        (org2jekyll-now))
-         (layout      (org2jekyll--input-read "Layout: " '("post" "default")))
-         (title       (org2jekyll--read-title))
-         (description (org2jekyll--read-description))
-         (tags        (org2jekyll--read-tags))
-         (categories  (org2jekyll--read-categories))
+  (let* ((metadata (org2jekyll--init-buffer-metadata))
+         (author      (plist-get metadata :author))
+         (date        (plist-get metadata :date))
+         (layout      (plist-get metadata :layout))
+         (title       (plist-get metadata :title))
+         (description (plist-get metadata :description))
+         (tags        (plist-get metadata :tags))
+         (categories  (plist-get metadata :categories))
          (draft-file  (org2jekyll--draft-filename
                        (org2jekyll-input-directory org2jekyll-jekyll-drafts-dir)
                        title)))
