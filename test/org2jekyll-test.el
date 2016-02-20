@@ -1,57 +1,62 @@
 (require 'ert)
 (require 'el-mock)
 
-(require 'cl)
 (require 'org2jekyll)
 
-(ert-deftest test-org2jekyll-get-option-from-file ()
-  (let ((temp-filename "/tmp/test-publish-article-p"))
-    (with-temp-file temp-filename  (insert "#+BLOG: tony's blog\n#+DATE: some-date"))
-    (should (equal "tony's blog" (org2jekyll-get-option-from-file temp-filename "BLOG")))
-    (should (equal "some-date" (org2jekyll-get-option-from-file temp-filename "DATE")))
-    (should-not (org2jekyll-get-option-from-file temp-filename "some-other-non-existing-option"))))
-
 (ert-deftest test-org2jekyll-get-options-from-file ()
-  (let ((temp-filename "/tmp/test-publish-article-p"))
-    (with-temp-file temp-filename  (insert "#+LAYOUT: post\n#+DATE: some-date"))
-    (should (equal '(("layout" . "post")
-                     ("date" . "some-date"))
-                   (org2jekyll-get-options-from-file temp-filename '("layout" "date"))))
-    (should (equal '(("date" . "some-date"))
-                   (org2jekyll-get-options-from-file temp-filename '("date"))))
-    (should (equal '(("unknown"))
-                   (org2jekyll-get-options-from-file temp-filename '("unknown"))))
-    (should-not (org2jekyll-get-options-from-file temp-filename '()))))
-
-(ert-deftest test-org2jekyll-get-option-at-point ()
-  (should (equal "hello"
-                 (with-temp-buffer
-                   (org-mode)
-                   (insert "#+HEADING: hello
-#+DATE: some-date")
-                   (goto-char (point-min))
-                   (org2jekyll-get-option-at-point "HEADING"))))
-  (should (equal "some-date"
-                 (with-temp-buffer
-                   (org-mode)
-                   (insert "#+HEADING: hello
-#+DATE: some-date")
-                   (goto-char (point-min))
-                   (org2jekyll-get-option-at-point "DATE"))))
-  (should-not (with-temp-buffer
-                (org-mode)
-                (insert "#+HEADING: hello
-#+DATE: some-date")
-                (goto-char (point-min))
-                (org2jekyll-get-option-at-point "UNKNOWN"))))
+  (let* ((temp-file "/tmp/test-get-options-from-file")
+         (blog-key "#+BLOG:")
+         (blog-val "tony's blog")
+         (date-key "#+DATE:")
+         (date-val "some-date")
+         (_ (with-temp-file temp-file (insert (concat blog-key " " blog-val "\n"
+                                                      date-key " " date-val "\n"
+                                                      "Beef fungus articles"))))
+         (options-plist (org2jekyll-get-options-from-file temp-file))
+         (_ (delete-file temp-file)))
+    (should (string= blog-val (plist-get options-plist :blog)))
+    (should (string= date-val (plist-get options-plist :date)))))
 
 (ert-deftest test-org2jekyll-article-p ()
-  (should (let ((temp-filename "/tmp/test-publish-article-p"))
-            (with-temp-file temp-filename  (insert "#+LAYOUT: post\n#+DATE: some-date"))
-            (org2jekyll-article-p temp-filename)))
-  (should-not (let ((temp-filename "/tmp/test-publish-article-p"))
-                (with-temp-file temp-filename  (insert "#+NOT-AN-ARTICLE: tony's blog\n#+DATE: some-date"))
-                (org2jekyll-article-p temp-filename))))
+  (let* ((temp-file "/tmp/test-org2jekyll-get-article-p")
+         (layout-key "#+LAYOUT:") (layout-val "post")
+         (date-key "#+DATE:") (date-val "some-date")
+         (not-article-key "#+NOT-AN-ARTICLE:") (not-article-val "tony's blog")
+         (_ (with-temp-file temp-file (insert (concat layout-key " " layout-val "\n"
+                                                      date-key " " date-val "\n"))))
+         (article (org2jekyll-article-p temp-file))
+         (_ (delete-file temp-file))
+         (_ (with-temp-file temp-file (insert (concat not-article-key " " not-article-val "\n"))))
+         (not-article (org2jekyll-article-p temp-file))
+         (_ (delete-file temp-file)))
+    (should article)
+    (should-not not-article)))
+
+(ert-deftest test-org2jekyll-check-metadata ()
+  (let* ((temp-file "/tmp/test-org2jekyll-check-metadata")
+         (startup-key "#+STARTUP:") (startup-val "hidestars")
+         (options-key "#+OPTIONS:") (options-val "H:2 num:nil tags:nil toc:nil timestamps:t")
+         (layout-key "#+LAYOUT:") (layout-val "some-layout")
+         (author-key "#+AUTHOR:") (author-val "blog-author")
+         (date-key "#+DATE:") (date-val "post-date")
+         (title-key "#+TITLE:") (title-val "post title with spaces")
+         (description-key "#+DESCRIPTION:") (description-val "post some description")
+         (tags-key "#+TAGS:") (tags-val "post-tag0, post-tag1")
+         (categories-key "#+CATEGORIES:") (categories-val "post-category, other-category")
+         (_ (with-temp-file temp-file
+              (insert (concat startup-key " " startup-val "\n"
+                              options-key " " options-val "\n"
+                              layout-key " " layout-val "\n"
+                              author-key " " author-val "\n"
+                              date-key " " date-val "\n"
+                              title-key " " title-val "\n"
+                              description-key " " description-val "\n"
+                              tags-key " " tags-val "\n"
+                              categories-key " " categories-val "\n"))))
+         (options-plist (org2jekyll-get-options-from-file temp-file))
+         (_ (delete-file temp-file))
+         (check-metadata (org2jekyll-check-metadata options-plist)))
+    (should (null check-metadata))))
 
 (ert-deftest test-org2jekyll-make-slug ()
   (should (string= "this-is-a-test"
@@ -62,7 +67,6 @@
                    (org2jekyll--make-slug "你好-test")))
   (should (string= "你好-большие-test"
                    (org2jekyll--make-slug "你好-большие-test"))))
-
 
 (ert-deftest test-org2jekyll--draft-filename ()
   (let ((org2jekyll-jekyll-post-ext ".ext"))
@@ -96,6 +100,8 @@ author: Antoine R. Dumont
 categories: \n- jabber\n- emacs\n- tools\n- gtalk
 tags: \n- tag0\n- tag1\n- tag2
 excerpt: Installing jabber and using it from emacs + authentication tips and tricks
+comments: true
+permalink: /posts/gtalk/
 ---
 #+END_HTML
 "
@@ -106,7 +112,9 @@ excerpt: Installing jabber and using it from emacs + authentication tips and tri
                                                    ("author" . "Antoine R. Dumont")
                                                    ("categories" . "\n- jabber\n- emacs\n- tools\n- gtalk")
                                                    ("tags"  . "\n- tag0\n- tag1\n- tag2")
-                                                   ("description" . "Installing jabber and using it from emacs + authentication tips and tricks"))))))
+                                                   ("description" . "Installing jabber and using it from emacs + authentication tips and tricks")
+                                                   ("comments" . "true")
+                                                   ("permalink" . "/posts/gtalk/"))))))
   ;; Org 9.0+ and org 8.3.x git snapshots
   (should (string= "#+BEGIN_EXPORT HTML
 ---
@@ -117,6 +125,8 @@ author: Alexey Kopytov
 categories: \n- jabber\n- emacs\n- tools\n- gtalk
 tags: \n- tag0\n- tag1\n- tag2
 excerpt: Installing jabber and using it from emacs + authentication tips and tricks
+comments: true
+permalink: /posts/gtalk/
 ---
 #+END_EXPORT
 "
@@ -127,9 +137,11 @@ excerpt: Installing jabber and using it from emacs + authentication tips and tri
                                                    ("author" . "Alexey Kopytov")
                                                    ("categories" . "\n- jabber\n- emacs\n- tools\n- gtalk")
                                                    ("tags"  . "\n- tag0\n- tag1\n- tag2")
-                                                   ("description" . "Installing jabber and using it from emacs + authentication tips and tricks")))))))
+                                                   ("description" . "Installing jabber and using it from emacs + authentication tips and tricks")
+                                                   ("comments" . "true")
+                                                   ("permalink" . "/posts/gtalk/")))))))
 
-(ert-deftest test-org2jekyll--org-to-yaml-metadata ()
+(ert-deftest test-org2jekyll--org-to-jekyll-metadata ()
   (should (equal '(("layout" . "post")
                    ("title" . "gtalk in emacs using jabber mode")
                    ("date" . "2013-01-13")
@@ -139,13 +151,17 @@ excerpt: Installing jabber and using it from emacs + authentication tips and tri
 - emacs
 - tools
 - gtalk")
-                   ("excerpt" . "Installing jabber and using it from emacs + authentication tips and tricks"))
-                 (org2jekyll--org-to-yaml-metadata '(("layout" . "post")
-                                                     ("title" . "gtalk in emacs using jabber mode")
-                                                     ("date" . "2013-01-13")
-                                                     ("author" . "Antoine R. Dumont")
-                                                     ("categories" . "\n- jabber\n- emacs\n- tools\n- gtalk")
-                                                     ("description" . "Installing jabber and using it from emacs + authentication tips and tricks"))))))
+                   ("excerpt" . "Installing jabber and using it from emacs + authentication tips and tricks")
+                   ("comments" . "true")
+                   ("permalink" . "/posts/gtalk/"))
+                 (org2jekyll--org-to-jekyll-metadata '(("layout" . "post")
+                                                       ("title" . "gtalk in emacs using jabber mode")
+                                                       ("date" . "2013-01-13")
+                                                       ("author" . "Antoine R. Dumont")
+                                                       ("categories" . "\n- jabber\n- emacs\n- tools\n- gtalk")
+                                                       ("description" . "Installing jabber and using it from emacs + authentication tips and tricks")
+                                                       ("comments" . "true")
+                                                       ("permalink" . "/posts/gtalk/"))))))
 
 (ert-deftest test-org2jekyll--compute-ready-jekyll-file-name ()
   (should (equal "/home/tony/org/2012-10-10-scratch.org"
@@ -237,49 +253,67 @@ excerpt: fake-description with spaces and all
   (should (equal "original-value" (org2jekyll-assoc-default "key" '(("key". "original-value")) "default-value")))
   (should (equal "default-value"  (org2jekyll-assoc-default "key" '(("key")) "default-value"))))
 
-(ert-deftest test-org2jekyll-read-metadata ()
-  (should (equal '(("layout" . "default")
-                   ("title" . "some-title")
-                   ("date" . "2015-12-23")
-                   ("categories" . "\n- cat0\n- cat1")
-                   ("tags" . "\n- tag0\n- tag1")
-                   ("author" . "me")
-                   ("description" . "desc"))
-                 (mocklet (((org2jekyll-get-options-from-file "org-file" '("title" "date" "categories" "tags" "description" "author" "layout"))
-                            => `(("layout"      . "default")
-                                 ("title"       . "some-title")
-                                 ("date"        . "2015-12-23 Sat 14:20")
-                                 ("categories"  . "cat0, cat1")
-                                 ("tags"        . "tag0, tag1")
-                                 ("author"      . "me")
-                                 ("description" . "desc"))))
-                   (org2jekyll-read-metadata "org-file"))))
+(ert-deftest test-org2jekyll-remove-org-only-options ()
+  (let* ((test-options '(("startup" . "hidestars")
+                         ("options" . "toc:nil")
+                         ("author" . "me")
+                         ("date" . "2015-12-23 Sat 14:20")
+                         ("title" . "some-title")))
+         (expected-results '(("author" . "me")
+                             ("date" . "2015-12-23 Sat 14:20")
+                             ("title" . "some-title")))
+         (jekyll-options (org2jekyll-remove-org-only-options test-options)))
+    (should (equal expected-results jekyll-options))))
 
-  (should (equal '(("layout" . "post")
-                   ("title" . "dummy-title")
-                   ("date" . "2015-01-01")
-                   ("categories" . "\n- cat1\n- cat2")
-                   ("tags" . "\n- tag1\n- tag2")
-                   ("author" . "me")
-                   ("description" . "desc"))
-                 (mocklet (((org2jekyll-get-options-from-file "org-file-2" '("title" "date" "categories" "tags" "description" "author" "layout"))
-                            => `(("layout"      . "post")
-                                 ("title"       . "dummy-title")
-                                 ("categories"  . "cat1, cat2")
-                                 ("tags"        . "tag1, tag2")
-                                 ("author"      . "me")
-                                 ("description" . "desc")))
-                           ((org2jekyll-now)
-                            => "2015-01-01 Sat 14:20"))
-                   (org2jekyll-read-metadata "org-file-2"))))
-  (should (equal "This org-mode file is missing mandatory header(s):
+(ert-deftest test-org2jekyll-read-metadata ()
+  (let* ((temp-file "/tmp/test-org2jekyll-read-metadata")
+         (startup-key "#+STARTUP:") (startup-val "hidestars")
+         (options-key "#+OPTIONS:") (options-val "H:2 num:nil tags:nil toc:nil timestamps:t")
+         (layout-key "#+LAYOUT:") (layout-val "default")
+         (author-key "#+AUTHOR:") (author-val "me")
+         (date-key "#+DATE:") (date-val "2015-12-23 Sat 14:20")
+         (title-key "#+TITLE:") (title-val "some-title")
+         (description-key "#+DESCRIPTION:") (description-val "desc")
+         (tags-key "#+TAGS:") (tags-val "tag0, tag1")
+         (categories-key "#+CATEGORIES:") (categories-val "cat0, cat1")
+         (comments-key "#+COMMENTS:") (comments-val "true")
+         (_ (with-temp-file temp-file
+              (insert (concat startup-key " " startup-val "\n"
+                              options-key " " options-val "\n"
+                              layout-key " " layout-val "\n"
+                              title-key " " title-val "\n"
+                              date-key " " date-val "\n"
+                              categories-key " " categories-val "\n"
+                              tags-key " " tags-val "\n"
+                              author-key " " author-val "\n"
+                              description-key " " description-val "\n"
+                              comments-key " " comments-val "\n"))))
+         (options-alist (org2jekyll-read-metadata temp-file))
+         (_ (delete-file temp-file)))
+    (should (equal "default" (assoc-default "layout" options-alist)))
+    (should (equal "some-title" (assoc-default "title" options-alist)))
+    (should (equal "2015-12-23" (assoc-default "date" options-alist)))
+    (should (equal "\n- cat0\n- cat1" (assoc-default "categories" options-alist)))
+    (should (equal "\n- tag0\n- tag1" (assoc-default "tags" options-alist)))
+    (should (equal "me" (assoc-default "author" options-alist)))
+    (should (equal "desc" (assoc-default "description" options-alist)))
+    (should (equal "true" (assoc-default "comments" options-alist)))
+    (should (null (assoc-default "startup" options-alist)))
+    (should (null (assoc-default "options" options-alist)))))
+
+(ert-deftest test-org2jekyll-read-metadata-missing-values ()
+  (let* ((temp-file "/tmp/test-org2jekyll-read-metadata-missing-values")
+         (layout-key "#+LAYOUT:") (layout-val "post")
+         (description-key "#+DESCRIPTION:") (description-val "desc")
+         (_ (with-temp-file temp-file
+              (insert (concat layout-key " " layout-val "\n"
+                              description-key " " description-val "\n"))))
+         (options-alist (org2jekyll-read-metadata temp-file))
+         (_ (delete-file temp-file)))
+    (should (equal "This org-mode file is missing mandatory header(s):
 - The title is mandatory, please add '#+TITLE' at the top of your org buffer.
 - The categories is mandatory, please add '#+CATEGORIES' at the top of your org buffer.
-Publication skipped"
-                 (mocklet (((org2jekyll-get-options-from-file "org-file-2" '("title" "date" "categories" "tags" "description" "author" "layout"))
-                            => `(("layout"      . "post")
-                                 ("description" . "desc"))))
-                   (org2jekyll-read-metadata "org-file-2")))))
+Publication skipped" options-alist))))
 
 (ert-deftest test-org2jekyll-default-headers-template ()
   (should (equal "#+STARTUP: showall
@@ -350,7 +384,7 @@ Publication skipped"
   (should (org2jekyll-page-p "default"))
   (should-not (org2jekyll-page-p "post")))
 
-(ert-deftest test-org2jekyll-check-metadata ()
+(ert-deftest test-org2jekyll-check-metadata-extra ()
   (should (equal "- The title is mandatory, please add '#+TITLE' at the top of your org buffer.
 - The categories is mandatory, please add '#+CATEGORIES' at the top of your org buffer.
 - The description is mandatory, please add '#+DESCRIPTION' at the top of your org buffer.
@@ -359,13 +393,13 @@ Publication skipped"
 
   (should (equal "- The categories is mandatory, please add '#+CATEGORIES' at the top of your org buffer.
 - The description is mandatory, please add '#+DESCRIPTION' at the top of your org buffer."
-                 (org2jekyll-check-metadata '(("title" . "some-title")
-                                              ("layout" . "some-layout")))))
-  (should-not (org2jekyll-check-metadata '(("title" . "some-title")
-                                           ("layout" . "some-layout")
-                                           ("author" . "some-author")
-                                           ("categories" . "some-categories")
-                                           ("description" . "some-description")))))
+                 (org2jekyll-check-metadata '(:title "some-title"
+                                                     :layout "some-layout"))))
+  (should-not (org2jekyll-check-metadata '(:title "some-title"
+                                                  :layout "some-layout"
+                                                  :author "some-author"
+                                                  :categories "some-categories"
+                                                  :description "some-description"))))
 
 (ert-deftest test-org2jekyll--yaml-escape ()
   (should (string= "this is a title"
@@ -511,12 +545,6 @@ Publication skipped"
   (should-not (with-mock
                 (mock (read-string "Categories (csv): "))
                 (org2jekyll--read-categories))))
-
-(ert-deftest test-org2jekyll-layout ()
-  (should (equal :layout
-                 (with-mock
-                   (mock (org2jekyll-get-option-from-file "some-org-file" "layout") => :layout)
-                   (org2jekyll-layout "some-org-file")))))
 
 (ert-deftest test-org2jekyll--input-read ()
   (should (eq :input-done
