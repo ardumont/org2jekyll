@@ -1,4 +1,4 @@
-;;; utilities-test.el ---                            -*- lexical-binding: t; -*-
+;;; org2jekyll-utilities-test.el ---                 -*- lexical-binding: t; -*-
 
 ;; Copyright (C) 2015  Antoine R. Dumont
 
@@ -24,7 +24,7 @@
 
 ;;; Code:
 
-(require 'utilities)
+(require 'org2jekyll-utilities)
 (require 'ert)
 
 (ert-deftest test-org2jekyll-tests-with-temp-buffer ()
@@ -50,5 +50,5 @@ line 3
                     (replace-regexp "line " "" nil (point-min) (point-max))))))
 
 
-(provide 'utilities-test)
-;;; utilities-test.el ends here
+(provide 'org2jekyll-utilities-test)
+;;; org2jekyll-utilities-test.el ends here
