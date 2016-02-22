@@ -1,4 +1,4 @@
-;;; utilities.el ---                                 -*- lexical-binding: t; -*-
+;;; org2jekyll-utilities.el ---                      -*- lexical-binding: t; -*-
 
 ;; Copyright (C) 2015  Antoine R. Dumont
 
@@ -47,5 +47,5 @@ NB-LINES-FORWARD is the number of lines to get back to."
      ,body-test
      (buffer-substring-no-properties (point-min) (point-max))))
 
-(provide 'utilities)
-;;; utilities.el ends here
+(provide 'org2jekyll-utilities)
+;;; org2jekyll-utilities.el ends here
