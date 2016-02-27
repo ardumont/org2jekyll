@@ -1,8 +1,11 @@
 #+title: org2jekyll
 #+author: ardumont
 
-[[https://travis-ci.org/ardumont/org2jekyll][file:https://travis-ci.org/ardumont/org2jekyll.svg]]
-[[https://coveralls.io/r/ardumont/org2jekyll][file:https://coveralls.io/repos/ardumont/org2jekyll/badge.svg]]
+[[https://travis-ci.org/ardumont/org2jekyll][file:https://travis-ci.org/ardumont/org2jekyll.svg?branch=master]]
+[[https://coveralls.io/github/ardumont/org2jekyll?branch=master][file:https://coveralls.io/repos/github/ardumont/org2jekyll/badge.svg?branch=master]]
+[[https://melpa.org/#/org2jekyll][file:https://melpa.org/packages/org2jekyll-badge.svg]]
+[[https://stable.melpa.org/#/org2jekyll][file:https://stable.melpa.org/packages/org2jekyll-badge.svg]]
+[[https://www.gnu.org/licenses/gpl-2.0.txt][file:https://img.shields.io/:license-GPLv2-blue.svg]]
 
 Blogging with org-mode and jekyll without alien yaml headers.
 
