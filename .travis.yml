@@ -1,22 +1,16 @@
-language: emacs-lisp
-env:
-  global:
-    - PATH=$HOME/.cask/bin:$HOME/.evm/bin:$PATH
-  matrix:
-    # - EVM_EMACS=emacs-24.1-bin
-    # - EVM_EMACS=emacs-24.2-bin
-    - EVM_EMACS=emacs-24.3-bin
-    - EVM_EMACS=emacs-24.4-bin
-    - EVM_EMACS=emacs-24.5-bin
+language: generic
+sudo: false
+
 before_install:
-  # evm install
-  - curl -fsSkL https://gist.github.com/rejeep/7736123/raw > travis.sh && source ./travis.sh
-  # install the matrix's emacs version
+  - curl -fsSkL https://gist.github.com/rejeep/ebcd57c3af83b049833b/raw > x.sh && source ./x.sh
   - evm install $EVM_EMACS --use --skip
-  - cask --version
-  - emacs --version
-  # install deps for cask
   - cask
+
+env:
+  - EVM_EMACS=emacs-24.3-travis
+  - EVM_EMACS=emacs-24.4-travis
+  - EVM_EMACS=emacs-24.5-travis
+
 script:
-  - pwd
-  - make install test
+  - emacs --version
+  - make test
