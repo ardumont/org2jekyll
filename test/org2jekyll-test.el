@@ -78,7 +78,7 @@
   (should (equal "\n- jabber\n- emacs\n- gtalk\n- tools\n- authentication"  (org2jekyll--csv-to-yaml "jabber,emacs,gtalk,tools,authentication"))))
 
 (ert-deftest test-org2jekyll--to-yaml-header ()
-  (should (string= "#+BEGIN_EXPORT HTML
+  (should (string= "#+BEGIN_HTML
 ---
 layout: post
 title: gtalk in emacs using jabber mode
@@ -88,15 +88,36 @@ categories: \n- jabber\n- emacs\n- tools\n- gtalk
 tags: \n- tag0\n- tag1\n- tag2
 excerpt: Installing jabber and using it from emacs + authentication tips and tricks
 ---
+#+END_HTML
+"
+                   (let ((org-version "8.3"))
+                     (org2jekyll--to-yaml-header '(("layout" . "post")
+                                                   ("title" . "gtalk in emacs using jabber mode")
+                                                   ("date" . "2013-01-13")
+                                                   ("author" . "Antoine R. Dumont")
+                                                   ("categories" . "\n- jabber\n- emacs\n- tools\n- gtalk")
+                                                   ("tags"  . "\n- tag0\n- tag1\n- tag2")
+                                                   ("description" . "Installing jabber and using it from emacs + authentication tips and tricks"))))))
+  (should (string= "#+BEGIN_EXPORT HTML
+---
+layout: post
+title: gtalk in emacs using jabber mode
+date: 2013-01-13
+author: Alexey Kopytov
+categories: \n- jabber\n- emacs\n- tools\n- gtalk
+tags: \n- tag0\n- tag1\n- tag2
+excerpt: Installing jabber and using it from emacs + authentication tips and tricks
+---
 #+END_EXPORT
 "
-                   (org2jekyll--to-yaml-header '(("layout" . "post")
-                                                 ("title" . "gtalk in emacs using jabber mode")
-                                                 ("date" . "2013-01-13")
-                                                 ("author" . "Antoine R. Dumont")
-                                                 ("categories" . "\n- jabber\n- emacs\n- tools\n- gtalk")
-                                                 ("tags"  . "\n- tag0\n- tag1\n- tag2")
-                                                 ("description" . "Installing jabber and using it from emacs + authentication tips and tricks"))))))
+                   (let ((org-version "9.0"))
+                     (org2jekyll--to-yaml-header '(("layout" . "post")
+                                                   ("title" . "gtalk in emacs using jabber mode")
+                                                   ("date" . "2013-01-13")
+                                                   ("author" . "Alexey Kopytov")
+                                                   ("categories" . "\n- jabber\n- emacs\n- tools\n- gtalk")
+                                                   ("tags"  . "\n- tag0\n- tag1\n- tag2")
+                                                   ("description" . "Installing jabber and using it from emacs + authentication tips and tricks")))))))
 
 (ert-deftest test-org2jekyll--org-to-yaml-metadata ()
   (should (equal '(("layout" . "post")
@@ -126,7 +147,7 @@ excerpt: Installing jabber and using it from emacs + authentication tips and tri
 
 (require 'el-mock)
 (ert-deftest test-org2jekyll--copy-org-file-to-jekyll-org-file ()
-  (should (equal "#+BEGIN_EXPORT
+  (should (equal "#+BEGIN_HTML
 ---
 layout: post
 title: some fake title
@@ -135,12 +156,13 @@ categories: \n- some-fake-category1\n- some-fake-category2
 author: some-fake-author
 excerpt: some-fake-description with spaces and all
 ---
-#+END_EXPORT
+#+END_HTML
 #+fake-meta: some fake meta
 * some content"
                  (let ((fake-date            "2012-10-10")
                        (fake-org-file        "/tmp/scratch.org")
-                       (fake-org-jekyll-file "/tmp/fake-org-jekyll.org"))
+                       (fake-org-jekyll-file "/tmp/fake-org-jekyll.org")
+                       (org-version          "8.2.10"))
                    ;; @before
                    (when (file-exists-p fake-org-file) (delete-file fake-org-file))
                    (when (file-exists-p fake-org-jekyll-file) (delete-file fake-org-jekyll-file))
@@ -157,6 +179,40 @@ excerpt: some-fake-description with spaces and all
                                                                                        ("categories"  . "\n- some-fake-category1\n- some-fake-category2")
                                                                                        ("author"      . "some-fake-author")
                                                                                        ("description" . "some-fake-description with spaces and all")))
+                          (insert-file-contents it)
+                          (with-temp-buffer it (buffer-string)))))))
+  (should (equal "#+BEGIN_EXPORT HTML
+---
+layout: post
+title: fake title
+date: 2016-02-28
+categories: \n- fake-category1\n- fake-category2
+author: fake-author
+excerpt: fake-description with spaces and all
+---
+#+END_EXPORT
+#+fake-meta: fake meta
+* some content"
+                 (let ((fake-date            "2016-02-28")
+                       (fake-org-file        "/tmp/scratch-9.0.org")
+                       (fake-org-jekyll-file "/tmp/fake-org-jekyll-9.0.org")
+                       (org-version          "9.0"))
+                   ;; @before
+                   (when (file-exists-p fake-org-file) (delete-file fake-org-file))
+                   (when (file-exists-p fake-org-jekyll-file) (delete-file fake-org-jekyll-file))
+                   ;; @Test
+                   (mocklet (((org2jekyll--compute-ready-jekyll-file-name fake-date fake-org-file) => fake-org-jekyll-file))
+                     ;; create fake org file with some default content
+                     (with-temp-file fake-org-file
+                       (insert "#+fake-meta: fake meta\n* some content"))
+                     ;; create the fake jekyll file with jekyll metadata
+                     (--> fake-org-file
+                          (org2jekyll--copy-org-file-to-jekyll-org-file fake-date it `(("layout"      . "post")
+                                                                                       ("title"       . "fake title")
+                                                                                       ("date"        . ,fake-date)
+                                                                                       ("categories"  . "\n- fake-category1\n- fake-category2")
+                                                                                       ("author"      . "fake-author")
+                                                                                       ("description" . "fake-description with spaces and all")))
                           (insert-file-contents it)
                           (with-temp-buffer it (buffer-string))))))))
 
