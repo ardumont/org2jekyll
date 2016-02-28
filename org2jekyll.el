@@ -351,9 +351,9 @@ Depends on the metadata header #+LAYOUT."
        org2jekyll--org-to-yaml-metadata
        (--map (format "%s: %s" (car it) (cdr it)) it)
        (cons "---" it)
-       (cons "#+BEGIN_HTML" it)
+       (cons "#+BEGIN_EXPORT HTML" it)
        (-snoc it "---")
-       (-snoc it "#+END_HTML\n")
+       (-snoc it "#+END_EXPORT\n")
        (s-join "\n" it)))
 
 (defun org2jekyll--csv-to-yaml (str-csv)

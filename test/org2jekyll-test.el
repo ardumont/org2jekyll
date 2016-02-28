@@ -78,7 +78,7 @@
   (should (equal "\n- jabber\n- emacs\n- gtalk\n- tools\n- authentication"  (org2jekyll--csv-to-yaml "jabber,emacs,gtalk,tools,authentication"))))
 
 (ert-deftest test-org2jekyll--to-yaml-header ()
-  (should (string= "#+BEGIN_HTML
+  (should (string= "#+BEGIN_EXPORT HTML
 ---
 layout: post
 title: gtalk in emacs using jabber mode
@@ -88,7 +88,7 @@ categories: \n- jabber\n- emacs\n- tools\n- gtalk
 tags: \n- tag0\n- tag1\n- tag2
 excerpt: Installing jabber and using it from emacs + authentication tips and tricks
 ---
-#+END_HTML
+#+END_EXPORT
 "
                    (org2jekyll--to-yaml-header '(("layout" . "post")
                                                  ("title" . "gtalk in emacs using jabber mode")
@@ -126,7 +126,7 @@ excerpt: Installing jabber and using it from emacs + authentication tips and tri
 
 (require 'el-mock)
 (ert-deftest test-org2jekyll--copy-org-file-to-jekyll-org-file ()
-  (should (equal "#+BEGIN_HTML
+  (should (equal "#+BEGIN_EXPORT
 ---
 layout: post
 title: some fake title
@@ -135,7 +135,7 @@ categories: \n- some-fake-category1\n- some-fake-category2
 author: some-fake-author
 excerpt: some-fake-description with spaces and all
 ---
-#+END_HTML
+#+END_EXPORT
 #+fake-meta: some fake meta
 * some content"
                  (let ((fake-date            "2012-10-10")
