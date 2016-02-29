@@ -347,14 +347,21 @@ Depends on the metadata header #+LAYOUT."
 
 (defun org2jekyll--to-yaml-header (org-metadata)
   "Given a list of ORG-METADATA, compute the yaml header string."
-  (--> org-metadata
-       org2jekyll--org-to-yaml-metadata
-       (--map (format "%s: %s" (car it) (cdr it)) it)
-       (cons "---" it)
-       (cons "#+BEGIN_HTML" it)
-       (-snoc it "---")
-       (-snoc it "#+END_HTML\n")
-       (s-join "\n" it)))
+  ;; HACK: support both pre-9.0 and 9.0+ Org export block syntax. Instead of
+  ;; checking for the version, check for org-element-block-name-alist
+  ;; availability to detect pre-release 9.0 Git snapshots with the new syntax,
+  ;; see http://orgmode.org/cgit.cgi/org-mode.git/commit/?id=54318ad
+  (-let (((begin end) (if (boundp 'org-element-block-name-alist)
+                          '("#+BEGIN_HTML" "#+END_HTML\n")
+                        '("#+BEGIN_EXPORT HTML" "#+END_EXPORT\n"))))
+    (--> org-metadata
+         org2jekyll--org-to-yaml-metadata
+         (--map (format "%s: %s" (car it) (cdr it)) it)
+         (cons "---" it)
+         (cons begin it)
+         (-snoc it "---")
+         (-snoc it end)
+         (s-join "\n" it))))
 
 (defun org2jekyll--csv-to-yaml (str-csv)
   "Transform a STR-CSV entries into a yaml entries."
