@@ -239,13 +239,18 @@ When ready, /M-x org2jekyll-publish/ to publish it.
 
 /M-x org2jekyll-publish-posts/
 
-Depending on your org-publish configuration and org2jekll, this will compulse the list of org-mode posts (*#+LAYOUT* with 'post' value) and publish them.
+Depending on your org-publish configuration and org2jekll, this will compile the list of org-mode posts (*#+LAYOUT* with 'post' value) and publish them.
 
 ** Publish all pages
 
 /M-x org2jekyll-publish-pages/
 
-Depending on your org-publish configuration and org2jekll, this will compulse the list of org-mode pages (*#+LAYOUT* with 'default value) and publish them.
+Depending on your org-publish configuration and org2jekll, this will compile the list of org-mode pages (*#+LAYOUT* with 'default value) and publish them.
+
+** Previews
+
+You can keep an org file in your blog directory without publishing it, by writing it as a plain org file without the org2jekyll headers. Once you're ready
+to publish it as a post or an article, add the appropriate metadata headers and org2jekyll will now publish the file.
 
 * Minor mode
 
