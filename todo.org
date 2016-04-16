@@ -1,6 +1,18 @@
 #+title: Backlog
 #+author: ardumont
 
+* IN-PROGRESS 0.1.9 [100%]
+- [X] Permit to add extra yaml headers during export with user-custom variable (#34)
+- [X] Support the new org-mode export block syntax with retro-compatibility (#32)
+- [X] Refactoring on internal function names
+- [X] Add MELPA and license badges
+- [X] Doc - Improvments (#33)
+- [X] CI - Improvments (#31)
+- [X] Packaging - Sign annotated tag during release
+- [X] Packaging - Switch to new version of evm.
+- [X] Packaging - Rename utilities.el to org2jekyll-utilities.el (#30)
+- [X] Upgrade version
+
 * DONE 0.1.8 [100%]
 CLOSED: [2015-09-06 Sun 15:44]
 - [X] Update version
