@@ -103,6 +103,20 @@
 
 (defalias 'org2jekyll/jekyll-posts-dir 'org2jekyll-jekyll-posts-dir)
 
+(defcustom org2jekyll-extra-yaml-headers nil
+  "An entry of static yaml header (already formatted).
+E.g. from https://github.com/ardumont/org2jekyll/issues/34#issue-148684715:
+scheme-text: \"#0029ff\"
+scheme-link: \"#ff00b4\"
+scheme-hover: \"#ff00b4\"
+scheme-code: \"#ad00ff\"
+scheme-bg: \"#00ebff\"
+scheme-hero-text: \"#00ebff\"
+scheme-hero-link: \"#00ebff\"
+scheme-hero-bg: \"#0029ff\"
+plugin: lightense"
+  :group 'org2jekyll)
+
 (defvar org2jekyll-jekyll-post-ext ".org"
   "File extension of Jekyll posts.")
 
@@ -363,9 +377,11 @@ Depends on the metadata header #+LAYOUT."
          (--map (format "%s: %s" (car it) (cdr it)) it)
          (cons "---" it)
          (cons begin it)
+         (-snoc it org2jekyll-extra-yaml-headers)
          (-snoc it "---")
          (-snoc it end)
-         (s-join "\n" it))))
+         (s-join "\n" it)
+         (s-replace "\n\n" "\n" it))))
 
 (defun org2jekyll--csv-to-yaml (str-csv)
   "Transform a STR-CSV entries into a yaml entries."
