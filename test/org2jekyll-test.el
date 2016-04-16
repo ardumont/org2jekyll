@@ -23,27 +23,27 @@
                    (org2jekyll-get-options-from-file temp-filename '("unknown"))))
     (should-not (org2jekyll-get-options-from-file temp-filename '()))))
 
-(ert-deftest test-org2jekyll-get-option-at-point ()
+(ert-deftest test-org2jekyll-get-option ()
   (should (equal "hello"
                  (with-temp-buffer
                    (org-mode)
                    (insert "#+HEADING: hello
 #+DATE: some-date")
                    (goto-char (point-min))
-                   (org2jekyll-get-option-at-point "HEADING"))))
+                   (org2jekyll-get-option "HEADING"))))
   (should (equal "some-date"
                  (with-temp-buffer
                    (org-mode)
                    (insert "#+HEADING: hello
 #+DATE: some-date")
                    (goto-char (point-min))
-                   (org2jekyll-get-option-at-point "DATE"))))
+                   (org2jekyll-get-option "DATE"))))
   (should-not (with-temp-buffer
                 (org-mode)
                 (insert "#+HEADING: hello
 #+DATE: some-date")
                 (goto-char (point-min))
-                (org2jekyll-get-option-at-point "UNKNOWN"))))
+                (org2jekyll-get-option "UNKNOWN"))))
 
 (ert-deftest test-org2jekyll-article-p ()
   (should (let ((temp-filename "/tmp/test-publish-article-p"))

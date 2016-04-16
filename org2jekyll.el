@@ -306,7 +306,7 @@ The `'%s`' will be replaced respectively by the blog entry name, the author, the
 
 (defalias 'org2jekyll/list-drafts 'org2jekyll-list-drafts)
 
-(defun org2jekyll-get-option-at-point (opt)
+(defun org2jekyll-get-option (opt)
   "Gets the header value of the option OPT from a buffer."
   (let* ((regexp (org-make-options-regexp (list (upcase opt) (downcase opt)))))
     (save-excursion
@@ -320,7 +320,7 @@ The `'%s`' will be replaced respectively by the blog entry name, the author, the
     (when (file-exists-p orgfile)
       (insert-file-contents orgfile)
       (goto-char (point-min))
-      (org2jekyll-get-option-at-point option))))
+      (org2jekyll-get-option option))))
 
 (defun org2jekyll-get-options-from-file (orgfile options)
   "Return the ORGFILE's OPTIONS."
@@ -330,7 +330,7 @@ The `'%s`' will be replaced respectively by the blog entry name, the author, the
       (mapcar (lambda (option)
                 (save-excursion
                   (goto-char (point-min))
-                  (cons option (org2jekyll-get-option-at-point option))))
+                  (cons option (org2jekyll-get-option option))))
               options))))
 
 (defun org2jekyll-layout (org-file)
@@ -562,7 +562,7 @@ Layout `'default`' is a page."
     (deferred:$
       (deferred:next (lambda ()
                        (-> "layout"
-                           org2jekyll-get-option-at-point
+                           org2jekyll-get-option
                            org2jekyll-post-p
                            (if 'org2jekyll-publish-post
                                'org2jekyll-publish-page))))
