@@ -1,7 +1,8 @@
 #+title: Backlog
 #+author: ardumont
 
-* IN-PROGRESS 0.1.9 [100%]
+* DONE 0.1.9 [100%]
+CLOSED: [2016-04-16 Sat 18:36]
 - [X] Permit to add extra yaml headers during export with user-custom variable (#34)
 - [X] Support the new org-mode export block syntax with retro-compatibility (#32)
 - [X] Refactoring on internal function names
