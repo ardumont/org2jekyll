@@ -525,7 +525,7 @@ Publication skipped" error-messages)
    'org2jekyll--publish-post-org-file-with-metadata
    org-file))
 
-(defun org2ekyll--publish-page-org-file-with-metadata (org-metadata org-file)
+(defun org2jekyll--publish-page-org-file-with-metadata (org-metadata org-file)
   "Publish as page with ORG-METADATA the ORG-FILE."
   (let* ((blog-project (assoc-default "layout" org-metadata))
          (ext (file-name-extension org-file))
@@ -543,7 +543,7 @@ Publication skipped" error-messages)
 (defun org2jekyll-publish-page (org-file)
   "Publish ORG-FILE as a page."
   (org2jekyll-read-metadata-and-execute
-   'org2ekyll--publish-page-org-file-with-metadata
+   'org2jekyll--publish-page-org-file-with-metadata
    org-file))
 
 (defun org2jekyll-post-p (layout)

@@ -614,7 +614,7 @@ Publication skipped"
   (should (eq :publish-page-done
               (with-mock
                 (mock (org2jekyll-read-metadata-and-execute
-                       'org2ekyll--publish-page-org-file-with-metadata
+                       'org2jekyll--publish-page-org-file-with-metadata
                        :org-file) => :publish-page-done)
                 (org2jekyll-publish-page :org-file)))))
 
