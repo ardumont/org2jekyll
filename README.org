@@ -11,28 +11,35 @@ Blogging with org-mode and jekyll without alien yaml headers.
 
 * Table of Contents                                                     :TOC_4:
  - [[#upgrade][Upgrade]]
-     - [[#012---014][0.1.2 -> 0.1.4]]
+   - [[#018---019][0.1.8 -> 0.1.9]]
+   - [[#012---014][0.1.2 -> 0.1.4]]
  - [[#description][Description]]
-     - [[#rationale][Rationale]]
-     - [[#pre-requisite][Pre-requisite]]
+   - [[#rationale][Rationale]]
+   - [[#pre-requisite][Pre-requisite]]
  - [[#installsetup][Install/Setup]]
-     - [[#install][Install]]
-     - [[#setup][Setup]]
-     - [[#a-working-example][A working example]]
+   - [[#install][Install]]
+   - [[#setup][Setup]]
+   - [[#a-working-example][A working example]]
  - [[#use][Use]]
-     - [[#post][Post]]
-         - [[#headers][Headers]]
-         - [[#publish][Publish]]
-         - [[#how][How]]
-     - [[#page][Page]]
-         - [[#headers][Headers]]
-         - [[#publish][Publish]]
-         - [[#how][How]]
-     - [[#publish-all-posts][Publish all posts]]
-     - [[#publish-all-pages][Publish all pages]]
+   - [[#post][Post]]
+     - [[#headers][Headers]]
+     - [[#publish][Publish]]
+     - [[#how][How]]
+     - [[#optional][Optional]]
+   - [[#page][Page]]
+     - [[#headers][Headers]]
+     - [[#publish][Publish]]
+     - [[#how][How]]
+   - [[#publish-all-posts][Publish all posts]]
+   - [[#publish-all-pages][Publish all pages]]
+   - [[#previews][Previews]]
  - [[#minor-mode][Minor mode]]
 
 * Upgrade
+
+** 0.1.8 -> 0.1.9
+- Remove deprecated api function names mentioned in 0.1.2 -> 0.1.4 migration.
+- Permit user to define on per-buffer setup or per-custom variable basis some extra yaml header
 
 ** 0.1.2 -> 0.1.4
 
@@ -184,6 +191,7 @@ For a post (layout 'post'):
 #+TITLE: hello
 #+DESCRIPTION: some description
 #+CATEGORIES: category0, category1
+#+EXTRA-YAML-HEADERS: theme: blah\nplugin: lightense\nscheme-hover: \"#ff00b4\"
 #+end_src
 
 *Note*
@@ -202,6 +210,22 @@ This will be published as post article.
 - The *#+LAYOUT* entry refers to the *post* entry in *org-publish-project-alist*.
 - This will create another temporary org-mode file based on the current one with the right naming convention, transform the org headers into yaml, publish to the jekyll directory (according to your org-publish setup) and delete the temporary file.
 
+*** Optional
+
+As in issue https://github.com/ardumont/org2jekyll/issues/36, you
+could have the need to add some extra yaml headers.  To add such, you
+can either use the buffer option *EXTRA-YAML-HEADERS* (as in previous
+sample) or define a global user custom
+`org2jekyll-extra-yaml-headers`.
+
+
+#+BEGIN_SRC emacs-lisp
+(custom-set-variables '(org2jekyll-extra-yaml-headers "theme: blah\nplugin: lightense\nscheme-hover: \"#ff00b4\""))
+#+END_SRC
+
+The buffer option has priority over the user custom. That is, if you
+define both, it's the buffer one which take precedence.
+
 ** Page
 
 *** Headers
@@ -218,6 +242,7 @@ For a page (layout 'default').
 #+TITLE: hello
 #+DESCRIPTION: some description
 #+CATEGORIES: some-category
+#+EXTRA-YAML-HEADERS: theme: blah\nplugin: lightense\nscheme-hover: \"#ff00b4\"
 #+end_src
 
 *Note*

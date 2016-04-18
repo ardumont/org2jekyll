@@ -1,10 +1,10 @@
 ;;; org2jekyll.el --- Minor mode to publish org-mode post to jekyll without specific yaml
 
-;; Copyright (C) 2014 Antoine R. Dumont <eniotna.t AT gmail.com>
+;; Copyright (C) 2014-2016 Antoine R. Dumont <eniotna.t AT gmail.com>
 
 ;; Author: Antoine R. Dumont <eniotna.t AT gmail.com>
 ;; Maintainer: Antoine R. Dumont <eniotna.t AT gmail.com>
-;; Version: 0.1.8
+;; Version: 0.1.9
 ;; Package-Requires: ((dash-functional "2.11.0") (s "1.9.0") (deferred "0.3.1"))
 ;; Keywords: org-mode jekyll blog publish
 ;; URL: https://github.com/ardumont/org2jekyll
@@ -69,15 +69,11 @@
   :require 'org2jekyll
   :group 'org2jekyll)
 
-(defalias 'org2jekyll/blog-author 'org2jekyll-blog-author) ;; for compatibility
-
 (defcustom org2jekyll-source-directory nil
   "Path to the source directory."
   :type 'string
   :require 'org2jekyll
   :group 'org2jekyll)
-
-(defalias 'org2jekyll/source-directory 'org2jekyll-source-directory)
 
 (defcustom org2jekyll-jekyll-directory nil
   "Path to Jekyll blog."
@@ -85,15 +81,11 @@
   :require 'org2jekyll
   :group 'org2jekyll)
 
-(defalias 'org2jekyll/jekyll-directory 'org2jekyll-jekyll-directory)
-
 (defcustom org2jekyll-jekyll-drafts-dir nil
   "Relative path to drafts directory."
   :type 'string
   :require 'org2jekyll
   :group 'org2jekyll)
-
-(defalias 'org2jekyll/jekyll-drafts-dir 'org2jekyll-jekyll-drafts-dir)
 
 (defcustom org2jekyll-jekyll-posts-dir nil
   "Relative path to posts directory."
@@ -101,7 +93,19 @@
   :require 'org2jekyll
   :group 'org2jekyll)
 
-(defalias 'org2jekyll/jekyll-posts-dir 'org2jekyll-jekyll-posts-dir)
+(defcustom org2jekyll-extra-yaml-headers nil
+  "An entry of static yaml header (already formatted).
+E.g. from https://github.com/ardumont/org2jekyll/issues/34#issue-148684715:
+scheme-text: \"#0029ff\"
+scheme-link: \"#ff00b4\"
+scheme-hover: \"#ff00b4\"
+scheme-code: \"#ad00ff\"
+scheme-bg: \"#00ebff\"
+scheme-hero-text: \"#00ebff\"
+scheme-hero-link: \"#00ebff\"
+scheme-hero-bg: \"#0029ff\"
+plugin: lightense"
+  :group 'org2jekyll)
 
 (defvar org2jekyll-jekyll-post-ext ".org"
   "File extension of Jekyll posts.")
@@ -268,8 +272,6 @@ The `'%s`' will be replaced respectively by the blog entry name, the author, the
         (insert "* ")))
     (find-file draft-file)))
 
-(defalias 'org2jekyll/create-draft! 'org2jekyll-create-draft)
-
 (defun org2jekyll--list-dir (dir)
   "List the content of DIR."
   (find-file dir))
@@ -281,8 +283,6 @@ The `'%s`' will be replaced respectively by the blog entry name, the author, the
   (org2jekyll--list-dir
    (org2jekyll-output-directory org2jekyll-jekyll-posts-dir)))
 
-(defalias 'org2jekyll/list-posts 'org2jekyll-list-posts)
-
 ;;;###autoload
 (defun org2jekyll-list-drafts ()
   "List the drafts folder."
@@ -290,9 +290,7 @@ The `'%s`' will be replaced respectively by the blog entry name, the author, the
   (org2jekyll--list-dir
    (org2jekyll-input-directory org2jekyll-jekyll-drafts-dir)))
 
-(defalias 'org2jekyll/list-drafts 'org2jekyll-list-drafts)
-
-(defun org2jekyll-get-option-at-point (opt)
+(defun org2jekyll-get-option (opt)
   "Gets the header value of the option OPT from a buffer."
   (let* ((regexp (org-make-options-regexp (list (upcase opt) (downcase opt)))))
     (save-excursion
@@ -306,7 +304,7 @@ The `'%s`' will be replaced respectively by the blog entry name, the author, the
     (when (file-exists-p orgfile)
       (insert-file-contents orgfile)
       (goto-char (point-min))
-      (org2jekyll-get-option-at-point option))))
+      (org2jekyll-get-option option))))
 
 (defun org2jekyll-get-options-from-file (orgfile options)
   "Return the ORGFILE's OPTIONS."
@@ -316,7 +314,7 @@ The `'%s`' will be replaced respectively by the blog entry name, the author, the
       (mapcar (lambda (option)
                 (save-excursion
                   (goto-char (point-min))
-                  (cons option (org2jekyll-get-option-at-point option))))
+                  (cons option (org2jekyll-get-option option))))
               options))))
 
 (defun org2jekyll-layout (org-file)
@@ -353,19 +351,28 @@ Depends on the metadata header #+LAYOUT."
   ;; see http://orgmode.org/cgit.cgi/org-mode.git/commit/?id=54318ad
   (boundp 'org-element-block-name-alist))
 
+(defun org2jekyll--read-extra-yaml-headers ()
+  "Compute extra-yaml-headers from current buffer."
+  (-if-let (extra-headers (org2jekyll-get-option "extra-yaml-headers"))
+      (s-replace "\\n" "\n" extra-headers)
+    org2jekyll-extra-yaml-headers))
+
 (defun org2jekyll--to-yaml-header (org-metadata)
   "Given a list of ORG-METADATA, compute the yaml header string."
   (-let (((begin end) (if (org2jekyll--old-org-version-p)
                           '("#+BEGIN_HTML" "#+END_HTML\n")
-                        '("#+BEGIN_EXPORT HTML" "#+END_EXPORT\n"))))
+                        '("#+BEGIN_EXPORT HTML" "#+END_EXPORT\n")))
+         (extra-headers (org2jekyll--read-extra-yaml-headers)))
     (--> org-metadata
          org2jekyll--org-to-yaml-metadata
          (--map (format "%s: %s" (car it) (cdr it)) it)
          (cons "---" it)
          (cons begin it)
+         (-snoc it extra-headers)
          (-snoc it "---")
          (-snoc it end)
-         (s-join "\n" it))))
+         (s-join "\n" it)
+         (s-replace "\n\n" "\n" it))))
 
 (defun org2jekyll--csv-to-yaml (str-csv)
   "Transform a STR-CSV entries into a yaml entries."
@@ -502,7 +509,7 @@ Publication skipped" error-messages)
    'org2jekyll--publish-post-org-file-with-metadata
    org-file))
 
-(defun org2ekyll--publish-page-org-file-with-metadata (org-metadata org-file)
+(defun org2jekyll--publish-page-org-file-with-metadata (org-metadata org-file)
   "Publish as page with ORG-METADATA the ORG-FILE."
   (let* ((blog-project (assoc-default "layout" org-metadata))
          (ext (file-name-extension org-file))
@@ -520,7 +527,7 @@ Publication skipped" error-messages)
 (defun org2jekyll-publish-page (org-file)
   "Publish ORG-FILE as a page."
   (org2jekyll-read-metadata-and-execute
-   'org2ekyll--publish-page-org-file-with-metadata
+   'org2jekyll--publish-page-org-file-with-metadata
    org-file))
 
 (defun org2jekyll-post-p (layout)
@@ -546,7 +553,7 @@ Layout `'default`' is a page."
     (deferred:$
       (deferred:next (lambda ()
                        (-> "layout"
-                           org2jekyll-get-option-at-point
+                           org2jekyll-get-option
                            org2jekyll-post-p
                            (if 'org2jekyll-publish-post
                                'org2jekyll-publish-page))))
@@ -556,8 +563,6 @@ Layout `'default`' is a page."
                            final-message))
       (deferred:nextc it (lambda (final-message)
                            (org2jekyll-message final-message))))))
-
-(defalias 'org2jekyll/publish! 'org2jekyll-publish)
 
 (defvar org2jekyll-mode-map nil "Default Bindings map for org2jekyll mode.")
 
@@ -583,8 +588,6 @@ Layout `'default`' is a page."
       (lambda (posts)
         (mapc #'org2jekyll-publish-post posts)))))
 
-(defalias 'org2jekyll/publish-posts! 'org2jekyll-publish-posts)
-
 ;;;###autoload
 (defun org2jekyll-publish-pages ()
   "Publish all the pages."
@@ -597,8 +600,6 @@ Layout `'default`' is a page."
     (deferred:nextc it
       (lambda (pages)
         (mapc #'org2jekyll-publish-page pages)))))
-
-(defalias 'org2jekyll/publish-pages! 'org2jekyll-publish-pages)
 
 ;;;###autoload
 (define-minor-mode org2jekyll-mode
