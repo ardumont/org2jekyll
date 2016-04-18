@@ -69,15 +69,11 @@
   :require 'org2jekyll
   :group 'org2jekyll)
 
-(defalias 'org2jekyll/blog-author 'org2jekyll-blog-author) ;; for compatibility
-
 (defcustom org2jekyll-source-directory nil
   "Path to the source directory."
   :type 'string
   :require 'org2jekyll
   :group 'org2jekyll)
-
-(defalias 'org2jekyll/source-directory 'org2jekyll-source-directory)
 
 (defcustom org2jekyll-jekyll-directory nil
   "Path to Jekyll blog."
@@ -85,23 +81,17 @@
   :require 'org2jekyll
   :group 'org2jekyll)
 
-(defalias 'org2jekyll/jekyll-directory 'org2jekyll-jekyll-directory)
-
 (defcustom org2jekyll-jekyll-drafts-dir nil
   "Relative path to drafts directory."
   :type 'string
   :require 'org2jekyll
   :group 'org2jekyll)
 
-(defalias 'org2jekyll/jekyll-drafts-dir 'org2jekyll-jekyll-drafts-dir)
-
 (defcustom org2jekyll-jekyll-posts-dir nil
   "Relative path to posts directory."
   :type 'string
   :require 'org2jekyll
   :group 'org2jekyll)
-
-(defalias 'org2jekyll/jekyll-posts-dir 'org2jekyll-jekyll-posts-dir)
 
 (defcustom org2jekyll-extra-yaml-headers nil
   "An entry of static yaml header (already formatted).
@@ -282,8 +272,6 @@ The `'%s`' will be replaced respectively by the blog entry name, the author, the
         (insert "* ")))
     (find-file draft-file)))
 
-(defalias 'org2jekyll/create-draft! 'org2jekyll-create-draft)
-
 (defun org2jekyll--list-dir (dir)
   "List the content of DIR."
   (find-file dir))
@@ -295,16 +283,12 @@ The `'%s`' will be replaced respectively by the blog entry name, the author, the
   (org2jekyll--list-dir
    (org2jekyll-output-directory org2jekyll-jekyll-posts-dir)))
 
-(defalias 'org2jekyll/list-posts 'org2jekyll-list-posts)
-
 ;;;###autoload
 (defun org2jekyll-list-drafts ()
   "List the drafts folder."
   (interactive)
   (org2jekyll--list-dir
    (org2jekyll-input-directory org2jekyll-jekyll-drafts-dir)))
-
-(defalias 'org2jekyll/list-drafts 'org2jekyll-list-drafts)
 
 (defun org2jekyll-get-option (opt)
   "Gets the header value of the option OPT from a buffer."
@@ -580,8 +564,6 @@ Layout `'default`' is a page."
       (deferred:nextc it (lambda (final-message)
                            (org2jekyll-message final-message))))))
 
-(defalias 'org2jekyll/publish! 'org2jekyll-publish)
-
 (defvar org2jekyll-mode-map nil "Default Bindings map for org2jekyll mode.")
 
 (setq org2jekyll-mode-map
@@ -606,8 +588,6 @@ Layout `'default`' is a page."
       (lambda (posts)
         (mapc #'org2jekyll-publish-post posts)))))
 
-(defalias 'org2jekyll/publish-posts! 'org2jekyll-publish-posts)
-
 ;;;###autoload
 (defun org2jekyll-publish-pages ()
   "Publish all the pages."
@@ -620,8 +600,6 @@ Layout `'default`' is a page."
     (deferred:nextc it
       (lambda (pages)
         (mapc #'org2jekyll-publish-page pages)))))
-
-(defalias 'org2jekyll/publish-pages! 'org2jekyll-publish-pages)
 
 ;;;###autoload
 (define-minor-mode org2jekyll-mode
