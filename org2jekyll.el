@@ -1,6 +1,6 @@
 ;;; org2jekyll.el --- Minor mode to publish org-mode post to jekyll without specific yaml
 
-;; Copyright (C) 2014 Antoine R. Dumont <eniotna.t AT gmail.com>
+;; Copyright (C) 2014-2016 Antoine R. Dumont <eniotna.t AT gmail.com>
 
 ;; Author: Antoine R. Dumont <eniotna.t AT gmail.com>
 ;; Maintainer: Antoine R. Dumont <eniotna.t AT gmail.com>
