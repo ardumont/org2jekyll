@@ -141,10 +141,11 @@ categories: \n- jabber\n- emacs\n- tools\n- gtalk
 tags: \n- tag0\n- tag1\n- tag2
 excerpt: Installing jabber and using it from emacs + authentication tips and tricks
 theme: blah
+plugin: light
 ---
 #+END_HTML
 "
-                   (let ((org2jekyll-extra-yaml-headers "theme: blah"))
+                   (let ((org2jekyll-extra-yaml-headers "theme: blah\nplugin: light"))
                      (mocklet (((org2jekyll--old-org-version-p) => t))
                        (org2jekyll--to-yaml-header '(("layout" . "post")
                                                      ("title" . "gtalk in emacs using jabber mode")
@@ -616,3 +617,36 @@ Publication skipped"
                        'org2ekyll--publish-page-org-file-with-metadata
                        :org-file) => :publish-page-done)
                 (org2jekyll-publish-page :org-file)))))
+
+(ert-deftest test-org2jekyll--read-extra-yaml-headers ()
+  (should (string= "theme: dark\nplugin: light"
+                   (org2jekyll-tests-with-temp-buffer
+                    "#+extra-yaml-headers: theme: dark\nplugin: light"
+                    (org2jekyll--read-extra-yaml-headers)))))
+
+(ert-deftest test-org2jekyll--read-extra-yaml-headers ()
+  (should (string= "theme: dark"
+                   (org2jekyll-tests-with-temp-buffer
+                    "#+title: hello
+#+extra-yaml-headers: theme: dark
+* one description"
+                    (org2jekyll--read-extra-yaml-headers))))
+  (should-not (org2jekyll-tests-with-temp-buffer
+               "#+title: hello
+* one description"
+               (org2jekyll--read-extra-yaml-headers))))
+
+(ert-deftest test-org2jekyll--read-extra-yaml-headers-2 ()
+  (should (string= "theme: dark"
+                   (let ((org2jekyll-extra-yaml-headers "something"))
+                     (org2jekyll-tests-with-temp-buffer
+                      "#+title: hello
+#+extra-yaml-headers: theme: dark
+* one description"
+                      (org2jekyll--read-extra-yaml-headers)))))
+  (should (string= "something2"
+                   (let ((org2jekyll-extra-yaml-headers "something2"))
+                     (org2jekyll-tests-with-temp-buffer
+                      "#+title: hello
+* one description"
+                      (org2jekyll--read-extra-yaml-headers))))))

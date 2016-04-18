@@ -367,17 +367,24 @@ Depends on the metadata header #+LAYOUT."
   ;; see http://orgmode.org/cgit.cgi/org-mode.git/commit/?id=54318ad
   (boundp 'org-element-block-name-alist))
 
+(defun org2jekyll--read-extra-yaml-headers ()
+  "Compute extra-yaml-headers from current buffer."
+  (-if-let (extra-headers (org2jekyll-get-option "extra-yaml-headers"))
+      (s-replace "\\n" "\n" extra-headers)
+    org2jekyll-extra-yaml-headers))
+
 (defun org2jekyll--to-yaml-header (org-metadata)
   "Given a list of ORG-METADATA, compute the yaml header string."
   (-let (((begin end) (if (org2jekyll--old-org-version-p)
                           '("#+BEGIN_HTML" "#+END_HTML\n")
-                        '("#+BEGIN_EXPORT HTML" "#+END_EXPORT\n"))))
+                        '("#+BEGIN_EXPORT HTML" "#+END_EXPORT\n")))
+         (extra-headers (org2jekyll--read-extra-yaml-headers)))
     (--> org-metadata
          org2jekyll--org-to-yaml-metadata
          (--map (format "%s: %s" (car it) (cdr it)) it)
          (cons "---" it)
          (cons begin it)
-         (-snoc it org2jekyll-extra-yaml-headers)
+         (-snoc it extra-headers)
          (-snoc it "---")
          (-snoc it end)
          (s-join "\n" it)
