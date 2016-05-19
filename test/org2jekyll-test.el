@@ -1,7 +1,10 @@
+;;; org2jekyll-test.el --- Test org2jekyll
+;;; Commentary:
+
 (require 'ert)
-(require 'org2jekyll)
 (require 'el-mock)
 
+;;; Code:
 (ert-deftest test-org2jekyll-get-options-from-file ()
   (let* ((temp-file "/tmp/test-get-options-from-file")
          (blog-key "#+BLOG:")
@@ -592,3 +595,4 @@ Publication skipped" options-alist))))
                        'org2jekyll--publish-page-org-file-with-metadata
                        :org-file) => :publish-page-done)
                 (org2jekyll-publish-page :org-file)))))
+;;; org2jekyll-test.el ends here
