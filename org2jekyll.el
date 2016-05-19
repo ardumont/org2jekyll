@@ -384,24 +384,25 @@ Return DEFAULT-VALUE if not found."
       data
     default-value))
 
-(setq org2jekyll-header-metadata '((:title       . 'mandatory)
-                                   (:date)
-                                   (:categories  . 'mandatory)
-                                   (:tags)
-                                   (:description . 'mandatory)
-                                   (:author)
-                                   (:layout      . 'mandatory)))
+(defconst org2jekyll-required-org-header-alist '((:title       . 'required)
+                                                 (:date)
+                                                 (:categories  . 'required)
+                                                 (:tags)
+                                                 (:description . 'required)
+                                                 (:author)
+                                                 (:layout      . 'required)))
 
 (defun org2jekyll-check-metadata (org-metadata)
-  "Check that the mandatory header metadata in ORG-METADATA are provided.
-Return the error messages if any or nil if everything is alright."
-  (let ((mandatory-values (funcall (-compose (lambda (l) (mapcar #'car l))
+  "Check that all required headers in ORG-METADATA are provided.
+Return error messages for any required headers that are missing,
+and nil if no problems are found."
+  (let ((required-options (funcall (-compose (lambda (l) (mapcar #'car l))
                                              (lambda (l) (-filter #'cdr l)))
-                                   org2jekyll-header-metadata)))
+                                   org2jekyll-required-org-header-alist)))
     (-when-let (error-messages
-                (->> mandatory-values
+                (->> required-options
                      (--map (unless (plist-member org-metadata it)
-                              (format (concat "- The %s is mandatory, please add "
+                              (format (concat "- The %s is required, please add "
                                               "'#+%s' at the top of your org buffer.")
                                       (substring (symbol-name it) 1 nil)
                                       (upcase (substring (symbol-name it) 1 nil)))))
@@ -411,11 +412,11 @@ Return the error messages if any or nil if everything is alright."
 
 (defun org2jekyll-remove-org-only-options (yaml-alist)
   "Filter out org options with no Jekyll meaning from YAML-ALIST."
-  (let* ((jekyll-keywords (--map (substring (symbol-name (car it)) 1 nil)
-                                 org2jekyll-header-metadata))
+  (let* ((required-options (--map (substring (symbol-name (car it)) 1 nil)
+                                  org2jekyll-required-org-header-alist))
          (org-options (--map (downcase (substring it 0 -1))
                              org-options-keywords))
-         (org-only-options (--filter (not (member it jekyll-keywords))
+         (org-only-options (--filter (not (member it required-options))
                                      org-options))
          (jekyll-options (--filter (not (member (car it) org-only-options))
                                    yaml-alist)))
@@ -423,8 +424,9 @@ Return the error messages if any or nil if everything is alright."
 
 (defun org2jekyll-read-metadata (org-file)
   "Given an ORG-FILE, return its org metadata.
-If non-mandatory values are missing, they are replaced with dummy ones.
-Otherwise, display the error messages about the missing mandatory values."
+If unrequired values are missing, they are replaced with dummy
+ones.  Otherwise, display the error messages about the missing
+required values."
   (let* ((buffer-metadata (org2jekyll-get-options-from-file org-file))
          (org-defaults `(:date ,(org2jekyll-now)
                                :tags "dummy-tags-should-be-replaced"
@@ -441,7 +443,7 @@ Otherwise, display the error messages about the missing mandatory values."
                                   (cdr it))
                             (kvplist->alist yaml-metadata))))
     (-if-let (error-messages (org2jekyll-check-metadata buffer-metadata))
-        (format "This org-mode file is missing mandatory header(s):
+        (format "This org-mode file is missing required header(s):
 %s
 Publication skipped" error-messages)
       (org2jekyll-remove-org-only-options yaml-alist))))

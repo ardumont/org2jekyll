@@ -275,8 +275,8 @@ excerpt: fake-description with spaces and all
     (should (null (assoc-default "startup" options-alist)))
     (should (null (assoc-default "options" options-alist)))))
 
-(ert-deftest test-org2jekyll-read-metadata-mandatory-headers ()
-  (let* ((temp-file "/tmp/test-org2jekyll-read-metadata-mandatory-headers")
+(ert-deftest test-org2jekyll-read-metadata-required-headers ()
+  (let* ((temp-file "/tmp/test-org2jekyll-read-metadata-required-headers")
          (layout-key "#+LAYOUT:") (layout-val "post")
          (description-key "#+DESCRIPTION:") (description-val "desc")
          (_ (with-temp-file temp-file
@@ -284,9 +284,9 @@ excerpt: fake-description with spaces and all
                               description-key " " description-val "\n"))))
          (options-alist (org2jekyll-read-metadata temp-file))
          (_ (delete-file temp-file)))
-    (should (equal "This org-mode file is missing mandatory header(s):
-- The title is mandatory, please add '#+TITLE' at the top of your org buffer.
-- The categories is mandatory, please add '#+CATEGORIES' at the top of your org buffer.
+    (should (equal "This org-mode file is missing required header(s):
+- The title is required, please add '#+TITLE' at the top of your org buffer.
+- The categories is required, please add '#+CATEGORIES' at the top of your org buffer.
 Publication skipped" options-alist))))
 
 (ert-deftest test-org2jekyll-default-headers-template ()
@@ -383,13 +383,13 @@ Publication skipped" options-alist))))
          (_ (delete-file temp-file))
          (metadata-errors (org2jekyll-check-metadata options-plist)))
     (should (null metadata-errors)))
-  (should (equal "- The title is mandatory, please add '#+TITLE' at the top of your org buffer.
-- The categories is mandatory, please add '#+CATEGORIES' at the top of your org buffer.
-- The description is mandatory, please add '#+DESCRIPTION' at the top of your org buffer.
-- The layout is mandatory, please add '#+LAYOUT' at the top of your org buffer."
+  (should (equal "- The title is required, please add '#+TITLE' at the top of your org buffer.
+- The categories is required, please add '#+CATEGORIES' at the top of your org buffer.
+- The description is required, please add '#+DESCRIPTION' at the top of your org buffer.
+- The layout is required, please add '#+LAYOUT' at the top of your org buffer."
                  (org2jekyll-check-metadata nil)))
-  (should (equal "- The categories is mandatory, please add '#+CATEGORIES' at the top of your org buffer.
-- The description is mandatory, please add '#+DESCRIPTION' at the top of your org buffer."
+  (should (equal "- The categories is required, please add '#+CATEGORIES' at the top of your org buffer.
+- The description is required, please add '#+DESCRIPTION' at the top of your org buffer."
                  (org2jekyll-check-metadata '(:title "some-title"
                                                      :layout "some-layout"))))
   (should-not (org2jekyll-check-metadata '(:title "some-title"
