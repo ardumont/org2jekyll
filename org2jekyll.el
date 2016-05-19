@@ -93,20 +93,6 @@
   :require 'org2jekyll
   :group 'org2jekyll)
 
-(defcustom org2jekyll-extra-yaml-headers nil
-  "An entry of static yaml header (already formatted).
-E.g. from https://github.com/ardumont/org2jekyll/issues/34#issue-148684715:
-scheme-text: \"#0029ff\"
-scheme-link: \"#ff00b4\"
-scheme-hover: \"#ff00b4\"
-scheme-code: \"#ad00ff\"
-scheme-bg: \"#00ebff\"
-scheme-hero-text: \"#00ebff\"
-scheme-hero-link: \"#00ebff\"
-scheme-hero-bg: \"#0029ff\"
-plugin: lightense"
-  :group 'org2jekyll)
-
 (defvar org2jekyll-jekyll-post-ext ".org"
   "File extension of Jekyll posts.")
 
@@ -350,12 +336,6 @@ Depends on the metadata header #+LAYOUT."
   ;; availability to detect pre-release 9.0 Git snapshots with the new syntax,
   ;; see http://orgmode.org/cgit.cgi/org-mode.git/commit/?id=54318ad
   (boundp 'org-element-block-name-alist))
-
-(defun org2jekyll--read-extra-yaml-headers ()
-  "Compute extra-yaml-headers from current buffer."
-  (-if-let (extra-headers (org2jekyll-get-option "extra-yaml-headers"))
-      (s-replace "\\n" "\n" extra-headers)
-    org2jekyll-extra-yaml-headers))
 
 (defun org2jekyll--to-yaml-header (org-metadata)
   "Given a list of ORG-METADATA, compute the yaml header string."
