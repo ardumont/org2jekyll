@@ -383,16 +383,13 @@ Return DEFAULT-VALUE if not found."
       data
     default-value))
 
-(defvar org2jekyll-header-metadata nil
-  "The needed headers for org buffer for org2jekyll to work.")
-
-(setq org2jekyll-header-metadata '(("title"       . 'mandatory)
-                                   ("date")
-                                   ("categories"  . 'mandatory)
-                                   ("tags")
-                                   ("description" . 'mandatory)
-                                   ("author")
-                                   ("layout"      . 'mandatory)))
+(setq org2jekyll-header-metadata '((:title       . 'mandatory)
+                                   (:date)
+                                   (:categories  . 'mandatory)
+                                   (:tags)
+                                   (:description . 'mandatory)
+                                   (:author)
+                                   (:layout      . 'mandatory)))
 
 (defun org2jekyll-check-metadata (org-metadata)
   "Check that the mandatory header metadata in ORG-METADATA are provided.
@@ -402,8 +399,11 @@ Return the error messages if any or nil if everything is alright."
                                    org2jekyll-header-metadata)))
     (-when-let (error-messages
                 (->> mandatory-values
-                     (--map (when (null (assoc-default it org-metadata))
-                              (format "- The %s is mandatory, please add '#+%s' at the top of your org buffer." it (upcase it))))
+                     (--map (unless (plist-member org-metadata it)
+                              (format (concat "- The %s is mandatory, please add "
+                                              "'#+%s' at the top of your org buffer.")
+                                      (substring (symbol-name it) 1 nil)
+                                      (upcase (substring (symbol-name it) 1 nil)))))
                      (s-join "\n")
                      s-trim))
       (if (string= "" error-messages) nil error-messages))))
@@ -431,31 +431,6 @@ Otherwise, display the error messages about the missing mandatory values."
         (format "This org-mode file is missing mandatory header(s):
 %s
 Publication skipped" error-messages)
-      `(("layout"      . ,(-> "layout"
-                              (org2jekyll-assoc-default org-metadata "post")))
-        ("title"       . ,(-> "title"
-                              (org2jekyll-assoc-default
-                               org-metadata
-                               "dummy-title-should-be-replaced")))
-        ("date"        . ,(-> "date"
-                              (org2jekyll-assoc-default
-                               org-metadata
-                               (org2jekyll-now))
-                              org2jekyll--convert-timestamp-to-yyyy-dd-mm))
-        ("categories"  . ,(-> "categories"
-                              (org2jekyll-assoc-default
-                               org-metadata
-                               "dummy-category-should-be-replaced")
-                              org2jekyll--csv-to-yaml))
-        ("tags"        . ,(-> "tags"
-                              (org2jekyll-assoc-default
-                               org-metadata
-                               "dummy-tags-should-be-replaced")
-                              org2jekyll--csv-to-yaml))
-        ("author"      . ,(-> "author"
-                              (org2jekyll-assoc-default org-metadata "")))
-        ("description" . ,(-> "description"
-                              (org2jekyll-assoc-default org-metadata "")))))))
 
 (defun org2jekyll-read-metadata-and-execute (action-fn org-file)
   "Execute ACTION-FN function after checking metadata from the ORG-FILE."

@@ -267,13 +267,19 @@ excerpt: fake-description with spaces and all
                             => "2015-01-01 Sat 14:20"))
                    (org2jekyll-read-metadata "org-file-2"))))
   (should (equal "This org-mode file is missing mandatory header(s):
+(ert-deftest test-org2jekyll-read-metadata-mandatory-headers ()
+  (let* ((temp-file "/tmp/test-org2jekyll-read-metadata-mandatory-headers")
+         (layout-key "#+LAYOUT:") (layout-val "post")
+         (description-key "#+DESCRIPTION:") (description-val "desc")
+         (_ (with-temp-file temp-file
+              (insert (concat layout-key " " layout-val "\n"
+                              description-key " " description-val "\n"))))
+         (options-alist (org2jekyll-read-metadata temp-file))
+         (_ (delete-file temp-file)))
+    (should (equal "This org-mode file is missing mandatory header(s):
 - The title is mandatory, please add '#+TITLE' at the top of your org buffer.
 - The categories is mandatory, please add '#+CATEGORIES' at the top of your org buffer.
-Publication skipped"
-                 (mocklet (((org2jekyll-get-options-from-file "org-file-2" '("title" "date" "categories" "tags" "description" "author" "layout"))
-                            => `(("layout"      . "post")
-                                 ("description" . "desc"))))
-                   (org2jekyll-read-metadata "org-file-2")))))
+Publication skipped" options-alist))))
 
 (ert-deftest test-org2jekyll-default-headers-template ()
   (should (equal "#+STARTUP: showall
@@ -345,21 +351,44 @@ Publication skipped"
   (should-not (org2jekyll-page-p "post")))
 
 (ert-deftest test-org2jekyll-check-metadata ()
+  (let* ((temp-file "/tmp/test-org2jekyll-check-metadata")
+         (startup-key "#+STARTUP:") (startup-val "hidestars")
+         (options-key "#+OPTIONS:") (options-val "H:2 num:nil tags:nil toc:nil timestamps:t")
+         (layout-key "#+LAYOUT:") (layout-val "some-layout")
+         (author-key "#+AUTHOR:") (author-val "blog-author")
+         (date-key "#+DATE:") (date-val "post-date")
+         (title-key "#+TITLE:") (title-val "post title with spaces")
+         (description-key "#+DESCRIPTION:") (description-val "post some description")
+         (tags-key "#+TAGS:") (tags-val "post-tag0, post-tag1")
+         (categories-key "#+CATEGORIES:") (categories-val "post-category, other-category")
+         (_ (with-temp-file temp-file
+              (insert (concat startup-key " " startup-val "\n"
+                              options-key " " options-val "\n"
+                              layout-key " " layout-val "\n"
+                              author-key " " author-val "\n"
+                              date-key " " date-val "\n"
+                              title-key " " title-val "\n"
+                              description-key " " description-val "\n"
+                              tags-key " " tags-val "\n"
+                              categories-key " " categories-val "\n"))))
+         (options-plist (org2jekyll-get-options-from-file temp-file))
+         (_ (delete-file temp-file))
+         (metadata-errors (org2jekyll-check-metadata options-plist)))
+    (should (null metadata-errors)))
   (should (equal "- The title is mandatory, please add '#+TITLE' at the top of your org buffer.
 - The categories is mandatory, please add '#+CATEGORIES' at the top of your org buffer.
 - The description is mandatory, please add '#+DESCRIPTION' at the top of your org buffer.
 - The layout is mandatory, please add '#+LAYOUT' at the top of your org buffer."
                  (org2jekyll-check-metadata nil)))
-
   (should (equal "- The categories is mandatory, please add '#+CATEGORIES' at the top of your org buffer.
 - The description is mandatory, please add '#+DESCRIPTION' at the top of your org buffer."
-                 (org2jekyll-check-metadata '(("title" . "some-title")
-                                              ("layout" . "some-layout")))))
-  (should-not (org2jekyll-check-metadata '(("title" . "some-title")
-                                           ("layout" . "some-layout")
-                                           ("author" . "some-author")
-                                           ("categories" . "some-categories")
-                                           ("description" . "some-description")))))
+                 (org2jekyll-check-metadata '(:title "some-title"
+                                                     :layout "some-layout"))))
+  (should-not (org2jekyll-check-metadata '(:title "some-title"
+                                                  :layout "some-layout"
+                                                  :author "some-author"
+                                                  :categories "some-categories"
+                                                  :description "some-description"))))
 
 (ert-deftest test-org2jekyll--yaml-escape ()
   (should (string= "this is a title"
