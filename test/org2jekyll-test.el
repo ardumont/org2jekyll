@@ -112,7 +112,7 @@ excerpt: Installing jabber and using it from emacs + authentication tips and tri
                                                    ("tags"  . "\n- tag0\n- tag1\n- tag2")
                                                    ("description" . "Installing jabber and using it from emacs + authentication tips and tricks")))))))
 
-(ert-deftest test-org2jekyll--org-to-yaml-metadata ()
+(ert-deftest test-org2jekyll--org-to-jekyll-metadata ()
   (should (equal '(("layout" . "post")
                    ("title" . "gtalk in emacs using jabber mode")
                    ("date" . "2013-01-13")
@@ -123,12 +123,12 @@ excerpt: Installing jabber and using it from emacs + authentication tips and tri
 - tools
 - gtalk")
                    ("excerpt" . "Installing jabber and using it from emacs + authentication tips and tricks"))
-                 (org2jekyll--org-to-yaml-metadata '(("layout" . "post")
                                                      ("title" . "gtalk in emacs using jabber mode")
                                                      ("date" . "2013-01-13")
                                                      ("author" . "Antoine R. Dumont")
                                                      ("categories" . "\n- jabber\n- emacs\n- tools\n- gtalk")
                                                      ("description" . "Installing jabber and using it from emacs + authentication tips and tricks"))))))
+                 (org2jekyll--org-to-jekyll-metadata '(("layout" . "post")
 
 (ert-deftest test-org2jekyll--compute-ready-jekyll-file-name ()
   (should (equal "/home/tony/org/2012-10-10-scratch.org"

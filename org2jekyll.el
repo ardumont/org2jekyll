@@ -310,19 +310,13 @@ The `'%s`' will be replaced respectively by the blog entry name, the author, the
 Depends on the metadata header #+LAYOUT."
   (plist-get (org2jekyll-get-options-from-file org-file) :layout))
 
-(defvar org2jekyll-map-keys '(("title"       . "title")
-                              ("categories"  . "categories")
-                              ("tags"        . "tags")
-                              ("date"        . "date")
-                              ("description" . "excerpt")
-                              ("author"      . "author")
-                              ("layout"      . "layout"))
-  "Keys to map from org headers to jekyll's headers.")
-
-(defun org2jekyll--org-to-yaml-metadata (org-metadata)
-  "Given an ORG-METADATA map, return a yaml one with transformed data."
-  (--map `(,(assoc-default (car it) org2jekyll-map-keys) . ,(cdr it))
-         org-metadata))
+(defun org2jekyll--org-to-jekyll-metadata (org-metadata)
+  "Given an ORG-METADATA map, translate Org keywords to Jekyll keywords."
+  (let ((org2jekyll-map-keys '(("description" . "excerpt"))))
+    (--map (-if-let (jekyll-car (assoc-default (car it) org2jekyll-map-keys))
+               (cons jekyll-car (cdr it))
+             it)
+           org-metadata)))
 
 (defun org2jekyll--convert-timestamp-to-yyyy-dd-mm (timestamp)
   "Convert org TIMESTAMP to ."
@@ -341,18 +335,15 @@ Depends on the metadata header #+LAYOUT."
   "Given a list of ORG-METADATA, compute the yaml header string."
   (-let (((begin end) (if (org2jekyll--old-org-version-p)
                           '("#+BEGIN_HTML" "#+END_HTML\n")
-                        '("#+BEGIN_EXPORT HTML" "#+END_EXPORT\n")))
-         (extra-headers (org2jekyll--read-extra-yaml-headers)))
+                        '("#+BEGIN_EXPORT HTML" "#+END_EXPORT\n"))))
     (--> org-metadata
-         org2jekyll--org-to-yaml-metadata
+         org2jekyll--org-to-jekyll-metadata
          (--map (format "%s: %s" (car it) (cdr it)) it)
          (cons "---" it)
          (cons begin it)
-         (-snoc it extra-headers)
          (-snoc it "---")
          (-snoc it end)
-         (s-join "\n" it)
-         (s-replace "\n\n" "\n" it))))
+         (s-join "\n" it))))
 
 (defun org2jekyll--csv-to-yaml (str-csv)
   "Transform a STR-CSV entries into a yaml entries."
