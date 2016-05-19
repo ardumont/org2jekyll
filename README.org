@@ -25,11 +25,12 @@ Blogging with org-mode and jekyll without alien yaml headers.
      - [[#headers][Headers]]
      - [[#publish][Publish]]
      - [[#how][How]]
-     - [[#optional][Optional]]
+     - [[#extra-headers][Extra headers]]
    - [[#page][Page]]
-     - [[#headers][Headers]]
-     - [[#publish][Publish]]
-     - [[#how][How]]
+     - [[#headers-1][Headers]]
+     - [[#publish-1][Publish]]
+     - [[#how-1][How]]
+     - [[#extra-headers-1][Extra-headers]]
    - [[#publish-all-posts][Publish all posts]]
    - [[#publish-all-pages][Publish all pages]]
    - [[#previews][Previews]]
@@ -180,7 +181,6 @@ For a post (layout 'post') or page (layout 'default'), add org headers (layout, 
 *** Headers
 
 For a post (layout 'post'):
-
 #+begin_src org
 #+STARTUP: showall
 #+STARTUP: hidestars
@@ -191,7 +191,6 @@ For a post (layout 'post'):
 #+TITLE: hello
 #+DESCRIPTION: some description
 #+CATEGORIES: category0, category1
-#+EXTRA-YAML-HEADERS: theme: blah\nplugin: lightense\nscheme-hover: \"#ff00b4\"
 #+end_src
 
 *Note*
@@ -210,21 +209,29 @@ This will be published as post article.
 - The *#+LAYOUT* entry refers to the *post* entry in *org-publish-project-alist*.
 - This will create another temporary org-mode file based on the current one with the right naming convention, transform the org headers into yaml, publish to the jekyll directory (according to your org-publish setup) and delete the temporary file.
 
-*** Optional
+*** Extra headers
 
 As in issue https://github.com/ardumont/org2jekyll/issues/36, you
-could have the need to add some extra yaml headers.  To add such, you
-can either use the buffer option *EXTRA-YAML-HEADERS* (as in previous
-sample) or define a global user custom
-`org2jekyll-extra-yaml-headers`.
+could [[http://jekyllrb.com/docs/frontmatter/#predefined-global-variables][need to add some extra jekyll headers]].
 
+Simply add them as org properties (thanks [[https://github.com/halcyon][@halcyon]] for his work on [[https://github.com/ardumont/org2jekyll/pull/41][#41]]).
 
-#+BEGIN_SRC emacs-lisp
-(custom-set-variables '(org2jekyll-extra-yaml-headers "theme: blah\nplugin: lightense\nscheme-hover: \"#ff00b4\""))
+For example, adding those properties in the org file:
+#+BEGIN_SRC org
+#+THEME: blah
+#+PLUGIN: lightense
+#+SCHEME-HOVER: "#ff00b4"
 #+END_SRC
 
-The buffer option has priority over the user custom. That is, if you
-define both, it's the buffer one which take precedence.
+Then publishing, will generate:
+#+BEGIN_SRC yaml
+---
+...
+theme: blah
+plugin: lightense
+scpheme-hover: "#ff00b4"
+---
+#+END_SRC
 
 ** Page
 
@@ -242,7 +249,6 @@ For a page (layout 'default').
 #+TITLE: hello
 #+DESCRIPTION: some description
 #+CATEGORIES: some-category
-#+EXTRA-YAML-HEADERS: theme: blah\nplugin: lightense\nscheme-hover: \"#ff00b4\"
 #+end_src
 
 *Note*
@@ -259,6 +265,10 @@ When ready, /M-x org2jekyll-publish/ to publish it.
 
 - The *#+LAYOUT* entry refers to the *default* entry in *org-publish-project-alist*.
 - This will update the current org-mode with the necessary yaml and publish to the jekyll directory (according to your org-publish setup), then revert back to your normal org-mode file.
+
+*** Extra-headers
+
+cf. [[#extra-headers][post extra-headers]]
 
 ** Publish all posts
 
