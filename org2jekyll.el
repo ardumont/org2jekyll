@@ -276,16 +276,28 @@ The `'%s`' will be replaced respectively by the blog entry name, the author, the
   (org2jekyll--list-dir
    (org2jekyll-input-directory org2jekyll-jekyll-drafts-dir)))
 
-(defun org2jekyll-get-option (opt)
-  "Gets the header value of the option OPT from a buffer."
-  (let* ((regexp (org-make-options-regexp (list (upcase opt) (downcase opt)))))
+(defun org2jekyll-get-options-from-buffer ()
+  "Return special lines at the beginning of current buffer."
+  (let ((special-line-regex "^#\\+\\(.+\\):[ \t]+\\(.+\\)$")
+        (get-current-line (lambda ()
+                            (buffer-substring-no-properties (line-beginning-position)
+                                                            (line-end-position))))
+        (options-plist))
     (save-excursion
       (goto-char (point-min))
-      (if (re-search-forward regexp nil t 1)
-          (match-string-no-properties 2)))))
+      (catch 'break
+        (while (string-match special-line-regex (funcall get-current-line))
+          (setq options-plist (plist-put options-plist
+                                         (->> (funcall get-current-line)
+                                              (match-string 1)
+                                              downcase
+                                              (concat ":")
+                                              intern)
+                                         (match-string 2 (funcall get-current-line))))
+          (unless (= 0 (forward-line))
+            (throw 'break nil))))
+      options-plist)))
 
-(defun org2jekyll-get-option-from-file (orgfile option)
-  "Return the ORGFILE's OPTION."
   (with-temp-buffer
     (when (file-exists-p orgfile)
       (insert-file-contents orgfile)
