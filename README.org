@@ -229,7 +229,7 @@ Then publishing, will generate:
 ...
 theme: blah
 plugin: lightense
-scpheme-hover: "#ff00b4"
+scheme-hover: "#ff00b4"
 ---
 #+END_SRC
 
