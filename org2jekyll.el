@@ -5,7 +5,7 @@
 ;; Author: Antoine R. Dumont <eniotna.t AT gmail.com>
 ;; Maintainer: Antoine R. Dumont <eniotna.t AT gmail.com>
 ;; Version: 0.1.9
-;; Package-Requires: ((dash-functional "2.11.0") (s "1.9.0") (deferred "0.3.1"))
+;; Package-Requires: ((dash-functional "2.11.0") (s "1.9.0") (deferred "0.3.1") (kv "0.0.19"))
 ;; Keywords: org-mode jekyll blog publish
 ;; URL: https://github.com/ardumont/org2jekyll
 
@@ -57,6 +57,7 @@
 (require 's)
 (require 'deferred)
 (require 'ido)
+(require 'kv)
 
 (defgroup org2jekyll nil "Publish org-mode posts to jekyll"
   :tag "org2jekyll"
@@ -424,13 +425,27 @@ Return the error messages if any or nil if everything is alright."
   "Given an ORG-FILE, return its org metadata.
 If non-mandatory values are missing, they are replaced with dummy ones.
 Otherwise, display the error messages about the missing mandatory values."
-  (let* ((org-metadata-list (mapcar #'car org2jekyll-header-metadata))
-         (org-metadata (org2jekyll-get-options-from-file org-file
-                                                         org-metadata-list)))
-    (-if-let (error-messages (org2jekyll-check-metadata org-metadata))
+  (let* ((buffer-metadata (org2jekyll-get-options-from-file org-file))
+         (org-defaults `(:date ,(org2jekyll-now)
+                               :tags "dummy-tags-should-be-replaced"
+                               :author ""))
+         (merged-metadata (kvplist-merge org-defaults buffer-metadata))
+         (categories (org2jekyll--csv-to-yaml (plist-get merged-metadata :categories)))
+         (tags (org2jekyll--csv-to-yaml (plist-get merged-metadata :tags)))
+         (date (org2jekyll--convert-timestamp-to-yyyy-dd-mm (plist-get merged-metadata :date)))
+         (yaml-metadata (-> merged-metadata
+                            (plist-put :categories categories)
+                            (plist-put :tags tags)
+                            (plist-put :date date)))
+         (yaml-alist (--map (cons (symbol-name (car it))
+                                  (cdr it))
+                            (kvplist->alist yaml-metadata))))
+    (-if-let (error-messages (org2jekyll-check-metadata buffer-metadata))
         (format "This org-mode file is missing mandatory header(s):
 %s
 Publication skipped" error-messages)
+      (org2jekyll-remove-org-only-options yaml-alist))))
+
 
 (defun org2jekyll-read-metadata-and-execute (action-fn org-file)
   "Execute ACTION-FN function after checking metadata from the ORG-FILE."
@@ -510,8 +525,7 @@ Layout `'default`' is a page."
   (lexical-let ((org-file (buffer-file-name (current-buffer))))
     (deferred:$
       (deferred:next (lambda ()
-                       (-> "layout"
-                           org2jekyll-get-option
+                       (-> (plist-get (org2jekyll-get-options-from-buffer) :layout)
                            org2jekyll-post-p
                            (if 'org2jekyll-publish-post
                                'org2jekyll-publish-page))))
