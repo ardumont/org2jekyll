@@ -305,12 +305,10 @@ The `'%s`' will be replaced respectively by the blog entry name, the author, the
       (insert-file-contents orgfile)
       (org2jekyll-get-options-from-buffer))))
 
-(defun org2jekyll-layout (org-file)
+(defun org2jekyll-article-p (org-file)
   "Determine if the current ORG-FILE's layout.
 Depends on the metadata header #+LAYOUT."
-  (org2jekyll-get-option-from-file org-file "layout"))
-
-(defalias 'org2jekyll-article-p 'org2jekyll-layout)
+  (plist-get (org2jekyll-get-options-from-file org-file) :layout))
 
 (defvar org2jekyll-map-keys '(("title"       . "title")
                               ("categories"  . "categories")

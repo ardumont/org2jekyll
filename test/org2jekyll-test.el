@@ -20,12 +20,21 @@
     (should (string= date-val (plist-get options-plist :date)))))
 
 (ert-deftest test-org2jekyll-article-p ()
-  (should (let ((temp-filename "/tmp/test-publish-article-p"))
-            (with-temp-file temp-filename  (insert "#+LAYOUT: post\n#+DATE: some-date"))
-            (org2jekyll-article-p temp-filename)))
-  (should-not (let ((temp-filename "/tmp/test-publish-article-p"))
-                (with-temp-file temp-filename  (insert "#+NOT-AN-ARTICLE: tony's blog\n#+DATE: some-date"))
-                (org2jekyll-article-p temp-filename))))
+  (let* ((temp-file "/tmp/test-org2jekyll-get-article-p")
+         (layout-key "#+LAYOUT:") (layout-val "post")
+         (date-key "#+DATE:") (date-val "some-date")
+         (not-article-key "#+NOT-AN-ARTICLE:") (not-article-val "tony's blog")
+         (_ (with-temp-file temp-file (insert (concat layout-key " " layout-val "\n"
+                                                      date-key " " date-val "\n"))))
+         (article (org2jekyll-article-p temp-file))
+         (_ (delete-file temp-file))
+         (_ (with-temp-file temp-file (insert (concat not-article-key " " not-article-val "\n"))))
+         (not-article (org2jekyll-article-p temp-file))
+         (_ (delete-file temp-file)))
+    (should article)
+    (should-not not-article)))
+
+
 
 (ert-deftest test-org2jekyll-make-slug ()
   (should (string= "this-is-a-test"
@@ -485,12 +494,6 @@ Publication skipped"
   (should-not (with-mock
                 (mock (read-string "Categories (csv): "))
                 (org2jekyll--read-categories))))
-
-(ert-deftest test-org2jekyll-layout ()
-  (should (equal :layout
-                 (with-mock
-                   (mock (org2jekyll-get-option-from-file "some-org-file" "layout") => :layout)
-                   (org2jekyll-layout "some-org-file")))))
 
 (ert-deftest test-org2jekyll--input-read ()
   (should (eq :input-done
