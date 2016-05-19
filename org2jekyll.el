@@ -408,6 +408,18 @@ Return the error messages if any or nil if everything is alright."
                      s-trim))
       (if (string= "" error-messages) nil error-messages))))
 
+(defun org2jekyll-remove-org-only-options (yaml-alist)
+  "Filter out org options with no Jekyll meaning from YAML-ALIST."
+  (let* ((jekyll-keywords (--map (substring (symbol-name (car it)) 1 nil)
+                                 org2jekyll-header-metadata))
+         (org-options (--map (downcase (substring it 0 -1))
+                             org-options-keywords))
+         (org-only-options (--filter (not (member it jekyll-keywords))
+                                     org-options))
+         (jekyll-options (--filter (not (member (car it) org-only-options))
+                                   yaml-alist)))
+    jekyll-options))
+
 (defun org2jekyll-read-metadata (org-file)
   "Given an ORG-FILE, return its org metadata.
 If non-mandatory values are missing, they are replaced with dummy ones.
