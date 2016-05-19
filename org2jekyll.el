@@ -298,22 +298,12 @@ The `'%s`' will be replaced respectively by the blog entry name, the author, the
             (throw 'break nil))))
       options-plist)))
 
+(defun org2jekyll-get-options-from-file (orgfile)
+  "Return special lines at the beginning of ORGFILE."
   (with-temp-buffer
     (when (file-exists-p orgfile)
       (insert-file-contents orgfile)
-      (goto-char (point-min))
-      (org2jekyll-get-option option))))
-
-(defun org2jekyll-get-options-from-file (orgfile options)
-  "Return the ORGFILE's OPTIONS."
-  (with-temp-buffer
-    (when (file-exists-p orgfile)
-      (insert-file-contents orgfile)
-      (mapcar (lambda (option)
-                (save-excursion
-                  (goto-char (point-min))
-                  (cons option (org2jekyll-get-option option))))
-              options))))
+      (org2jekyll-get-options-from-buffer))))
 
 (defun org2jekyll-layout (org-file)
   "Determine if the current ORG-FILE's layout.

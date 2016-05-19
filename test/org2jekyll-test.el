@@ -4,25 +4,20 @@
 (require 'cl)
 (require 'org2jekyll)
 
-(ert-deftest test-org2jekyll-get-option-from-file ()
-  (let ((temp-filename "/tmp/test-publish-article-p"))
-    (with-temp-file temp-filename  (insert "#+BLOG: tony's blog\n#+DATE: some-date"))
-    (should (equal "tony's blog" (org2jekyll-get-option-from-file temp-filename "BLOG")))
-    (should (equal "some-date" (org2jekyll-get-option-from-file temp-filename "DATE")))
-    (should-not (org2jekyll-get-option-from-file temp-filename "some-other-non-existing-option"))))
 
 (ert-deftest test-org2jekyll-get-options-from-file ()
-  (let ((temp-filename "/tmp/test-publish-article-p"))
-    (with-temp-file temp-filename  (insert "#+LAYOUT: post\n#+DATE: some-date"))
-    (should (equal '(("layout" . "post")
-                     ("date" . "some-date"))
-                   (org2jekyll-get-options-from-file temp-filename '("layout" "date"))))
-    (should (equal '(("date" . "some-date"))
-                   (org2jekyll-get-options-from-file temp-filename '("date"))))
-    (should (equal '(("unknown"))
-                   (org2jekyll-get-options-from-file temp-filename '("unknown"))))
-    (should-not (org2jekyll-get-options-from-file temp-filename '()))))
-
+  (let* ((temp-file "/tmp/test-get-options-from-file")
+         (blog-key "#+BLOG:")
+         (blog-val "tony's blog")
+         (date-key "#+DATE:")
+         (date-val "some-date")
+         (_ (with-temp-file temp-file (insert (concat blog-key " " blog-val "\n"
+                                                      date-key " " date-val "\n"
+                                                      "Beef fungus articles"))))
+         (options-plist (org2jekyll-get-options-from-file temp-file))
+         (_ (delete-file temp-file)))
+    (should (string= blog-val (plist-get options-plist :blog)))
+    (should (string= date-val (plist-get options-plist :date)))))
 
 (ert-deftest test-org2jekyll-article-p ()
   (should (let ((temp-filename "/tmp/test-publish-article-p"))
