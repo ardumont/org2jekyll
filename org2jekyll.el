@@ -5,7 +5,7 @@
 ;; Author: Antoine R. Dumont <eniotna.t AT gmail.com>
 ;; Maintainer: Antoine R. Dumont <eniotna.t AT gmail.com>
 ;; Version: 0.1.9
-;; Package-Requires: ((dash-functional "2.11.0") (s "1.9.0") (deferred "0.3.1"))
+;; Package-Requires: ((dash-functional "2.11.0") (s "1.9.0") (deferred "0.3.1") (kv "0.0.19"))
 ;; Keywords: org-mode jekyll blog publish
 ;; URL: https://github.com/ardumont/org2jekyll
 
@@ -57,6 +57,7 @@
 (require 's)
 (require 'deferred)
 (require 'ido)
+(require 'kv)
 
 (defgroup org2jekyll nil "Publish org-mode posts to jekyll"
   :tag "org2jekyll"
@@ -91,20 +92,6 @@
   "Relative path to posts directory."
   :type 'string
   :require 'org2jekyll
-  :group 'org2jekyll)
-
-(defcustom org2jekyll-extra-yaml-headers nil
-  "An entry of static yaml header (already formatted).
-E.g. from https://github.com/ardumont/org2jekyll/issues/34#issue-148684715:
-scheme-text: \"#0029ff\"
-scheme-link: \"#ff00b4\"
-scheme-hover: \"#ff00b4\"
-scheme-code: \"#ad00ff\"
-scheme-bg: \"#00ebff\"
-scheme-hero-text: \"#00ebff\"
-scheme-hero-link: \"#00ebff\"
-scheme-hero-bg: \"#0029ff\"
-plugin: lightense"
   :group 'org2jekyll)
 
 (defvar org2jekyll-jekyll-post-ext ".org"
@@ -290,53 +277,47 @@ The `'%s`' will be replaced respectively by the blog entry name, the author, the
   (org2jekyll--list-dir
    (org2jekyll-input-directory org2jekyll-jekyll-drafts-dir)))
 
-(defun org2jekyll-get-option (opt)
-  "Gets the header value of the option OPT from a buffer."
-  (let* ((regexp (org-make-options-regexp (list (upcase opt) (downcase opt)))))
+(defun org2jekyll-get-options-from-buffer ()
+  "Return special lines at the beginning of current buffer."
+  (let ((special-line-regex "^#\\+\\(.+\\):[ \t]+\\(.+\\)$")
+        (get-current-line (lambda ()
+                            (buffer-substring-no-properties (line-beginning-position)
+                                                            (line-end-position))))
+        (options-plist))
     (save-excursion
       (goto-char (point-min))
-      (if (re-search-forward regexp nil t 1)
-          (match-string-no-properties 2)))))
+      (catch 'break
+        (while (string-match special-line-regex (funcall get-current-line))
+          (setq options-plist (plist-put options-plist
+                                         (->> (funcall get-current-line)
+                                              (match-string 1)
+                                              downcase
+                                              (concat ":")
+                                              intern)
+                                         (match-string 2 (funcall get-current-line))))
+          (unless (= 0 (forward-line))
+            (throw 'break nil))))
+      options-plist)))
 
-(defun org2jekyll-get-option-from-file (orgfile option)
-  "Return the ORGFILE's OPTION."
+(defun org2jekyll-get-options-from-file (orgfile)
+  "Return special lines at the beginning of ORGFILE."
   (with-temp-buffer
     (when (file-exists-p orgfile)
       (insert-file-contents orgfile)
-      (goto-char (point-min))
-      (org2jekyll-get-option option))))
+      (org2jekyll-get-options-from-buffer))))
 
-(defun org2jekyll-get-options-from-file (orgfile options)
-  "Return the ORGFILE's OPTIONS."
-  (with-temp-buffer
-    (when (file-exists-p orgfile)
-      (insert-file-contents orgfile)
-      (mapcar (lambda (option)
-                (save-excursion
-                  (goto-char (point-min))
-                  (cons option (org2jekyll-get-option option))))
-              options))))
-
-(defun org2jekyll-layout (org-file)
+(defun org2jekyll-article-p (org-file)
   "Determine if the current ORG-FILE's layout.
 Depends on the metadata header #+LAYOUT."
-  (org2jekyll-get-option-from-file org-file "layout"))
+  (plist-get (org2jekyll-get-options-from-file org-file) :layout))
 
-(defalias 'org2jekyll-article-p 'org2jekyll-layout)
-
-(defvar org2jekyll-map-keys '(("title"       . "title")
-                              ("categories"  . "categories")
-                              ("tags"        . "tags")
-                              ("date"        . "date")
-                              ("description" . "excerpt")
-                              ("author"      . "author")
-                              ("layout"      . "layout"))
-  "Keys to map from org headers to jekyll's headers.")
-
-(defun org2jekyll--org-to-yaml-metadata (org-metadata)
-  "Given an ORG-METADATA map, return a yaml one with transformed data."
-  (--map `(,(assoc-default (car it) org2jekyll-map-keys) . ,(cdr it))
-         org-metadata))
+(defun org2jekyll--org-to-jekyll-metadata (org-metadata)
+  "Given an ORG-METADATA map, translate Org keywords to Jekyll keywords."
+  (let ((org2jekyll-map-keys '(("description" . "excerpt"))))
+    (--map (-if-let (jekyll-car (assoc-default (car it) org2jekyll-map-keys))
+               (cons jekyll-car (cdr it))
+             it)
+           org-metadata)))
 
 (defun org2jekyll--convert-timestamp-to-yyyy-dd-mm (timestamp)
   "Convert org TIMESTAMP to ."
@@ -351,28 +332,19 @@ Depends on the metadata header #+LAYOUT."
   ;; see http://orgmode.org/cgit.cgi/org-mode.git/commit/?id=54318ad
   (boundp 'org-element-block-name-alist))
 
-(defun org2jekyll--read-extra-yaml-headers ()
-  "Compute extra-yaml-headers from current buffer."
-  (-if-let (extra-headers (org2jekyll-get-option "extra-yaml-headers"))
-      (s-replace "\\n" "\n" extra-headers)
-    org2jekyll-extra-yaml-headers))
-
 (defun org2jekyll--to-yaml-header (org-metadata)
   "Given a list of ORG-METADATA, compute the yaml header string."
   (-let (((begin end) (if (org2jekyll--old-org-version-p)
                           '("#+BEGIN_HTML" "#+END_HTML\n")
-                        '("#+BEGIN_EXPORT HTML" "#+END_EXPORT\n")))
-         (extra-headers (org2jekyll--read-extra-yaml-headers)))
+                        '("#+BEGIN_EXPORT HTML" "#+END_EXPORT\n"))))
     (--> org-metadata
-         org2jekyll--org-to-yaml-metadata
+         org2jekyll--org-to-jekyll-metadata
          (--map (format "%s: %s" (car it) (cdr it)) it)
          (cons "---" it)
          (cons begin it)
-         (-snoc it extra-headers)
          (-snoc it "---")
          (-snoc it end)
-         (s-join "\n" it)
-         (s-replace "\n\n" "\n" it))))
+         (s-join "\n" it))))
 
 (defun org2jekyll--csv-to-yaml (str-csv)
   "Transform a STR-CSV entries into a yaml entries."
@@ -412,67 +384,70 @@ Return DEFAULT-VALUE if not found."
       data
     default-value))
 
-(defvar org2jekyll-header-metadata nil
-  "The needed headers for org buffer for org2jekyll to work.")
-
-(setq org2jekyll-header-metadata '(("title"       . 'mandatory)
-                                   ("date")
-                                   ("categories"  . 'mandatory)
-                                   ("tags")
-                                   ("description" . 'mandatory)
-                                   ("author")
-                                   ("layout"      . 'mandatory)))
+(defconst org2jekyll-required-org-header-alist '((:title       . 'required)
+                                                 (:date)
+                                                 (:categories  . 'required)
+                                                 (:tags)
+                                                 (:description . 'required)
+                                                 (:author)
+                                                 (:layout      . 'required)))
 
 (defun org2jekyll-check-metadata (org-metadata)
-  "Check that the mandatory header metadata in ORG-METADATA are provided.
-Return the error messages if any or nil if everything is alright."
-  (let ((mandatory-values (funcall (-compose (lambda (l) (mapcar #'car l))
+  "Check that all required headers in ORG-METADATA are provided.
+Return error messages for any required headers that are missing,
+and nil if no problems are found."
+  (let ((required-options (funcall (-compose (lambda (l) (mapcar #'car l))
                                              (lambda (l) (-filter #'cdr l)))
-                                   org2jekyll-header-metadata)))
+                                   org2jekyll-required-org-header-alist)))
     (-when-let (error-messages
-                (->> mandatory-values
-                     (--map (when (null (assoc-default it org-metadata))
-                              (format "- The %s is mandatory, please add '#+%s' at the top of your org buffer." it (upcase it))))
+                (->> required-options
+                     (--map (unless (plist-member org-metadata it)
+                              (format (concat "- The %s is required, please add "
+                                              "'#+%s' at the top of your org buffer.")
+                                      (substring (symbol-name it) 1 nil)
+                                      (upcase (substring (symbol-name it) 1 nil)))))
                      (s-join "\n")
                      s-trim))
       (if (string= "" error-messages) nil error-messages))))
 
+(defun org2jekyll-remove-org-only-options (yaml-alist)
+  "Filter out org options with no Jekyll meaning from YAML-ALIST."
+  (let* ((required-options (--map (substring (symbol-name (car it)) 1 nil)
+                                  org2jekyll-required-org-header-alist))
+         (org-options (--map (downcase (substring it 0 -1))
+                             org-options-keywords))
+         (org-only-options (--filter (not (member it required-options))
+                                     org-options))
+         (jekyll-options (--filter (not (member (car it) org-only-options))
+                                   yaml-alist)))
+    jekyll-options))
+
 (defun org2jekyll-read-metadata (org-file)
   "Given an ORG-FILE, return its org metadata.
-If non-mandatory values are missing, they are replaced with dummy ones.
-Otherwise, display the error messages about the missing mandatory values."
-  (let* ((org-metadata-list (mapcar #'car org2jekyll-header-metadata))
-         (org-metadata (org2jekyll-get-options-from-file org-file
-                                                         org-metadata-list)))
-    (-if-let (error-messages (org2jekyll-check-metadata org-metadata))
-        (format "This org-mode file is missing mandatory header(s):
+If unrequired values are missing, they are replaced with dummy
+ones.  Otherwise, display the error messages about the missing
+required values."
+  (let* ((buffer-metadata (org2jekyll-get-options-from-file org-file))
+         (org-defaults `(:date ,(org2jekyll-now)
+                               :tags "dummy-tags-should-be-replaced"
+                               :author ""))
+         (merged-metadata (kvplist-merge org-defaults buffer-metadata))
+         (categories (org2jekyll--csv-to-yaml (plist-get merged-metadata :categories)))
+         (tags (org2jekyll--csv-to-yaml (plist-get merged-metadata :tags)))
+         (date (org2jekyll--convert-timestamp-to-yyyy-dd-mm (plist-get merged-metadata :date)))
+         (yaml-metadata (-> merged-metadata
+                            (plist-put :categories categories)
+                            (plist-put :tags tags)
+                            (plist-put :date date)))
+         (yaml-alist (--map (cons (symbol-name (car it))
+                                  (cdr it))
+                            (kvplist->alist yaml-metadata))))
+    (-if-let (error-messages (org2jekyll-check-metadata buffer-metadata))
+        (format "This org-mode file is missing required header(s):
 %s
 Publication skipped" error-messages)
-      `(("layout"      . ,(-> "layout"
-                              (org2jekyll-assoc-default org-metadata "post")))
-        ("title"       . ,(-> "title"
-                              (org2jekyll-assoc-default
-                               org-metadata
-                               "dummy-title-should-be-replaced")))
-        ("date"        . ,(-> "date"
-                              (org2jekyll-assoc-default
-                               org-metadata
-                               (org2jekyll-now))
-                              org2jekyll--convert-timestamp-to-yyyy-dd-mm))
-        ("categories"  . ,(-> "categories"
-                              (org2jekyll-assoc-default
-                               org-metadata
-                               "dummy-category-should-be-replaced")
-                              org2jekyll--csv-to-yaml))
-        ("tags"        . ,(-> "tags"
-                              (org2jekyll-assoc-default
-                               org-metadata
-                               "dummy-tags-should-be-replaced")
-                              org2jekyll--csv-to-yaml))
-        ("author"      . ,(-> "author"
-                              (org2jekyll-assoc-default org-metadata "")))
-        ("description" . ,(-> "description"
-                              (org2jekyll-assoc-default org-metadata "")))))))
+      (org2jekyll-remove-org-only-options yaml-alist))))
+
 
 (defun org2jekyll-read-metadata-and-execute (action-fn org-file)
   "Execute ACTION-FN function after checking metadata from the ORG-FILE."
@@ -552,8 +527,7 @@ Layout `'default`' is a page."
   (lexical-let ((org-file (buffer-file-name (current-buffer))))
     (deferred:$
       (deferred:next (lambda ()
-                       (-> "layout"
-                           org2jekyll-get-option
+                       (-> (plist-get (org2jekyll-get-options-from-buffer) :layout)
                            org2jekyll-post-p
                            (if 'org2jekyll-publish-post
                                'org2jekyll-publish-page))))
