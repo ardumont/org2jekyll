@@ -31,5 +31,4 @@
 
 (require 'org2jekyll)
 
-(provide 'test-helper)
 ;;; test-helper.el ends here
