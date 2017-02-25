@@ -1,6 +1,6 @@
 ;;; org2jekyll-utilities.el ---                      -*- lexical-binding: t; -*-
 
-;; Copyright (C) 2015  Antoine R. Dumont
+;; Copyright (C) 2015-2017  Antoine R. Dumont
 
 ;; Author: Antoine R. Dumont <tony@dagobah>
 ;; Keywords:
