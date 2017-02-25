@@ -1,6 +1,6 @@
 ;;; test-helper.el ---                               -*- lexical-binding: t; -*-
 
-;; Copyright (C) 2015  Antoine Romain Dumont
+;; Copyright (C) 2015-2017  Antoine Romain Dumont
 
 ;; Author: Antoine Romain Dumont <antoine.romain.dumont@gmail.com>
 ;; Keywords:
