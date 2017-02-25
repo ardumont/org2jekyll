@@ -306,3 +306,12 @@ org2jekyll provides you a minor mode with the following default binding:
 To (de)activate this in an org file: /M-x org2jekyll-mode/
 
 As usual, you can use emacs' power to setup your own bindings.
+
+* Problems
+
+** dependencies
+
+As a note, org2jekyll [[https://github.com/ardumont/org2jekyll/blob/master/org2jekyll.el#L8][declares its dependencies]] but it's possible that
+some are not fully respected. And then problem [[#43][may arise]].  So if you
+found out a problem about it, feel free to open an issue mentioning
+the version of the library you are using.
