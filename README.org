@@ -19,7 +19,7 @@ Blogging with org-mode and jekyll without alien yaml headers.
 - [[#installsetup][Install/Setup]]
   - [[#install][Install]]
   - [[#setup][Setup]]
-  - [[#a-working-example][A working example]]
+  - [[#a-running-example][A running example]]
   - [[#a-reproducible-example][A reproducible example]]
 - [[#use][Use]]
   - [[#post][Post]]
@@ -170,7 +170,7 @@ The previous sample contains important information:
 - *images*, *js*, *css* represent where you choose to store those kinds of files (you can name these as you wish)
 - *web* is a composition of web files you may need to create a full post or page, typically, css, images, html, js, etc... (do not name this one differently either)
 
-** A working example
+** A running example
 
 - blog: [[http://ardumont.github.io/]]
 
@@ -182,7 +182,7 @@ The previous sample contains important information:
 
 ** A reproducible example
 
-In this very repository, try and follow this [[https://github.com/ardumont/org2jekyll/testing-blog/org/blogging-with-org2jekyll.org][local article]].
+You can clone this repository. Then, try and follow this [[https://github.com/ardumont/org2jekyll/blob/master/testing-blog/org/blogging-with-org2jekyll.org][local article]].
 
 * Use
 
