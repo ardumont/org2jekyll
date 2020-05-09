@@ -40,13 +40,15 @@ Blogging with org-mode and jekyll without alien yaml headers.
 
 ** 0.1.8 -> 0.1.9
 - Remove deprecated api function names mentioned in 0.1.2 -> 0.1.4 migration.
-- Permit user to define on per-buffer setup or per-custom variable basis some extra yaml header
+- Permit user to define on per-buffer setup or per-custom variable basis some
+  extra yaml header
 
 ** 0.1.2 -> 0.1.4
 
-It occured to me that the [[https://www.gnu.org/software/emacs/manual/html_node/elisp/Coding-Conventions.html][elisp coding convention]] were not respected in the first place.
-So between the 0.1.2 and 0.1.3 version, the names and variables were updated to respect them.
-Now every command and variables uses `org2jekyll-` and no longer `org2jekyll/` prefix.
+It occured to me that the [[https://www.gnu.org/software/emacs/manual/html_node/elisp/Coding-Conventions.html][elisp coding convention]] were not respected in the
+first place. So between the 0.1.2 and 0.1.3 version, the names and variables
+were updated to respect them. Now every command and variables uses
+`org2jekyll-` and no longer `org2jekyll/` prefix.
 
 * Description
 
@@ -66,8 +68,10 @@ Only emacs' dependencies (org, etc...) no external ruby script.
 - [[http://orgmode.org/][org-mode]] rocks
 - Github uses [[http://jekyllrb.com/][Jekyll]]
 - [[http://jekyllrb.com/][Jekyll]] is nice
-- Existing solutions regarding org-mode and jekyll need the org-mode files to be altered with non-org notations to work together
-- I don't want to alter my org-mode files with alien yaml headers to satisfy jekyll
+- Existing solutions regarding org-mode and jekyll need the org-mode files to
+  be altered with non-org notations to work together
+- I don't want to alter my org-mode files with alien yaml headers to satisfy
+  jekyll
 
 Enters org2jekyll.
 
@@ -81,8 +85,9 @@ You have:
 
 ** Install
 
-Available only on [[https://marmalade-repo.org/][marmalade]] for the moment.
-Update your packages archive with marmalade:
+Available on [[http://melpa.org/#/getting-started][melpa]].
+
+Update your packages archives:
 
 #+begin_src emacs-lisp
 (require 'package)
@@ -193,8 +198,8 @@ For a post (layout 'post'):
 #+CATEGORIES: category0, category1
 #+end_src
 
-*Note*
-To easily do that, /M-x org2jekyll-create-draft/, this will ask you for everything needed and create a file with such metadata.
+*Note* To easily do that, /M-x org2jekyll-create-draft/, this will ask you for
+everything needed and create a file with such metadata.
 
 *** Publish
 
@@ -206,8 +211,13 @@ This will be published as post article.
 
 *** How
 
-- The *#+LAYOUT* entry refers to the *post* entry in *org-publish-project-alist*.
-- This will create another temporary org-mode file based on the current one with the right naming convention, transform the org headers into yaml, publish to the jekyll directory (according to your org-publish setup) and delete the temporary file.
+- The *#+LAYOUT* entry refers to the *post* entry in
+  *org-publish-project-alist*.
+
+- This will create another temporary org-mode file based on the current one
+  with the right naming convention, transform the org headers into yaml,
+  publish to the jekyll directory (according to your org-publish setup) and
+  delete the temporary file.
 
 *** Extra headers
 
@@ -251,8 +261,8 @@ For a page (layout 'default').
 #+CATEGORIES: some-category
 #+end_src
 
-*Note*
-To easily do that, /M-x org2jekyll-create-draft/, this will ask you for everything needed and create a file with such metadata.
+*Note* To easily do that, /M-x org2jekyll-create-draft/, this will ask you for
+everything needed and create a file with such metadata.
 
 Now create your article and publish it when ready /M-x org2jekyll-publish/.
 
@@ -263,8 +273,11 @@ When ready, /M-x org2jekyll-publish/ to publish it.
 
 *** How
 
-- The *#+LAYOUT* entry refers to the *default* entry in *org-publish-project-alist*.
-- This will update the current org-mode with the necessary yaml and publish to the jekyll directory (according to your org-publish setup), then revert back to your normal org-mode file.
+- The *#+LAYOUT* entry refers to the *default* entry in
+  *org-publish-project-alist*.
+- This will update the current org-mode with the necessary yaml and publish to
+  the jekyll directory (according to your org-publish setup), then revert back
+  to your normal org-mode file.
 
 *** Extra-headers
 
@@ -274,13 +287,15 @@ cf. [[#extra-headers][post extra-headers]]
 
 /M-x org2jekyll-publish-posts/
 
-Depending on your org-publish configuration and org2jekyll, this will compile the list of org-mode posts (*#+LAYOUT* with 'post' value) and publish them.
+Depending on your org-publish configuration and org2jekyll, this will compile
+the list of org-mode posts (*#+LAYOUT* with 'post' value) and publish them.
 
 ** Publish all pages
 
 /M-x org2jekyll-publish-pages/
 
-Depending on your org-publish configuration and org2jekyll, this will compile the list of org-mode pages (*#+LAYOUT* with 'default value) and publish them.
+Depending on your org-publish configuration and org2jekyll, this will compile
+the list of org-mode pages (*#+LAYOUT* with 'default value) and publish them.
 
 ** Previews
 

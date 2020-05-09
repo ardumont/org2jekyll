@@ -15,10 +15,8 @@ deps:
 build:
 	${CASK} build
 
-
 clean-dist:
 	rm -rf dist/
-
 
 clean: clean-dist
 	rm -rf *.tar
