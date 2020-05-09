@@ -96,6 +96,24 @@
   :require 'org2jekyll
   :group 'org2jekyll)
 
+(defcustom org2jekyll-jekyll-layouts '("post" "default")
+  "Possible layouts, by default either a post or a page"
+  :type 'string
+  :require 'org2jekyll
+  :group 'org2jekyll)
+
+(defcustom org2jekyll-jekyll-layout-post "post"
+  "Article blog post layout"
+  :type 'string
+  :require 'org2jekyll
+  :group 'org2jekyll)
+
+(defcustom org2jekyll-jekyll-layout-page "default"
+  "Article page layout, mostly intended as static pages (e.g about, contacts, etc...)"
+  :type 'string
+  :require 'org2jekyll
+  :group 'org2jekyll)
+
 (defvar org2jekyll-jekyll-post-ext ".org"
   "File extension of Jekyll posts.")
 
@@ -205,7 +223,7 @@ POST-CATEGORIES is the categories."
 :: () -> [(Symbol, String)]"
   (list :author      org2jekyll-blog-author
         :date        (org2jekyll-now)
-        :layout      (org2jekyll--input-read "Layout: " '("post" "default"))
+        :layout      (org2jekyll--input-read "Layout: " org2jekyll-jekyll-layouts)
         :title       (org2jekyll--read-title)
         :description (org2jekyll--read-description)
         :tags        (org2jekyll--read-tags)
@@ -518,11 +536,11 @@ Publication skipped" error-messages)
 
 (defun org2jekyll-post-p (layout)
   "Determine if the LAYOUT corresponds to a post."
-  (string= "post" layout))
+  (string= org2jekyll-jekyll-layout-post layout))
 
 (defun org2jekyll-page-p (layout)
   "Determine if the LAYOUT corresponds to a page."
-  (string= "default" layout))
+  (string= org2jekyll-jekyll-layout-page layout))
 
 (defun org2jekyll-publish-web-project ()
   "Publish the 'web' project."
@@ -566,7 +584,7 @@ Layout `'default`' is a page."
   (interactive)
   (deferred:$
     (deferred:next
-      (lambda () (->> (assoc "post" org-publish-project-alist)
+      (lambda () (->> (assoc org2jekyll-jekyll-layout-post org-publish-project-alist)
                  org-publish-get-base-files
                  (--filter (org2jekyll-post-p (org2jekyll-article-p it))))))
     (deferred:nextc it
@@ -579,7 +597,7 @@ Layout `'default`' is a page."
   (interactive)
   (deferred:$
     (deferred:next
-      (lambda () (->> (assoc "default" org-publish-project-alist)
+      (lambda () (->> (assoc org2jekyll-jekyll-layout-page org-publish-project-alist)
                  org-publish-get-base-files
                  (--filter (org2jekyll-page-p (org2jekyll-article-p it))))))
     (deferred:nextc it

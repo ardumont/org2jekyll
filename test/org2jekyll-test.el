@@ -379,12 +379,32 @@ Publication skipped" options-alist))))
                                                                     ("date" . :date)) :org-file))))))
 
 (ert-deftest test-org2jekyll-post-p ()
+  "With default layouts"
   (should (org2jekyll-post-p "post"))
   (should-not (org2jekyll-post-p "default")))
 
+(ert-deftest test-org2jekyll-post-p-with-customs ()
+  "With customs layouts"
+  (should
+   (let ((org2jekyll-jekyll-layout-post "something"))
+     (org2jekyll-post-p "something")))
+  (should-not
+   (let ((org2jekyll-jekyll-layout-post "something"))
+     (org2jekyll-post-p "default"))))
+
 (ert-deftest test-org2jekyll-page-p ()
+  "With default layouts"
   (should (org2jekyll-page-p "default"))
   (should-not (org2jekyll-page-p "post")))
+
+(ert-deftest test-org2jekyll-page-p-with-customs ()
+  "With custom layouts"
+  (should
+   (let ((org2jekyll-jekyll-layout-page "post"))
+     (org2jekyll-page-p "post")))
+  (should-not
+   (let ((org2jekyll-jekyll-layout-page "else"))
+     (org2jekyll-page-p "post"))))
 
 (ert-deftest test-org2jekyll-check-metadata ()
   (let* ((temp-file "/tmp/test-org2jekyll-check-metadata")
@@ -415,11 +435,11 @@ Publication skipped" options-alist))))
 - The categories is required, please add '#+CATEGORIES' at the top of your org buffer.
 - The description is required, please add '#+DESCRIPTION' at the top of your org buffer.
 - The layout is required, please add '#+LAYOUT' at the top of your org buffer."
-                 (org2jekyll-check-metadata nil)))
+                   (org2jekyll-check-metadata nil)))
   (should (string= "- The categories is required, please add '#+CATEGORIES' at the top of your org buffer.
 - The description is required, please add '#+DESCRIPTION' at the top of your org buffer."
-                 (org2jekyll-check-metadata '(:title "some-title"
-                                                     :layout "some-layout"))))
+                   (org2jekyll-check-metadata '(:title "some-title"
+                                                       :layout "some-layout"))))
   (should-not (org2jekyll-check-metadata '(:title "some-title"
                                                   :layout "some-layout"
                                                   :author "some-author"

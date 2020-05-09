@@ -36,6 +36,7 @@ Blogging with org-mode and jekyll without alien yaml headers.
   - [[#publish-all-pages][Publish all pages]]
   - [[#previews][Previews]]
 - [[#minor-mode][Minor mode]]
+- [[#layout-customization][Layout customization]]
 - [[#problems][Problems]]
   - [[#dependencies][dependencies]]
 
@@ -228,8 +229,7 @@ This will be published as post article.
 
 *** Extra headers
 
-As in issue https://github.com/ardumont/org2jekyll/issues/36, you
-could [[http://jekyllrb.com/docs/frontmatter/#predefined-global-variables][need to add some extra jekyll headers]].
+As in [[https://github.com/ardumont/org2jekyll/issues/36][issue 36]], you could [[http://jekyllrb.com/docs/frontmatter/#predefined-global-variables][need to add some extra jekyll headers]].
 
 Simply add them as org properties (thanks [[https://github.com/halcyon][@halcyon]] for his work on [[https://github.com/ardumont/org2jekyll/pull/41][#41]]).
 
@@ -306,8 +306,10 @@ the list of org-mode pages (*#+LAYOUT* with 'default value) and publish them.
 
 ** Previews
 
-You can keep an org file in your blog directory without publishing it, by writing it as a plain org file without the org2jekyll headers. Once you're ready
-to publish it as a post or an article, add the appropriate metadata headers and org2jekyll will now publish the file.
+You can keep an org file in your blog directory without publishing it, by
+writing it as a plain org file without the org2jekyll headers. Once you're
+ready to publish it as a post or an article, add the appropriate metadata
+headers and org2jekyll will now publish the file.
 
 * Minor mode
 
@@ -328,6 +330,25 @@ org2jekyll provides you a minor mode with the following default binding:
 To (de)activate this in an org file: /M-x org2jekyll-mode/
 
 As usual, you can use emacs' power to setup your own bindings.
+
+* Layout customization
+
+By default org2jekyll uses the layouts "post" (for article blog post) and
+"default" (for mostly dynamic pages, e.g. contact, about, ...). This now can be
+customized:
+
+#+BEGIN_SRC sh
+(custom-set-variables
+ '(org2jekyll-jekyll-layout-page  "page")
+ '(org2jekyll-jekyll-layout-post  "post")
+ '(org2jekyll-jekyll-layouts     '("page" "post")))
+#+END_SRC
+
+It's up to the users to make sure the entries are correctly setup-ed in the
+`org-publish-project-alist`.
+
+See for example [[https://github.com/ardumont/org2jekyll/blob/master/testing-blog/testing-blog-config.el][this sample configuration]] which define their own while keeping
+correctly the `org-publish-project-alist` in sync.
 
 * Problems
 

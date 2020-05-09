@@ -3,6 +3,7 @@
 
 * IN-PROGRESS 0.2.0 [100%]
 - [X] #46: Improve yaml date format
+- [X] #53: Allow defining specific layouts in yaml header
 - [X] Present a demonstration runnable from the repository
 - [X] Update documentations
 - [X] Update ci tools

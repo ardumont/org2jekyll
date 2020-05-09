@@ -1,7 +1,7 @@
 #+STARTUP: showall
 #+STARTUP: hidestars
 #+OPTIONS: H:2 num:nil tags:nil toc:nil timestamps:t
-#+LAYOUT: default
+#+LAYOUT: page
 #+AUTHOR: drjekyll&mrtony
 #+DATE: 2020-05-09 Sat 13:43
 #+TITLE: About me

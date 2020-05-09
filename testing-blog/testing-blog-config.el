@@ -25,13 +25,15 @@
 ;;; Code:
 
 (custom-set-variables
- '(org2jekyll-blog-author       "drjekyll&mrtony")
- '(org2jekyll-source-directory  (expand-file-name "org"))
- '(org2jekyll-jekyll-directory  (expand-file-name ""))
- '(org2jekyll-jekyll-drafts-dir "_drafts")
- '(org2jekyll-jekyll-posts-dir  "_posts/")
+ '(org2jekyll-jekyll-layout-page  "page")
+ '(org2jekyll-jekyll-layouts     '("page" "post"))
+ '(org2jekyll-blog-author        "drjekyll&mrtony")
+ '(org2jekyll-source-directory   (expand-file-name "org"))
+ '(org2jekyll-jekyll-directory   (expand-file-name ""))
+ '(org2jekyll-jekyll-drafts-dir  "_drafts")
+ '(org2jekyll-jekyll-posts-dir   "_posts/")
  '(org-publish-project-alist
-   `(("default"  ;; for mostly static pages (not blog post): about-me, contacts, etc...
+   `(("page"  ;; for mostly static pages (not blog post): about-me, contacts, etc...
       :base-directory ,(org2jekyll-input-directory)
       :base-extension "org"
       :publishing-directory ,(org2jekyll-output-directory)
