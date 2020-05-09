@@ -91,7 +91,7 @@ Update your packages archives:
 
 #+begin_src emacs-lisp
 (require 'package)
-(add-to-list 'package-archives '("marmalade" . "https://marmalade-repo.org/packages") t)
+(add-to-list 'package-archives '("melpa-stable" . "https://stable.melpa.org/packages/") t)
 (package-initialize)
 #+end_src
 
