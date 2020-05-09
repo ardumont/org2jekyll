@@ -2,6 +2,7 @@
 #+author: ardumont
 
 * IN-PROGRESS 0.2.0 [100%]
+- [X] #46: Improve yaml date format
 - [X] Present a demonstration runnable from the repository
 - [X] Update documentations
 - [X] Update ci tools

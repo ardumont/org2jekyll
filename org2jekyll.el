@@ -325,7 +325,7 @@ Depends on the metadata header #+LAYOUT."
 
 (defun org2jekyll--convert-timestamp-to-yyyy-dd-mm (timestamp)
   "Convert org TIMESTAMP to ."
-  (format-time-string "%Y-%m-%d"
+  (format-time-string "%Y-%m-%d %H:%M:%S"
                       (apply 'encode-time (org-parse-time-string timestamp))))
 
 (defun org2jekyll--old-org-version-p ()
