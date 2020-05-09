@@ -119,10 +119,12 @@ The `'%s`' will be replaced respectively by name, author, generated date, title,
   "Compute the folder name from a FOLDER-SOURCE and an optional FOLDER-NAME."
   (format "%s/%s" folder-source (if folder-name folder-name "")))
 
+;;;###autoload
 (defun org2jekyll-input-directory (&optional folder-name)
   "Compute the input folder from the FOLDER-NAME."
   (org2jekyll--optional-folder org2jekyll-source-directory folder-name))
 
+;;;###autoload
 (defun org2jekyll-output-directory (&optional folder-name)
   "Compute the output folder from the optional FOLDER-NAME."
   (org2jekyll--optional-folder org2jekyll-jekyll-directory folder-name))
