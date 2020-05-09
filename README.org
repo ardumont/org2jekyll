@@ -6,6 +6,7 @@
 [[https://melpa.org/#/org2jekyll][file:https://melpa.org/packages/org2jekyll-badge.svg]]
 [[https://stable.melpa.org/#/org2jekyll][file:https://stable.melpa.org/packages/org2jekyll-badge.svg]]
 [[https://www.gnu.org/licenses/gpl-2.0.txt][file:https://img.shields.io/:license-GPLv2-blue.svg]]
+[[https://archive.softwareheritage.org/badge/origin/https://github.com/ardumont/org2jekyll/][file:https://archive.softwareheritage.org/badge/origin/https://github.com/ardumont/org2jekyll/]]
 
 Blogging with org-mode and jekyll without alien yaml headers.
 
