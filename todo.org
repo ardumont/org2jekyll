@@ -1,6 +1,10 @@
 #+title: Backlog
 #+author: ardumont
 
+* IN-PROGRESS 0.2.0 [100%]
+- [X] Present a demonstration runnable from the repository
+- [X] Update documentations
+- [X] Update ci tools
 * DONE 0.1.9 [100%]
 CLOSED: [2016-04-16 Sat 18:36]
 - [X] Permit to add extra yaml headers during export with user-custom variable (#34)
