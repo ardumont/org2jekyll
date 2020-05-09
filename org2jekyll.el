@@ -1,9 +1,9 @@
 ;;; org2jekyll.el --- Minor mode to publish org-mode post to jekyll without specific yaml
 
-;; Copyright (C) 2014-2017 Antoine R. Dumont <eniotna.t AT gmail.com>
+;; Copyright (C) 2014-2020 Antoine R. Dumont (@ardumont)
 
-;; Author: Antoine R. Dumont <eniotna.t AT gmail.com>
-;; Maintainer: Antoine R. Dumont <eniotna.t AT gmail.com>
+;; Author: Antoine R. Dumont (@ardumont) <antoine.romain.dumont@gmail.com>
+;; Maintainer: Antoine R. Dumont (@ardumont) <antoine.romain.dumont@gmail.com>
 ;; Version: 0.1.9
 ;; Package-Requires: ((dash-functional "2.11.0") (s "1.9.0") (deferred "0.3.1") (kv "0.0.19"))
 ;; Keywords: org-mode jekyll blog publish
