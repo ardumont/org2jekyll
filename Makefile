@@ -49,4 +49,7 @@ update:
 	cd $(BLOG) ; bundle update; bundle lock; bundix
 
 run-dev:
-	cd $(BLOG); bundle exec jekyll serve --watch
+	cd $(BLOG); bundle exec jekyll serve --watch --trace
+
+clean-dev:
+	cd $(BLOG); bundle exec jekyll clean
