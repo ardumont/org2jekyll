@@ -46,5 +46,3 @@ release:
 version:
 	@echo -e "application $(PACKAGE): $(VERSION)\npackage: $(ARCHIVE)"
 
-emacs-install-clean: package
-	~/bin/emacs/emacs-install-clean.sh ./$(ARCHIVE)

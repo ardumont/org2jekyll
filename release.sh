@@ -28,5 +28,3 @@ git tag -a -s $VERSION
 git push origin --tag
 
 make package
-
-./upload-to-marmalade.sh $VERSION $PACKAGE
