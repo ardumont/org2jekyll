@@ -239,7 +239,14 @@ excerpt: fake-description with spaces and all
                             (buffer-string)))))))
 
 (ert-deftest test-org2jekyll--convert-timestamp-to-yyyy-dd-mm ()
-  (should (equal "2013-04-29 00:46:00" (org2jekyll--convert-timestamp-to-yyyy-dd-mm "2013-04-29 lun. 00:46"))))
+  "Convert to simple YYYY-MM-DD date like out of either org date of iso8601 like dates"
+  (should (string= "2013-04-29" (org2jekyll--convert-timestamp-to-yyyy-dd-mm "2013-04-29 lun. 00:46")))
+  (should (string= "2013-04-29" (org2jekyll--convert-timestamp-to-yyyy-dd-mm "2013-04-29 00:46:00"))))
+
+(ert-deftest test-org2jekyll--convert-timestamp-to-yyyy-dd-mm-hh-mm ()
+  "Convert org-mode date to iso8601 like date strings"
+  (should (string= "2020-04-29 00:46:00"
+                   (org2jekyll--convert-timestamp-to-yyyy-dd-mm-hh-mm "2020-04-29 lun. 00:46"))))
 
 (ert-deftest test-org2jekyll-assoc-default ()
   (should (string= "default-value"  (org2jekyll-assoc-default nil nil "default-value")))
@@ -363,12 +370,13 @@ Publication skipped" options-alist))))
   (should (eq :file-deleted
               (let ((org-publish-project-alist '((:post :project))))
                 (with-mock
-                  (mock (org2jekyll--copy-org-file-to-jekyll-org-file :date :org-file '(("layout" . :post)
-                                                                                        ("date" . :date))) => :jekyll-file)
-                  (mock (org-publish-file :jekyll-file '(:post :project)) => :published-file)
-                  (mock (delete-file :jekyll-file) => :file-deleted)
-                  (org2jekyll--publish-post-org-file-with-metadata '(("layout" . :post)
-                                                                     ("date" . :date)) :org-file))))))
+                 (mock (org2jekyll--copy-org-file-to-jekyll-org-file :date :org-file '(("layout" . :post)
+                                                                                       ("date" . :date))) => :jekyll-file)
+                 (mock (org2jekyll--convert-timestamp-to-yyyy-dd-mm :date) => :date)
+                 (mock (org-publish-file :jekyll-file '(:post :project)) => :published-file)
+                 (mock (delete-file :jekyll-file) => :file-deleted)
+                 (org2jekyll--publish-post-org-file-with-metadata '(("layout" . :post)
+                                                                    ("date" . :date)) :org-file))))))
 
 (ert-deftest test-org2jekyll-post-p ()
   (should (org2jekyll-post-p "post"))

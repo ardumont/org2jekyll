@@ -323,9 +323,14 @@ Depends on the metadata header #+LAYOUT."
              it)
            org-metadata)))
 
-(defun org2jekyll--convert-timestamp-to-yyyy-dd-mm (timestamp)
-  "Convert org TIMESTAMP to ."
+(defun org2jekyll--convert-timestamp-to-yyyy-dd-mm-hh-mm (timestamp)
+  "Convert org TIMESTAMP to YYYY-MM-DD HH:MM:00. For yaml header purposes."
   (format-time-string "%Y-%m-%d %H:%M:%S"
+                      (apply 'encode-time (org-parse-time-string timestamp))))
+
+(defun org2jekyll--convert-timestamp-to-yyyy-dd-mm (timestamp)
+  "Convert org TIMESTAMP to to YYYY-MM-DD. For filename renaming purposes."
+  (format-time-string "%Y-%m-%d"
                       (apply 'encode-time (org-parse-time-string timestamp))))
 
 (defun org2jekyll--old-org-version-p ()
@@ -438,7 +443,8 @@ required values."
          (merged-metadata (kvplist-merge org-defaults buffer-metadata))
          (categories (org2jekyll--csv-to-yaml (plist-get merged-metadata :categories)))
          (tags (org2jekyll--csv-to-yaml (plist-get merged-metadata :tags)))
-         (date (org2jekyll--convert-timestamp-to-yyyy-dd-mm (plist-get merged-metadata :date)))
+         (date (org2jekyll--convert-timestamp-to-yyyy-dd-mm-hh-mm
+                (plist-get merged-metadata :date)))
          (yaml-metadata (-> merged-metadata
                             (plist-put :categories categories)
                             (plist-put :tags tags)
@@ -474,10 +480,11 @@ Publication skipped" error-messages)
 
 (defun org2jekyll--publish-post-org-file-with-metadata (org-metadata org-file)
   "Publish as post with ORG-METADATA the ORG-FILE."
-  (let ((blog-project    (assoc-default "layout" org-metadata))
-        (jekyll-filename (org2jekyll--copy-org-file-to-jekyll-org-file
-                          (assoc-default "date" org-metadata)
-                          org-file org-metadata)))
+  (let* ((blog-project    (assoc-default "layout" org-metadata))
+         (file-date       (->  (assoc-default "date" org-metadata) org2jekyll--convert-timestamp-to-yyyy-dd-mm))
+         (jekyll-filename (org2jekyll--copy-org-file-to-jekyll-org-file
+                           file-date
+                           org-file org-metadata)))
     (org-publish-file jekyll-filename
                       (assoc blog-project org-publish-project-alist))
     (delete-file jekyll-filename)))
