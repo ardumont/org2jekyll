@@ -18,7 +18,7 @@
 # You can create any custom variable you would like, and they will be accessible
 # in the templates via {{ site.myvariable }}.
 
-title: TEST - Legendary blog
+title: Legendary blog for testing purposes
 email: tony@purpose.test
 description: >- # this means to ignore newlines until "baseurl:"
   Awesome description of blog post to ensure org2jekyll works the way it's
