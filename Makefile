@@ -3,6 +3,7 @@ VERSION = $$(grep "^;; Version: " $(PACKAGE).el | cut -f3 -d' ')
 ARCHIVE = $(PACKAGE)-$(VERSION).tar
 EMACS ?= emacs
 CASK ?= cask
+BLOG ?= testing-blog
 
 pr:
 	hub pull-request -b ardumont:master
@@ -44,3 +45,8 @@ release:
 version:
 	@echo -e "application $(PACKAGE): $(VERSION)\npackage: $(ARCHIVE)"
 
+update:
+	cd $(BLOG) ; bundle update; bundle lock; bundix
+
+run-dev:
+	cd $(BLOG); bundle exec jekyll serve --watch

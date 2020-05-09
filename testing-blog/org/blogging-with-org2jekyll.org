@@ -1,0 +1,98 @@
+#+STARTUP: showall
+#+STARTUP: hidestars
+#+OPTIONS: H:2 num:nil tags:nil toc:nil timestamps:t
+#+LAYOUT: post
+#+AUTHOR: drjekyll&mrtony
+#+DATE: 2020-05-09 Sat 12:34
+#+TITLE: Blogging with org2jekyll setup
+#+DESCRIPTION: A post demo to blog with org2jekyll
+#+TAGS: blog, org2jekyll, setup, jekyll
+#+CATEGORIES: blog, org2jekyll, setup, jekyll
+
+Hello, in this post, we will show how to setup org2jekyll and play with a local
+jekyll instance.
+
+For this, we will be using a mix of nix tools (nix-shell) and standard
+Makefile. The end-goal being reproducibility.
+
+Do not only trust what you read, try and reproduce it yourself following this.
+
+* Enter the environment
+
+To make your environment with jekyll aware system:
+#+BEGIN_SRC shell
+$ nix-shell
+#+END_SRC
+
+This will install the necessary tools for a jekyll to run locally. You need nix
+to be installed though *¯\_(ツ)_/¯*. The dependency cycle must start somewhere
+heh.
+
+Then, to run the instance:
+
+#+BEGIN_SRC shell
+$ make update run-dev
+#+END_SRC
+
+Note: `update` is needed the first time around to install the necessary
+dependencies.
+
+Open your browser and head over [[http://localhost:4000][your running instance]].
+
+Everything should be fine and you should see a basic jekyll instance running
+
+* Setup your emacs
+
+** Install org2jekyll
+
+If you do not have installed org2jekyll yet, it's fine, you can always
+temporarily activate it through emacs' buffer loading mechanism.
+
+Open [[https://github.com/ardumont/org2jekyll/blob/master/org2jekyll.el][org2jekyll.el]] with emacs, load it (**M-x eval-buffer**).
+
+** Setup org2jekyll
+
+Open [[https://github.com/ardumont/org2jekyll/blob/master/testing-blog/testing-blog-config.el][testing-blog-config.el]] with emacs, load it (**M-x eval-buffer**).
+
+Note that this file should really be somewhere in your personal emacs
+configuration stanza. It's declared here so it's publicly available ;)
+
+You should now be able to play with org2jekyll. And then check the result in
+the jekyll instance.
+
+* Create a blog post
+
+**M-x org2jekyll-create-draft** and follow the minibuffer questions. Choose the
+layout "post" (in the current configuration).
+
+Write some awesome stuff as you see fit, the org way.
+
+When done, publish: **M-x org2jekyll-publish**.
+
+From your browser, refresh your [[http://localhost:4000][your running instance]].
+You should now see your blog post published there.
+
+You can loop over edition in org and publish until you are satisfied.
+
+* Create a static page
+
+You can also edit static pages.
+
+For example a page about you, call it *about-me.org*
+
+**M-x org2jekyll-create-draft**, follow the minibuffer questions. Choose the
+layout "default" (in the current configuration).
+
+The write some things about yourself the org way.
+
+Optionally, you can add **#+PERMALINK: /about-me/** header.
+
+When done, **M-x org2jekyll-publish**.
+
+From your browser, refresh your [[http://localhost:4000][your running instance]].
+
+You should now see your about-me page there, not alongside the listed blog
+posts though. In the title menu bar. 
+
+If you don't find, depending on some jekyll configuration, you can always head
+over the [[http://localhost:4000/about-me][about-me page]] (if you used the extra permalink mentioned).

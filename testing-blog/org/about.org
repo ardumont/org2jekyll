@@ -1,0 +1,24 @@
+#+STARTUP: showall
+#+STARTUP: hidestars
+#+OPTIONS: H:2 num:nil tags:nil toc:nil timestamps:t
+#+LAYOUT: default
+#+AUTHOR: drjekyll&mrtony
+#+DATE: 2020-05-09 Sat 13:10
+#+TITLE: About
+#+DESCRIPTION: About page statically defined, rewritten in org to demonstrate the other default layout
+#+TAGS: about
+#+CATEGORIES: about
+#+PERMALINK: /about/
+
+Not original at all, we just plainly rewrote the default templated "about" page
+(from the /jekyll new testing-blog/ stanza that initializes jekyll blog site).
+
+* About
+
+This is the base Jekyll theme. You can find out more info about customizing
+your Jekyll theme, as well as basic Jekyll usage documentation at [[https://jekyllrb.com][jekyllrb.com]].
+
+You can find the source code for Minima at GitHub: [[https://github.com/jekyll][jekyll]] / [[https://github.com/jekyll/minima][minima]]
+
+You can find the source code for Jekyll at GitHub: [[https://github.com/jekyll][jekyll]] / [[https://github.com/jekyll/jekyll][jekyll]]
+

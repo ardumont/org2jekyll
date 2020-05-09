@@ -177,6 +177,10 @@ The previous sample contains important information:
 
 *Note* Yes, I may have to merge the last 2 repositories at some point...
 
+** A reproducible example
+
+In this very repository, try and follow this [[https://github.com/ardumont/org2jekyll/testing-blog/org/blogging-with-org2jekyll.org][local article]].
+
 * Use
 
 For a post (layout 'post') or page (layout 'default'), add org headers (layout, title, author, date, description, categories) to your org files.

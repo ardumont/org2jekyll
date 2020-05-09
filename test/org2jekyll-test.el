@@ -142,6 +142,7 @@ permalink: /posts/gtalk/
 - tools
 - gtalk")
                    ("excerpt" . "Installing jabber and using it from emacs + authentication tips and tricks")
+
                    ("comments" . "true")
                    ("permalink" . "/posts/gtalk/"))
                  (org2jekyll--org-to-jekyll-metadata '(("layout" . "post")
@@ -224,12 +225,13 @@ excerpt: fake-description with spaces and all
                        (insert "#+fake-meta: fake meta\n* some content"))
                      ;; create the fake jekyll file with jekyll metadata
                      (--> fake-org-file
-                          (org2jekyll--copy-org-file-to-jekyll-org-file fake-date it `(("layout"      . "post")
-                                                                                       ("title"       . "fake title")
-                                                                                       ("date"        . ,fake-date)
-                                                                                       ("categories"  . "\n- fake-category1\n- fake-category2")
-                                                                                       ("author"      . "fake-author")
-                                                                                       ("description" . "fake-description with spaces and all")))
+                          (org2jekyll--copy-org-file-to-jekyll-org-file
+                           fake-date it `(("layout"      . "post")
+                                          ("title"       . "fake title")
+                                          ("date"        . ,fake-date)
+                                          ("categories"  . "\n- fake-category1\n- fake-category2")
+                                          ("author"      . "fake-author")
+                                          ("description" . "fake-description with spaces and all")))
                           (insert-file-contents it)
                           (with-temp-buffer it (buffer-string))))))))
 

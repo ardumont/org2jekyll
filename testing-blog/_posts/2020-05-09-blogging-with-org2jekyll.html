@@ -1,0 +1,181 @@
+---
+date: 2020-05-09
+tags:
+- blog
+- org2jekyll
+- setup
+- jekyll
+author: drjekyll&mrtony
+layout: post
+title: Blogging with org2jekyll setup
+excerpt: A post demo to blog with org2jekyll
+categories:
+- blog
+- org2jekyll
+- setup
+- jekyll
+permalink: /about/
+---
+<p>
+Hello, in this post, we will show how to setup org2jekyll and play with a local
+jekyll instance.
+</p>
+
+<p>
+For this, we will be using a mix of nix tools (nix-shell) and standard
+Makefile. The end-goal being reproducibility.
+</p>
+
+<p>
+Do not only trust what you read, try and reproduce it yourself following this.
+</p>
+
+<div id="outline-container-org8821387" class="outline-2">
+<h2 id="org8821387">Enter the environment</h2>
+<div class="outline-text-2" id="text-org8821387">
+<p>
+To make your environment with jekyll aware system:
+</p>
+<div class="org-src-container">
+<pre class="src src-shell">$ nix-shell
+</pre>
+</div>
+
+<p>
+This will install the necessary tools for a jekyll to run locally. You need nix
+to be installed though <b>¯\<sub>(ツ)</sub>_/¯</b>. The dependency cycle must start somewhere
+heh.
+</p>
+
+<p>
+Then, to run the instance:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-shell">$ make update run-dev
+</pre>
+</div>
+
+<p>
+Note: `update` is needed the first time around to install the necessary
+dependencies.
+</p>
+
+<p>
+Open your browser and head over <a href="http://localhost:4000">your running instance</a>.
+</p>
+
+<p>
+Everything should be fine and you should see a basic jekyll instance running
+</p>
+</div>
+</div>
+
+<div id="outline-container-org1ce2d6f" class="outline-2">
+<h2 id="org1ce2d6f">Setup your emacs</h2>
+<div class="outline-text-2" id="text-org1ce2d6f">
+</div>
+<div id="outline-container-org0d2bf65" class="outline-3">
+<h3 id="org0d2bf65">Install org2jekyll</h3>
+<div class="outline-text-3" id="text-org0d2bf65">
+<p>
+If you do not have installed org2jekyll yet, it's fine, you can always
+temporarily activate it through emacs' buffer loading mechanism.
+</p>
+
+<p>
+Open <a href="https://github.com/ardumont/org2jekyll/blob/master/org2jekyll.el">org2jekyll.el</a> with emacs, load it (<b><b>M-x eval-buffer</b></b>).
+</p>
+</div>
+</div>
+
+<div id="outline-container-orga36e4c2" class="outline-3">
+<h3 id="orga36e4c2">Setup org2jekyll</h3>
+<div class="outline-text-3" id="text-orga36e4c2">
+<p>
+Open <a href="https://github.com/ardumont/org2jekyll/blob/master/testing-blog/testing-blog-config.el">testing-blog-config.el</a> with emacs, load it (<b><b>M-x eval-buffer</b></b>).
+</p>
+
+<p>
+Note that this file should really be somewhere in your personal emacs
+configuration stanza. It's declared here so it's publicly available ;)
+</p>
+
+<p>
+You should now be able to play with org2jekyll. And then check the result in
+the jekyll instance.
+</p>
+</div>
+</div>
+</div>
+
+<div id="outline-container-orga0405a6" class="outline-2">
+<h2 id="orga0405a6">Create a blog post</h2>
+<div class="outline-text-2" id="text-orga0405a6">
+<p>
+<b><b>M-x org2jekyll-create-draft</b></b> and follow the minibuffer questions. Choose the
+layout "post" (in the current configuration).
+</p>
+
+<p>
+Write some awesome stuff as you see fit, the org way.
+</p>
+
+<p>
+When done, publish: <b><b>M-x org2jekyll-publish</b></b>.
+</p>
+
+<p>
+From your browser, refresh your <a href="http://localhost:4000">your running instance</a>.
+You should now see your blog post published there.
+</p>
+
+<p>
+You can loop over edition in org and publish until you are satisfied.
+</p>
+</div>
+</div>
+
+<div id="outline-container-orgf5ed380" class="outline-2">
+<h2 id="orgf5ed380">Create a static page</h2>
+<div class="outline-text-2" id="text-orgf5ed380">
+<p>
+You can also edit static pages.
+</p>
+
+<p>
+For example a page about you, call it <b>about-me.org</b>
+</p>
+
+<p>
+<b><b>M-x org2jekyll-create-draft</b></b>, follow the minibuffer questions. Choose the
+layout "default" (in the current configuration).
+</p>
+
+<p>
+The write some things about yourself the org way.
+</p>
+
+<p>
+Optionally, you can add <b><b>#+PERMALINK: <i>about-me</i></b></b> header.
+</p>
+
+<p>
+When done, <b><b>M-x org2jekyll-publish</b></b>.
+</p>
+
+<p>
+From your browser, refresh your <a href="http://localhost:4000">your running instance</a>.
+</p>
+
+<p>
+You should now see your about-me page there, not alongside the listed blog
+posts though. In the title menu bar.
+</p>
+
+<p>
+If you don't find, depending on some jekyll configuration, you can always head
+over the <a href="http://localhost:4000/about-me">about-me page</a> (if you used the extra permalink mentioned).
+</p>
+</div>
+</div>
