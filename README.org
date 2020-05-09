@@ -112,7 +112,7 @@ Here is an example of my configuration for my [[http://ardumont.github.io/][blog
                       '(org2jekyll-jekyll-drafts-dir "")
                       '(org2jekyll-jekyll-posts-dir "_posts/")
                       '(org-publish-project-alist
-                        `(("default"
+                        `(("default"  ;; mostly static pages: about me, about, etc...
                            :base-directory ,(org2jekyll-input-directory)
                            :base-extension "org"
                            :publishing-directory ,(org2jekyll-output-directory)
@@ -126,7 +126,7 @@ Here is an example of my configuration for my [[http://ardumont.github.io/][blog
                            :make-index t
                            :html-extension "html"
                            :body-only t)
-                          ("post"
+                          ("post"  ;; dynamic pages like blog articles
                            :base-directory ,(org2jekyll-input-directory)
                            :base-extension "org"
                            :publishing-directory ,(org2jekyll-output-directory org2jekyll-jekyll-posts-dir)
