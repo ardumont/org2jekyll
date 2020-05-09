@@ -1,7 +1,8 @@
 #+title: Backlog
 #+author: ardumont
 
-* IN-PROGRESS 0.2.0 [100%]
+* DONE 0.2.0 [100%]
+  CLOSED: [2020-05-09 Sat 18:10]
 - [X] #46: Improve yaml date format
 - [X] #53: Allow defining specific layouts in yaml header
 - [X] Present a demonstration runnable from the repository
