@@ -604,7 +604,6 @@ Publication skipped" options-alist))))
                        :org-file) => :publish-post-done)
                 (org2jekyll-publish-post :org-file)))))
 
-
 (ert-deftest test-org2jekyll-publish-page ()
   (should (eq :publish-page-done
               (with-mock
@@ -612,4 +611,42 @@ Publication skipped" options-alist))))
                        'org2jekyll--publish-page-org-file-with-metadata
                        :org-file) => :publish-page-done)
                 (org2jekyll-publish-page :org-file)))))
+
+(ert-deftest test-org2jekyll--bug-report ()
+  (should (string= "Please:
+- Describe your problem with clarity and conciceness (cf. https://www.gnu.org/software/emacs/manual/html_node/emacs/Understanding-Bug-Reporting.html)
+- Explicit your installation choice (melpa, marmalade, el-get, tarball, git clone...).
+- A sample of your configuration.
+- Report the following message trace inside your issue.
+
+System information:
+- system-type: system-type
+- locale-coding-system: locale-coding-system
+- emacs-version: emacs-version
+- org version: org-version
+- org2jekyll version: org2jekyll-version
+- org2jekyll path: /path/to/org2jekyll"
+
+                   (let ((system-type "system-type")
+                         (locale-coding-system "locale-coding-system")
+                         (org2jekyll--version "org2jekyll-version"))
+                     (with-mock
+                       (mock (emacs-version) => "emacs-version")
+                       (mock (org-version) => "org-version")
+                       (mock (find-library-name "org2jekyll") => "/path/to/org2jekyll")
+                       (org2jekyll--bug-report))))))
+
+(ert-deftest test-org2jekyll-bug-report ()
+  (should (equal :res
+                 (with-mock
+                   (mock (browse-url "https://github.com/ardumont/org2jekyll/issues/new") => :opened)
+                   (mock (org2jekyll--bug-report) => :message)
+                   (mock (message :message) => :res)
+                   (org2jekyll-bug-report 'browse))))
+  (should (equal :res
+                 (with-mock
+                   (mock (org2jekyll--bug-report) => :message2)
+                   (mock (message :message2) => :res)
+                   (org2jekyll-bug-report)))))
+
 ;;; org2jekyll-test.el ends here

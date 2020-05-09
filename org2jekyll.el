@@ -59,6 +59,8 @@
 (require 'ido)
 (require 'kv)
 
+(defconst org2jekyll--version "0.1.9" "Current org2jekyll version installed.")
+
 (defgroup org2jekyll nil "Publish org-mode posts to jekyll"
   :tag "org2jekyll"
   :version "0.0.3"
@@ -576,6 +578,33 @@ Layout `'default`' is a page."
     (deferred:nextc it
       (lambda (pages)
         (mapc #'org2jekyll-publish-page pages)))))
+
+(defun org2jekyll--bug-report ()
+  "Compute the bug report for the user to include."
+  (->> `("Please:"
+         "- Describe your problem with clarity and conciceness (cf. https://www.gnu.org/software/emacs/manual/html_node/emacs/Understanding-Bug-Reporting.html)"
+         "- Explicit your installation choice (melpa, marmalade, el-get, tarball, git clone...)."
+         "- A sample of your configuration."
+         "- Report the following message trace inside your issue."
+         ""
+         "System information:"
+         ,(format "- system-type: %s" system-type)
+         ,(format "- locale-coding-system: %s" locale-coding-system)
+         ,(format "- emacs-version: %s" (emacs-version))
+         ,(format "- org version: %s" (org-version))
+         ,(format "- org2jekyll version: %s" org2jekyll--version)
+         ,(format "- org2jekyll path: %s" (find-library-name "org2jekyll")))
+       (s-join "\n")))
+
+(defun org2jekyll-bug-report (&optional open-url)
+  "Display a bug report message.
+When OPEN-URL is filled, with universal argument (`C-u') is used,
+opens new issue in org-trello's github tracker."
+  (interactive "P")
+  (when open-url
+    (browse-url "https://github.com/ardumont/org2jekyll/issues/new"))
+  (message (org2jekyll--bug-report)))
+
 
 ;;;###autoload
 (define-minor-mode org2jekyll-mode
