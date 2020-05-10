@@ -155,12 +155,17 @@ permalink: /posts/gtalk/
                                                        ("permalink" . "/posts/gtalk/"))))))
 
 (ert-deftest test-org2jekyll--compute-ready-jekyll-file-name ()
-  (should (string= "/home/tony/org/2012-10-10-scratch.org"
-                   (org2jekyll--compute-ready-jekyll-file-name "2012-10-10" "/home/tony/org/scratch.org")))
-  (should (string= "/home/tony/org/2012-10-10-scratch.org"
-                   (let* ((fake-drafts-folder "fake-drafts-folder")
+  (should (string= "/home/user/org/2012-10-10-scratch.org"
+                   (let ((org2jekyll-source-directory "/home/user/org"))
+                     (org2jekyll--compute-ready-jekyll-file-name "2012-10-10" "/home/tony/org/scratch.org"))))
+  (should (string= "/home/dude/repo/org/2020-05-10-awesome-post.org"
+                   (let ((org2jekyll-source-directory "/home/dude/repo/org"))
+                     (org2jekyll--compute-ready-jekyll-file-name "2020-05-10" "/home/dude/repo/org/some/nested/path/awesome-post.org"))))
+  (should (string= "/some/path/folder/2009-12-01-scratch.org"
+                   (let* ((org2jekyll-source-directory "/some/path/folder")
+                          (fake-drafts-folder "fake-drafts-folder")
                           (org2jekyll-jekyll-drafts-dir fake-drafts-folder))
-                     (org2jekyll--compute-ready-jekyll-file-name "2012-10-10" (format "/home/tony/org/%s/scratch.org" fake-drafts-folder))))))
+                     (org2jekyll--compute-ready-jekyll-file-name "2009-12-01" (format "/some/path/folder/%s/scratch.org" fake-drafts-folder))))))
 
 (ert-deftest test-org2jekyll--copy-org-file-to-jekyll-org-file ()
   ;; pre-9.0 Org releases
@@ -185,20 +190,20 @@ excerpt: some-fake-description with spaces and all
                      ;; @Test
                      (mocklet (((org2jekyll--old-org-version-p) => t)
                                ((org2jekyll--compute-ready-jekyll-file-name fake-date fake-org-file) => fake-org-jekyll-file))
-                       ;; create fake org file with some default content
-                       (with-temp-file fake-org-file
-                         (insert "#+fake-meta: some fake meta\n* some content"))
-                       ;; create the fake jekyll file with jekyll metadata
-                       (--> fake-org-file
-                            (org2jekyll--copy-org-file-to-jekyll-org-file
-                             fake-date it `(("layout"      . "post")
-                                            ("title"       . "some fake title")
-                                            ("date"        . ,fake-date)
-                                            ("categories"  . "\n- some-fake-category1\n- some-fake-category2")
-                                            ("author"      . "some-fake-author")
-                                            ("description" . "some-fake-description with spaces and all")))
-                            (insert-file-contents it)
-                            (buffer-string)))))))
+                              ;; create fake org file with some default content
+                              (with-temp-file fake-org-file
+                                (insert "#+fake-meta: some fake meta\n* some content"))
+                              ;; create the fake jekyll file with jekyll metadata
+                              (--> fake-org-file
+                                   (org2jekyll--copy-org-file-to-jekyll-org-file
+                                    fake-date it `(("layout"      . "post")
+                                                   ("title"       . "some fake title")
+                                                   ("date"        . ,fake-date)
+                                                   ("categories"  . "\n- some-fake-category1\n- some-fake-category2")
+                                                   ("author"      . "some-fake-author")
+                                                   ("description" . "some-fake-description with spaces and all")))
+                                   (insert-file-contents it)
+                                   (buffer-string)))))))
 
 (ert-deftest test-org2jekyll--copy-org-file-to-jekyll-org-file-2 ()
   ;; Org 9.0+ and org 8.3.x git snapshots

@@ -385,11 +385,10 @@ Depends on the metadata header #+LAYOUT."
 (defun org2jekyll--compute-ready-jekyll-file-name (date org-file)
   "Given a DATE and an ORG-FILE, compute a ready jekyll file name.
 If the current path contains the `'org2jekyll-jekyll-drafts-dir`', removes it."
-  (let ((temp-org-jekyll-filename (format "%s-%s" date
-                                          (file-name-nondirectory org-file)))
-        (temp-org-jekyll-directory (file-name-directory org-file)))
+  (let* ((temp-org-jekyll-filename (format "%s-%s" date
+                                           (file-name-nondirectory org-file))))
     (->> temp-org-jekyll-filename
-         (format "%s%s" temp-org-jekyll-directory)
+         (format "%s/%s" org2jekyll-source-directory)
          (replace-regexp-in-string (format "%s" org2jekyll-jekyll-drafts-dir) "")
          (replace-regexp-in-string "//" "/"))))
 
@@ -516,16 +515,18 @@ Publication skipped" error-messages)
 (defun org2jekyll--publish-page-org-file-with-metadata (org-metadata org-file)
   "Publish as page with ORG-METADATA the ORG-FILE."
   (let* ((blog-project (assoc-default "layout" org-metadata))
-         (ext (file-name-extension org-file))
-         (temp-file (format "%sorg2jekyll" (s-chop-suffix ext org-file))))
+         (filename     (file-name-nondirectory org-file))
+         (ext          (file-name-extension filename))
+         (temp-file    (format "%s/%sorg2jekyll"
+                               org2jekyll-source-directory
+                               (s-chop-suffix ext filename))))
     (copy-file org-file temp-file t t t)
     (with-temp-file temp-file
       (insert-file-contents temp-file)
       (goto-char (point-min))
-      (insert (org2jekyll--to-yaml-header org-metadata))
-      (write-file temp-file)
-      (org-publish-file temp-file
-                        (assoc blog-project org-publish-project-alist)))
+      (insert (org2jekyll--to-yaml-header org-metadata)))
+    (org-publish-file temp-file
+                      (assoc blog-project org-publish-project-alist))
     (delete-file temp-file)))
 
 (defun org2jekyll-publish-page (org-file)
