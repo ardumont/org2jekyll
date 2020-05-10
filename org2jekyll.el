@@ -58,6 +58,7 @@
 (require 'deferred)
 (require 'ido)
 (require 'kv)
+(require 'cl-lib) ;; lexical-let
 
 (defconst org2jekyll--version "0.2.0" "Current org2jekyll version installed.")
 
