@@ -85,13 +85,13 @@
   :group 'org2jekyll)
 
 (defcustom org2jekyll-jekyll-drafts-dir nil
-  "Relative path to drafts directory."
+  "Path to drafts directory relative to `org2jekyll-jekyll-directory`."
   :type 'string
   :require 'org2jekyll
   :group 'org2jekyll)
 
 (defcustom org2jekyll-jekyll-posts-dir nil
-  "Relative path to posts directory."
+  "Path to posts directory relative to `org2jekyll-jekyll-directory`."
   :type 'string
   :require 'org2jekyll
   :group 'org2jekyll)
