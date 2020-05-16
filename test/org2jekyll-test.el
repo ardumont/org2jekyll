@@ -68,16 +68,22 @@
                      (org2jekyll--draft-filename "/some/path/" "forbidden-symbol\\![](){}^$#")))))
 
 (ert-deftest test-org2jekyll--space-separated-values-to-yaml ()
-  (should (string= "\n- jabber\n- emacs\n- gtalk\n- tools\n- authentication"  (org2jekyll--space-separated-values-to-yaml "jabber emacs gtalk tools authentication")))
-  (should (string= "\n- jabber\n- emacs\n- gtalk\n- tools\n- authentication"  (org2jekyll--space-separated-values-to-yaml "jabber emacs  gtalk tools  authentication"))))
+  (should (string= "\n- jabber\n- emacs\n- gtalk\n- tools\n- authentication"
+                   (org2jekyll--space-separated-values-to-yaml "jabber emacs gtalk tools authentication")))
+  (should (string= "\n- jabber\n- emacs\n- gtalk\n- tools\n- authentication"
+                   (org2jekyll--space-separated-values-to-yaml "jabber emacs  gtalk tools  authentication")))
+  (should (string= ""
+                   (org2jekyll--space-separated-values-to-yaml nil)))
+  (should (string= ""
+                   (org2jekyll--space-separated-values-to-yaml ""))))
 
 (ert-deftest org2jekyll--old-org-version-p ()
   ;; pre-9.0 Org releases
   (should (mocklet (((boundp *) => t))
-            (org2jekyll--old-org-version-p)))
+                   (org2jekyll--old-org-version-p)))
   ;; Org 9.0+ and org 8.3.x git snapshots
   (should-not (mocklet (((boundp *) => nil))
-                (org2jekyll--old-org-version-p))))
+                       (org2jekyll--old-org-version-p))))
 
 (ert-deftest test-org2jekyll--to-yaml-header ()
   ;; pre-9.0 Org releases
@@ -274,7 +280,7 @@ excerpt: fake-description with spaces and all
 (ert-deftest test-org2jekyll-read-metadata ()
   (let* ((temp-file "/tmp/test-org2jekyll-read-metadata")
          (startup-key "#+STARTUP:") (startup-val "hidestars")
-         (options-key "#+OPTIONS:") (options-val "H:2 num:nil tags:nil toc:nil timestamps:t")
+         (options-key "#+OPTIONS:") (options-val "H:2 num:nil tags:t toc:nil timestamps:t")
          (layout-key "#+LAYOUT:") (layout-val "default")
          (author-key "#+AUTHOR:") (author-val "me")
          (date-key "#+DATE:") (date-val "2015-12-23 Sat 14:20")
@@ -324,7 +330,7 @@ Publication skipped" options-alist))))
 (ert-deftest test-org2jekyll-default-headers-template ()
   (should (string= "#+STARTUP: showall
 #+STARTUP: hidestars
-#+OPTIONS: H:2 num:nil tags:nil toc:nil timestamps:t
+#+OPTIONS: H:2 num:nil tags:t toc:nil timestamps:t
 #+LAYOUT: some-layout
 #+AUTHOR: blog-author
 #+DATE: post-date
@@ -414,7 +420,7 @@ Publication skipped" options-alist))))
 (ert-deftest test-org2jekyll-check-metadata ()
   (let* ((temp-file "/tmp/test-org2jekyll-check-metadata")
          (startup-key "#+STARTUP:") (startup-val "hidestars")
-         (options-key "#+OPTIONS:") (options-val "H:2 num:nil tags:nil toc:nil timestamps:t")
+         (options-key "#+OPTIONS:") (options-val "H:2 num:nil tags:t toc:nil timestamps:t")
          (layout-key "#+LAYOUT:") (layout-val "some-layout")
          (author-key "#+AUTHOR:") (author-val "blog-author")
          (date-key "#+DATE:") (date-val "post-date")
@@ -494,7 +500,7 @@ Publication skipped" options-alist))))
 (ert-deftest test-org2jekyll-create-draft ()
   (should (string= "#+STARTUP: showall
 #+STARTUP: hidestars
-#+OPTIONS: H:2 num:nil tags:nil toc:nil timestamps:t
+#+OPTIONS: H:2 num:nil tags:t toc:nil timestamps:t
 #+LAYOUT: post
 #+AUTHOR: tony
 #+DATE: some date
@@ -533,7 +539,7 @@ Publication skipped" options-alist))))
 (ert-deftest test-org2jekyll-init-current-buffer ()
   (should (string= "#+STARTUP: showall
 #+STARTUP: hidestars
-#+OPTIONS: H:2 num:nil tags:nil toc:nil timestamps:t
+#+OPTIONS: H:2 num:nil tags:t toc:nil timestamps:t
 #+LAYOUT: some-layout
 #+AUTHOR: dude
 #+DATE: some-date
@@ -672,14 +678,59 @@ System information:
 (ert-deftest test-org2jekyll-bug-report ()
   (should (equal :res
                  (with-mock
-                   (mock (browse-url "https://github.com/ardumont/org2jekyll/issues/new") => :opened)
-                   (mock (org2jekyll--bug-report) => :message)
-                   (mock (message :message) => :res)
-                   (org2jekyll-bug-report 'browse))))
+                  (mock (browse-url "https://github.com/ardumont/org2jekyll/issues/new") => :opened)
+                  (mock (org2jekyll--bug-report) => :message)
+                  (mock (message :message) => :res)
+                  (org2jekyll-bug-report 'browse))))
   (should (equal :res
                  (with-mock
-                   (mock (org2jekyll--bug-report) => :message2)
-                   (mock (message :message2) => :res)
-                   (org2jekyll-bug-report)))))
+                  (mock (org2jekyll--bug-report) => :message2)
+                  (mock (message :message2) => :res)
+                  (org2jekyll-bug-report)))))
+
+(ert-deftest test-org2jekyll--without-option-p-no-options-passed ()
+  (should (with-temp-buffer
+            (insert "#+OPTIONS: H:2 num:nil toc:nil timestamps:t\n")
+            (org2jekyll--without-option-p "toc")))
+  ;; mentioned to t, activated
+  (should-not (with-temp-buffer
+                (insert "#+OPTIONS: H:2 num:nil toc:t timestamps:t\n")
+                (org2jekyll--without-option-p "toc")))
+  ;; local option not present, activated
+  (should-not (with-temp-buffer
+                (insert "#+OPTIONS: H:2 num:nil timestamps:t\n")
+                (org2jekyll--without-option-p "toc")))
+  ;; no options at all then it's activated
+  (should-not (with-temp-buffer
+                (org2jekyll--without-option-p "toc"))))
+
+(ert-deftest test-org2jekyll--without-option-p-options-passed ()
+  ;; Option parsing should be detected appropriately
+  (should (with-temp-buffer
+            (insert "#+OPTIONS: H:2 num:nil timestamps:t\n")
+            (org2jekyll--without-option-p "num" (org2jekyll-get-options-from-buffer))))
+
+  (should-not (with-temp-buffer
+                (insert "#+OPTIONS: H:2 toc:t timestamps:t\n")
+                (org2jekyll--without-option-p "num" (org2jekyll-get-options-from-buffer))))
+
+  (should-not (with-temp-buffer
+                (insert "#+OPTIONS: H:2 num:t timestamps:t\n")
+                (org2jekyll--without-option-p "num" (org2jekyll-get-options-from-buffer)))))
+
+(ert-deftest test-org2jekyll--with-tags-p ()
+  ;; tags option parsing should be detected appropriately
+  (should-not (with-temp-buffer
+                (insert "#+OPTIONS: H:2 num:nil tags:nil timestamps:t\n")
+                (org2jekyll--with-tags-p (org2jekyll-get-options-from-buffer))))
+
+  (should (with-temp-buffer
+            (insert "#+OPTIONS: H:2 num:nil timestamps:t\n")
+            (org2jekyll--with-tags-p (org2jekyll-get-options-from-buffer))))
+
+  (should (with-temp-buffer
+            (insert "#+OPTIONS: H:2 num:t tags:t timestamps:t\n")
+            (org2jekyll--with-tags-p (org2jekyll-get-options-from-buffer)))))
+
 
 ;;; org2jekyll-test.el ends here

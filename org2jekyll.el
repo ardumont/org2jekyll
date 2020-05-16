@@ -126,7 +126,7 @@ The `'%s`' will be replaced respectively by name, author, generated date, title,
 (setq org2jekyll-jekyll-org-post-template
       "#+STARTUP: showall
 #+STARTUP: hidestars
-#+OPTIONS: H:2 num:nil tags:nil toc:nil timestamps:t
+#+OPTIONS: H:2 num:nil tags:t toc:nil timestamps:t
 #+LAYOUT: %s
 #+AUTHOR: %s
 #+DATE: %s
@@ -322,6 +322,23 @@ The `'%s`' will be replaced respectively by the blog entry name, the author, the
             (throw 'break nil))))
       options-plist)))
 
+(defun org2jekyll--without-option-p (option &optional options)
+  "Determine if OPTION needs to be deactivated amongst options."
+  ;; FIXME: Find the proper org implementation call ¯\_(ツ)_/¯
+  (let ((properties (-> (if options options (org2jekyll-get-options-from-buffer))
+                        (plist-get :options))))
+    (when properties
+      (let ((off-option (format "%s:nil" option)))
+        (->> properties
+             (s-split " ")
+             (--filter (string= off-option it)))))))
+
+(defun org2jekyll--with-tags-p (options)
+  "Determine, from OPTIONS if we need to export in yaml the tags options"
+  (-> "tags"
+      (org2jekyll--without-option-p options)
+      not))
+
 (defun org2jekyll-get-options-from-file (orgfile)
   "Return special lines at the beginning of ORGFILE."
   (with-temp-buffer
@@ -376,7 +393,7 @@ Depends on the metadata header #+LAYOUT."
 
 (defun org2jekyll--space-separated-values-to-yaml (str)
   "Transform a STR of space separated values entries into yaml entries."
-  (->> str
+  (->> (if str str "")
        (s-split " ")
        (--filter (unless (equal it "") it))
        (--map (format  "- %s" it))
@@ -417,7 +434,8 @@ Return DEFAULT-VALUE if not found."
                                                  (:tags)
                                                  (:description . 'required)
                                                  (:author)
-                                                 (:layout      . 'required)))
+                                                 (:layout      . 'required))
+  "Map of required org headers for jekyll to accept rendering.")
 
 (defun org2jekyll-check-metadata (org-metadata)
   "Check that all required headers in ORG-METADATA are provided.
@@ -451,16 +469,16 @@ and nil if no problems are found."
 
 (defun org2jekyll-read-metadata (org-file)
   "Given an ORG-FILE, return its org metadata.
-If unrequired values are missing, they are replaced with dummy
-ones.  Otherwise, display the error messages about the missing
-required values."
+It can display an error message about missing required values."
   (let* ((buffer-metadata (org2jekyll-get-options-from-file org-file))
-         (org-defaults `(:date ,(org2jekyll-now)
-                               :tags "dummy-tags-should-be-replaced"
-                               :author ""))
+         (org-defaults `(:date ,(org2jekyll-now) :author ""))
          (merged-metadata (kvplist-merge org-defaults buffer-metadata))
-         (categories (org2jekyll--space-separated-values-to-yaml (plist-get merged-metadata :categories)))
-         (tags (org2jekyll--space-separated-values-to-yaml (plist-get merged-metadata :tags)))
+         (categories (org2jekyll--space-separated-values-to-yaml
+                      (plist-get merged-metadata :categories)))
+         (tags (if (org2jekyll--with-tags-p buffer-metadata)
+                   (org2jekyll--space-separated-values-to-yaml
+                    (plist-get merged-metadata :tags))
+                 ""))
          (date (org2jekyll--convert-timestamp-to-yyyy-dd-mm-hh
                 (plist-get merged-metadata :date)))
          (yaml-metadata (-> merged-metadata
