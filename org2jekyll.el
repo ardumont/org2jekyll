@@ -667,13 +667,10 @@ Commands:
 (add-hook 'org2jekyll-mode-off-hook
           (lambda () (remove-hook 'org-publish-after-publishing-hook 'org2jekyll-install-yaml-headers)))
 
-;; install hook when entering org2jekyll-mode
-;; org2jekyll inserts the yaml when the publishing step is done
-;; so that we can respect org-publish's extra information are respected
-
-
-;; uninstall it when exiting the mode
-;; TODO
+;; install/uninstall hook when activating/deactivating org2jekyll-mode
+;; org2jekyll inserts the yaml when the publishing step is done, so now org
+;; does all the publishing in concordance to what the user expects and we do
+;; our update after it so Jekyll is happy.
 
 (provide 'org2jekyll)
 ;;; org2jekyll.el ends here
