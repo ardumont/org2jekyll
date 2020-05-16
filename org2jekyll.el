@@ -573,19 +573,15 @@ Publication skipped" error-messages)
 Layout `'post`' is a jekyll post.
 Layout `'default`' is a page (depending on the user customs)."
   (interactive)
-  (lexical-let ((org-file (buffer-file-name (current-buffer))))
-    (deferred:$
-      (deferred:next (lambda ()
-                       (-> (plist-get (org2jekyll-get-options-from-buffer) :layout)
-                           org2jekyll-post-p
-                           (if 'org2jekyll-publish-post
-                               'org2jekyll-publish-page))))
-      (deferred:nextc it (lambda (publish-fn) (funcall publish-fn org-file)))
-      (deferred:nextc it (lambda (final-message)
-                           (org2jekyll-publish-web-project)
-                           final-message))
-      (deferred:nextc it (lambda (final-message)
-                           (org2jekyll-message final-message))))))
+  (lexical-let* ((org-file (buffer-file-name (current-buffer))))
+    (let ((publish-fn (-> (plist-get (org2jekyll-get-options-from-buffer) :layout)
+                          org2jekyll-post-p
+                          (if 'org2jekyll-publish-post
+                              'org2jekyll-publish-page))))
+      (final-message (funcall publish-fn org-file)))
+    (progn
+      (org2jekyll-publish-web-project)
+      (org2jekyll-message final-message))))
 
 (defvar org2jekyll-mode-map nil "Default Bindings map for org2jekyll mode.")
 
