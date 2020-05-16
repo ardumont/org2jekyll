@@ -604,6 +604,13 @@ Layout `'default`' is a page (depending on the user customs)."
       (lambda (pages)
         (mapc #'org2jekyll-publish-page pages)))))
 
+(defun org2jekyll-version ()
+  "Little version helper"
+  (interactive)
+  (let ((version org2jekyll--version))
+    (message "org2jekyll-version: %s" version)
+    version))
+
 (defun org2jekyll--bug-report ()
   "Compute the bug report for the user to include."
   (->> `("Please:"

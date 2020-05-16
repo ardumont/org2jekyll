@@ -587,6 +587,11 @@ System information:
                   (mock (message :message2) => :res)
                   (org2jekyll-bug-report)))))
 
+(ert-deftest test-org2jekyll-version ()
+  (should (string= "version-org2jekyll"
+                   (let ((org2jekyll--version "version-org2jekyll"))
+                     (call-interactively 'org2jekyll-version)))))
+
 (ert-deftest test-org2jekyll--without-option-p-no-options-passed ()
   (should (with-temp-buffer
             (insert "#+OPTIONS: H:2 num:nil toc:nil timestamps:t\n")
