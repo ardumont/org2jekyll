@@ -1,6 +1,11 @@
 #+title: Backlog
 #+author: ardumont
 
+* DONE 0.2.2 [100%]
+  CLOSED: [2020-05-16 Sat 16:53]
+- [X] Allow toc generation (respect more the org-mode user setup)
+- [X] Update README about those changes
+- [X] Fix misindentation in function org2jekyll-publish
 * DONE 0.2.1 [100%]
   CLOSED: [2020-05-16 Sat 08:28]
 - [X] Update version and doc about new changes
