@@ -12,6 +12,7 @@ Blogging with org-mode and jekyll without alien yaml headers.
 
 * Table of Contents                                                     :TOC_4:
 - [[#upgrade][Upgrade]]
+  - [[#020---021][0.2.0 -> 0.2.1]]
   - [[#018---019][0.1.8 -> 0.1.9]]
   - [[#012---014][0.1.2 -> 0.1.4]]
 - [[#description][Description]]
@@ -42,6 +43,14 @@ Blogging with org-mode and jekyll without alien yaml headers.
   - [[#dependencies][dependencies]]
 
 * Upgrade
+
+** 0.2.0 -> 0.2.1
+
+- The `tags:nil` option is now respected, aligning with org-mode. So, when nil,
+  those are not exported in yaml headers.
+- When generating new org2jekyll buffer, the default option is now `tags:t`
+- `#+TAGS` and `#+CATEGORIES` are no longer comma separated values but space
+  separated values. This is also to be in check with org-mode.
 
 ** 0.1.8 -> 0.1.9
 - Remove deprecated api function names mentioned in 0.1.2 -> 0.1.4 migration.
