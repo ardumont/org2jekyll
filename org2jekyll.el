@@ -571,7 +571,7 @@ Publication skipped" error-messages)
 (defun org2jekyll-publish ()
   "Publish the current org file as post or page depending on the chosen layout.
 Layout `'post`' is a jekyll post.
-Layout `'default`' is a page."
+Layout `'default`' is a page (depending on the user customs)."
   (interactive)
   (lexical-let ((org-file (buffer-file-name (current-buffer))))
     (deferred:$
