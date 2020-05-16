@@ -1,16 +1,16 @@
 #+STARTUP: showall
 #+STARTUP: hidestars
-#+OPTIONS: H:2 num:nil tags:t toc:t timestamps:t
+#+OPTIONS: H:2 num:t tags:t toc:t timestamps:t
 #+LAYOUT: post
 #+AUTHOR: drjekyll&mrtony
 #+DATE: 2020-05-09 Sat 12:34
 #+TITLE: Blogging with org2jekyll setup
 #+DESCRIPTION: A post demo to blog with org2jekyll
-#+TAGS: blog, org2jekyll, setup, jekyll
-#+CATEGORIES: blog, org2jekyll, setup, jekyll
+#+TAGS: blog org2jekyll setup jekyll
+#+CATEGORIES: blog org2jekyll setup jekyll
 
-Hello, in this post, we will show how to setup org2jekyll and play with a local
-jekyll instance.
+In this post, we will show how to setup org2jekyll and play with a local jekyll
+instance.
 
 For this, we will be using a mix of nix tools (e.g. [[https://nixos.wiki/wiki/Development_environment_with_nix-shell][nix-shell]]) and standard
 Makefile. The end-goal being reproducibility.
@@ -85,14 +85,50 @@ layout "default" (in the current configuration).
 
 The write some things about yourself the org way.
 
-Optionally, you can add **#+PERMALINK: /about-me/** header.
+Optionally, you can add **#+PERMALINK: <whatever-you-want>** header.
 
 When done, **M-x org2jekyll-publish**.
 
 From your browser, refresh your [[http://localhost:4000][your running instance]].
 
 You should now see your about-me page there, not alongside the listed blog
-posts though. In the title menu bar. 
+posts though. In the title menu bar.
 
 If you don't find, depending on some jekyll configuration, you can always head
 over the [[http://localhost:4000/about-me][about-me page]] (if you used the extra permalink mentioned).
+
+* Evaluate block code the org-mode way
+
+Make your emacs able to deal with [[https://gitlab.com/ardumont/home/-/blob/5afd58b89517dbe03a1510ce4fadb5200d80c5bb/emacs/default.nix#L140-142][python and matplotlib for the following]].
+
+Evaluate the block (**C-c C-c**) to have the results below.
+
+#+BEGIN_SRC python :session :results t :exports t
+import os
+import matplotlib
+import matplotlib.pyplot as plt
+import numpy as np
+
+t = np.arange(0.0, 2.0, 0.01)
+s = 1 + np.sin(2 * np.pi * t)
+
+fig, ax = plt.subplots()
+ax.plot(t, s)
+
+ax.set(xlabel='time (s)', ylabel='voltage (mV)', title='Voltage over time')
+ax.grid()
+
+os.makedirs("./img", exist_ok=True)
+fig.savefig("./img/plot-sin.png")
+#+END_SRC
+
+#+RESULTS:
+| Text | (33.722222222222214 0.5 voltage (mV)) | Text | (0.5 23.52222222222222 time (s)) | Text | (0.5 1 Voltage over time) |
+
+* Display image
+
+Check your [[https://github.com/ardumont/org2jekyll/blob/master/testing-blog/_config.yml][_config.yml]] to determine where to store images.
+
+http://localhost:4000/assets/img/plot-sin.png
+
+source: https://matplotlib.org/gallery/lines_bars_and_markers/simple_plot.html

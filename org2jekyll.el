@@ -508,15 +508,19 @@ Publication skipped" error-messages)
 (defun org2jekyll-install-yaml-headers (original-file published-file)
   "Read ORIGINAL-FILE metadata and install yaml header to PUBLISHED-FILE.
 Then delete the original-file which is intended as a temporary file.
+Only for org-mode file, for other files, it's a noop.
 This function is intended to be used as org-publish hook function."
-  (let ((yaml-headers (-> original-file
-                          org2jekyll-read-metadata
-                          org2jekyll--to-yaml-header)))
-    (with-temp-file published-file
-      (insert-file-contents published-file)
-      (goto-char (point-min))
-      (insert yaml-headers))
-    (when (file-exists-p original-file) (delete-file original-file))))
+  (let ((original-file-ext (file-name-extension original-file))
+        (published-file-ext (file-name-extension published-file)))
+    (when (and (string= "org" original-file-ext) (string= "html" published-file-ext))
+      (let ((yaml-headers (-> original-file
+                              org2jekyll-read-metadata
+                              org2jekyll--to-yaml-header)))
+        (with-temp-file published-file
+          (insert-file-contents published-file)
+          (goto-char (point-min))
+          (insert yaml-headers))
+        (delete-file original-file)))))
 
 (defun org2jekyll--publish-page-org-file-with-metadata (org-metadata org-file)
   "Publish as page with ORG-METADATA the ORG-FILE."

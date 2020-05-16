@@ -66,21 +66,21 @@
      ("images"
       :base-directory ,(org2jekyll-input-directory "img")
       :base-extension "jpg\\|gif\\|png"
-      :publishing-directory ,(org2jekyll-output-directory "img")
+      :publishing-directory ,(org2jekyll-output-directory "assets/img")
       :publishing-function org-publish-attachment
       :recursive t)
 
      ("js"
       :base-directory ,(org2jekyll-input-directory "js")
       :base-extension "js"
-      :publishing-directory ,(org2jekyll-output-directory "js")
+      :publishing-directory ,(org2jekyll-output-directory "assets/js")
       :publishing-function org-publish-attachment
       :recursive t)
 
      ("css"
       :base-directory ,(org2jekyll-input-directory "css")
       :base-extension "css\\|el"
-      :publishing-directory ,(org2jekyll-output-directory "css")
+      :publishing-directory ,(org2jekyll-output-directory "assets/css")
       :publishing-function org-publish-attachment
       :recursive t)
 
