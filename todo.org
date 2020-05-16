@@ -1,6 +1,14 @@
 #+title: Backlog
 #+author: ardumont
 
+* DONE 0.2.1 [100%]
+  CLOSED: [2020-05-16 Sat 08:28]
+- [X] Update version and doc about new changes
+- [X] Respect the user setup regarding tags option export (align with org-mode)
+- [X] Define org2jekyll tags/categories as space separated values (align with
+  org-mode)
+- [X] Fix issue on time formatting which prevented rendering jekyll side
+
 * DONE 0.2.0 [100%]
   CLOSED: [2020-05-09 Sat 18:10]
 - [X] #46: Improve yaml date format
