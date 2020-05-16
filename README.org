@@ -12,6 +12,7 @@ Blogging with org-mode and jekyll without alien yaml headers.
 
 * Table of Contents                                                     :TOC_4:
 - [[#upgrade][Upgrade]]
+  - [[#021---022][0.2.1 -> 0.2.2]]
   - [[#020---021][0.2.0 -> 0.2.1]]
   - [[#018---019][0.1.8 -> 0.1.9]]
   - [[#012---014][0.1.2 -> 0.1.4]]
@@ -46,15 +47,17 @@ Blogging with org-mode and jekyll without alien yaml headers.
 
 ** 0.2.1 -> 0.2.2
 
-- The toc:t is now respected.
-- Note that org2jekyll changed internally how it's working and rely more on
-  org-mode mechanism. Notably, it uses a hook at the end of the publishing step
-  to preprend the jekyll yaml headers
+- The toc:t is now respected. Please make sure you want your table of contents
+  (`toc:t`) or not (`toc:nil`).
+- Note that org2jekyll changed internally how it's working and rely a bit
+  further on org-mode mechanism (so it's good ;). Notably, it uses a hook at
+  the end of the publishing step to prepend the jekyll yaml headers.
 
 ** 0.2.0 -> 0.2.1
 
 - The `tags:nil` option is now respected, aligning with org-mode. So, when nil,
-  those are not exported in yaml headers.
+  those are not exported in yaml headers. Please make sure you want those
+  activated (`tags:t`) or not (`tags:nil`).
 - When generating new org2jekyll buffer, the default option is now `tags:t`
 - `#+TAGS` and `#+CATEGORIES` are no longer comma separated values but space
   separated values. This is also to be in check with org-mode.
