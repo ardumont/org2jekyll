@@ -574,14 +574,14 @@ Layout `'post`' is a jekyll post.
 Layout `'default`' is a page (depending on the user customs)."
   (interactive)
   (lexical-let* ((org-file (buffer-file-name (current-buffer))))
-    (let ((publish-fn (-> (plist-get (org2jekyll-get-options-from-buffer) :layout)
-                          org2jekyll-post-p
-                          (if 'org2jekyll-publish-post
-                              'org2jekyll-publish-page))))
-      (final-message (funcall publish-fn org-file)))
-    (progn
-      (org2jekyll-publish-web-project)
-      (org2jekyll-message final-message))))
+    (let* ((publish-fn (-> (plist-get (org2jekyll-get-options-from-buffer) :layout)
+                           org2jekyll-post-p
+                           (if 'org2jekyll-publish-post
+                               'org2jekyll-publish-page)))
+           (final-message (funcall publish-fn org-file)))
+      (progn
+        (org2jekyll-publish-web-project)
+        (org2jekyll-message final-message)))))
 
 (defvar org2jekyll-mode-map nil "Default Bindings map for org2jekyll mode.")
 
