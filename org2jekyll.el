@@ -369,14 +369,6 @@ Depends on the metadata header #+LAYOUT."
   (format-time-string "%Y-%m-%d"
                       (apply 'encode-time (org-parse-time-string timestamp))))
 
-(defun org2jekyll--old-org-version-p ()
-  "Determine if we are in old version or not."
-  ;; HACK: support both pre-9.0 and 9.0+ Org export block syntax. Instead of
-  ;; checking for the version, check for org-element-block-name-alist
-  ;; availability to detect pre-release 9.0 Git snapshots with the new syntax,
-  ;; see http://orgmode.org/cgit.cgi/org-mode.git/commit/?id=54318ad
-  (boundp 'org-element-block-name-alist))
-
 (defun org2jekyll--to-yaml-header (org-metadata)
   "Given a list of ORG-METADATA, compute the yaml header string."
   (--> org-metadata

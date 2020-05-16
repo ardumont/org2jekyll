@@ -77,14 +77,6 @@
   (should (string= ""
                    (org2jekyll--space-separated-values-to-yaml ""))))
 
-(ert-deftest org2jekyll--old-org-version-p ()
-  ;; pre-9.0 Org releases
-  (should (mocklet (((boundp *) => t))
-                   (org2jekyll--old-org-version-p)))
-  ;; Org 9.0+ and org 8.3.x git snapshots
-  (should-not (mocklet (((boundp *) => nil))
-                       (org2jekyll--old-org-version-p))))
-
 (ert-deftest test-org2jekyll--to-yaml-header ()
   (should (string= "---
 layout: post
