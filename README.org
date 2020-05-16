@@ -54,15 +54,15 @@ Blogging with org-mode and jekyll without alien yaml headers.
 
 ** 0.1.8 -> 0.1.9
 - Remove deprecated api function names mentioned in 0.1.2 -> 0.1.4 migration.
-- Permit user to define on per-buffer setup or per-custom variable basis some
+- Allow user to define on per-buffer setup or per-custom variable basis some
   extra yaml header
 
 ** 0.1.2 -> 0.1.4
 
-It occured to me that the [[https://www.gnu.org/software/emacs/manual/html_node/elisp/Coding-Conventions.html][elisp coding convention]] were not respected in the
-first place. So between the 0.1.2 and 0.1.3 version, the names and variables
-were updated to respect them. Now every command and variables uses
-`org2jekyll-` and no longer `org2jekyll/` prefix.
+The [[https://www.gnu.org/software/emacs/manual/html_node/elisp/Coding-Conventions.html][elisp coding convention]] was not respected up to this version. So between
+the 0.1.2 and 0.1.3 version, the names and variables were updated to respect
+them. Now every command and variables uses `org2jekyll-` and no longer
+`org2jekyll/` prefix.
 
 * Description
 
