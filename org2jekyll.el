@@ -379,17 +379,12 @@ Depends on the metadata header #+LAYOUT."
 
 (defun org2jekyll--to-yaml-header (org-metadata)
   "Given a list of ORG-METADATA, compute the yaml header string."
-  (-let (((begin end) (if (org2jekyll--old-org-version-p)
-                          '("#+BEGIN_HTML" "#+END_HTML\n")
-                        '("#+BEGIN_EXPORT HTML" "#+END_EXPORT\n"))))
-    (--> org-metadata
-         org2jekyll--org-to-jekyll-metadata
-         (--map (format "%s: %s" (car it) (cdr it)) it)
-         (cons "---" it)
-         (cons begin it)
-         (-snoc it "---")
-         (-snoc it end)
-         (s-join "\n" it))))
+  (--> org-metadata
+       org2jekyll--org-to-jekyll-metadata
+       (--map (format "%s: %s" (car it) (cdr it)) it)
+       (cons "---" it)
+       (-snoc it "---\n")
+       (s-join "\n" it)))
 
 (defun org2jekyll--space-separated-values-to-yaml (str)
   "Transform a STR of space separated values entries into yaml entries."
@@ -409,17 +404,6 @@ If the current path contains the `'org2jekyll-jekyll-drafts-dir`', removes it."
          (format "%s/%s" org2jekyll-source-directory)
          (replace-regexp-in-string (format "%s" org2jekyll-jekyll-drafts-dir) "")
          (replace-regexp-in-string "//" "/"))))
-
-(defun org2jekyll--copy-org-file-to-jekyll-org-file (date org-file yaml-headers)
-  "Given DATE, ORG-FILE and YAML-HEADERS, copy content as org-jekyll ready file.
-This returns the new filename path."
-  (let ((jekyll-filename (org2jekyll--compute-ready-jekyll-file-name date
-                                                                     org-file)))
-    (with-temp-file jekyll-filename ;; write file updated with jekyll specifics
-      (insert-file-contents org-file)
-      (goto-char (point-min))
-      (insert (org2jekyll--to-yaml-header yaml-headers)))
-    jekyll-filename))
 
 (defun org2jekyll-assoc-default (key org-data default-value)
   "Given KEY, ORG-DATA and DEFAULT-VALUE, return the value associated with key.
@@ -516,14 +500,13 @@ Publication skipped" error-messages)
 
 (defun org2jekyll--publish-post-org-file-with-metadata (org-metadata org-file)
   "Publish as post with ORG-METADATA the ORG-FILE."
-  (let* ((blog-project    (assoc-default "layout" org-metadata))
-         (file-date       (->  (assoc-default "date" org-metadata) org2jekyll--convert-timestamp-to-yyyy-dd-mm))
-         (jekyll-filename (org2jekyll--copy-org-file-to-jekyll-org-file
-                           file-date
-                           org-file org-metadata)))
-    (org-publish-file jekyll-filename
-                      (assoc blog-project org-publish-project-alist))
-    (delete-file jekyll-filename)))
+  (let* ((blog-project (assoc-default "layout" org-metadata))
+         (file-date    (->  (assoc-default "date" org-metadata) org2jekyll--convert-timestamp-to-yyyy-dd-mm))
+         (temp-file    (org2jekyll--compute-ready-jekyll-file-name file-date org-file)))
+    (copy-file org-file temp-file 'overwrite 'keep-time 'preserve-ids 'preserve-perms)
+    (org-publish-file temp-file
+                      (assoc blog-project org-publish-project-alist)
+                      'no-cache)))
 
 (defun org2jekyll-publish-post (org-file)
   "Publish ORG-FILE as a post."
@@ -531,22 +514,31 @@ Publication skipped" error-messages)
    'org2jekyll--publish-post-org-file-with-metadata
    org-file))
 
+(defun org2jekyll-install-yaml-headers (original-file published-file)
+  "Read ORIGINAL-FILE metadata and install yaml header to PUBLISHED-FILE.
+Then delete the original-file which is intended as a temporary file.
+This function is intended to be used as org-publish hook function."
+  (let ((yaml-headers (-> original-file
+                          org2jekyll-read-metadata
+                          org2jekyll--to-yaml-header)))
+    (with-temp-file published-file
+      (insert-file-contents published-file)
+      (goto-char (point-min))
+      (insert yaml-headers))
+    (when (file-exists-p original-file) (delete-file original-file))))
+
 (defun org2jekyll--publish-page-org-file-with-metadata (org-metadata org-file)
   "Publish as page with ORG-METADATA the ORG-FILE."
   (let* ((blog-project (assoc-default "layout" org-metadata))
          (filename     (file-name-nondirectory org-file))
          (ext          (file-name-extension filename))
          (temp-file    (format "%s/%sorg2jekyll"
-                               org2jekyll-source-directory
+                               (s-chop-suffix "/" org2jekyll-source-directory)
                                (s-chop-suffix ext filename))))
-    (copy-file org-file temp-file t t t)
-    (with-temp-file temp-file
-      (insert-file-contents temp-file)
-      (goto-char (point-min))
-      (insert (org2jekyll--to-yaml-header org-metadata)))
+    (copy-file org-file temp-file 'overwrite 'keep-time 'preserve-ids 'preserve-perms)
     (org-publish-file temp-file
-                      (assoc blog-project org-publish-project-alist))
-    (delete-file temp-file)))
+                      (assoc blog-project org-publish-project-alist)
+                      'no-cache)))
 
 (defun org2jekyll-publish-page (org-file)
   "Publish ORG-FILE as a page."
@@ -661,6 +653,27 @@ Commands:
   :lighter " o2j"
   :group 'org2jekyll
   :keymap org2jekyll-mode-map)
+
+(defvar org2jekyll-mode-on-hook nil "org2jekyll starting hook")
+(setq org2jekyll-mode-off-hook nil) ;; for dev
+;; install org2jekyll hook in org-publish when activating org2jekyll-mode
+(add-hook 'org2jekyll-mode-on-hook
+          (lambda ()
+            (add-hook 'org-publish-after-publishing-hook 'org2jekyll-install-yaml-headers)))
+
+(defvar org2jekyll-mode-off-hook '() "org2jekyll stoping hook")
+(setq org2jekyll-mode-off-hook nil) ;; for dev
+;; uninstall hook on org-publish
+(add-hook 'org2jekyll-mode-off-hook
+          (lambda () (remove-hook 'org-publish-after-publishing-hook 'org2jekyll-install-yaml-headers)))
+
+;; install hook when entering org2jekyll-mode
+;; org2jekyll inserts the yaml when the publishing step is done
+;; so that we can respect org-publish's extra information are respected
+
+
+;; uninstall it when exiting the mode
+;; TODO
 
 (provide 'org2jekyll)
 ;;; org2jekyll.el ends here

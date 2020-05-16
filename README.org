@@ -44,6 +44,13 @@ Blogging with org-mode and jekyll without alien yaml headers.
 
 * Upgrade
 
+** 0.2.1 -> 0.2.2
+
+- The toc:t is now respected.
+- Note that org2jekyll changed internally how it's working and rely more on
+  org-mode mechanism. Notably, it uses a hook at the end of the publishing step
+  to preprend the jekyll yaml headers
+
 ** 0.2.0 -> 0.2.1
 
 - The `tags:nil` option is now respected, aligning with org-mode. So, when nil,

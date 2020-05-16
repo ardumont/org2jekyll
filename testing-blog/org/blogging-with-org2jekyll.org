@@ -1,6 +1,6 @@
 #+STARTUP: showall
 #+STARTUP: hidestars
-#+OPTIONS: H:2 num:nil tags:nil toc:nil timestamps:t
+#+OPTIONS: H:2 num:nil tags:t toc:t timestamps:t
 #+LAYOUT: post
 #+AUTHOR: drjekyll&mrtony
 #+DATE: 2020-05-09 Sat 12:34
@@ -12,12 +12,12 @@
 Hello, in this post, we will show how to setup org2jekyll and play with a local
 jekyll instance.
 
-For this, we will be using a mix of nix tools (nix-shell) and standard
+For this, we will be using a mix of nix tools (e.g. [[https://nixos.wiki/wiki/Development_environment_with_nix-shell][nix-shell]]) and standard
 Makefile. The end-goal being reproducibility.
 
 Do not only trust what you read, try and reproduce it yourself following this.
 
-* Enter the environment
+* Enter environment
 
 To make your environment with jekyll aware system:
 #+BEGIN_SRC shell
