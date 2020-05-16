@@ -271,7 +271,7 @@ Publication skipped" options-alist))))
                  (mock (org2jekyll--convert-timestamp-to-yyyy-dd-mm :date) => :date)
                  (mock (org2jekyll--compute-ready-jekyll-file-name :date :org-file) => :temp-file)
                  (mock (copy-file :org-file :temp-file 'overwrite 'keep-time 'preserve-ids 'preserve-perms) => nil)
-                 (mock (org-publish-file :temp-file '(:post :project) 'no-cache) => :published-post-file)
+                 (mock (org-publish-file :temp-file '(:post :project)) => :published-post-file)
                  (org2jekyll--publish-post-org-file-with-metadata '(("layout" . :post)
                                                                     ("date" . :date)) :org-file))))))
 
@@ -284,7 +284,7 @@ Publication skipped" options-alist))))
                         "filename.org" "/path/something/filename.org2jekyll"
                         'overwrite 'keep-time 'preserve-ids 'preserve-perms) => nil)
                  (mock (org-publish-file
-                        "/path/something/filename.org2jekyll" '(:page :project) 'no-cache) => :published-page-file)
+                        "/path/something/filename.org2jekyll" '(:page :project)) => :published-page-file)
                  (org2jekyll--publish-page-org-file-with-metadata '(("layout" . :page)
                                                                     ("date" . :date)) "filename.org"))))))
 

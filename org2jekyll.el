@@ -497,8 +497,7 @@ Publication skipped" error-messages)
          (temp-file    (org2jekyll--compute-ready-jekyll-file-name file-date org-file)))
     (copy-file org-file temp-file 'overwrite 'keep-time 'preserve-ids 'preserve-perms)
     (org-publish-file temp-file
-                      (assoc blog-project org-publish-project-alist)
-                      'no-cache)))
+                      (assoc blog-project org-publish-project-alist))))
 
 (defun org2jekyll-publish-post (org-file)
   "Publish ORG-FILE as a post."
@@ -529,8 +528,7 @@ This function is intended to be used as org-publish hook function."
                                (s-chop-suffix ext filename))))
     (copy-file org-file temp-file 'overwrite 'keep-time 'preserve-ids 'preserve-perms)
     (org-publish-file temp-file
-                      (assoc blog-project org-publish-project-alist)
-                      'no-cache)))
+                      (assoc blog-project org-publish-project-alist))))
 
 (defun org2jekyll-publish-page (org-file)
   "Publish ORG-FILE as a page."
