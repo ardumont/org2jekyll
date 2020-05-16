@@ -206,11 +206,11 @@ POST-CATEGORIES is the categories."
 
 (defun org2jekyll--read-tags ()
   "Read the tags."
-  (read-string "Tags (csv): "))
+  (read-string "Tags (space separated values): "))
 
 (defun org2jekyll--read-categories ()
   "Read the categories."
-  (read-string "Categories (csv): "))
+  (read-string "Categories (space separated values): "))
 
 (defun org2jekyll--input-read (prompt collection)
   "Input PROMPT with possibilities limited to COLLECTION."
@@ -374,14 +374,14 @@ Depends on the metadata header #+LAYOUT."
          (-snoc it end)
          (s-join "\n" it))))
 
-(defun org2jekyll--csv-to-yaml (str-csv)
-  "Transform a STR-CSV entries into a yaml entries."
-  (->> str-csv
-       (concat ",")
-       (s-replace ", " ",")
-       (s-replace "," "\n- ")
-       s-trim
-       (concat "\n")))
+(defun org2jekyll--space-separated-values-to-yaml (str)
+  "Transform a STR of space separated values entries into yaml entries."
+  (->> str
+       (s-split " ")
+       (--filter (unless (equal it "") it))
+       (--map (format  "- %s" it))
+       (cons "")
+       (s-join "\n")))
 
 (defun org2jekyll--compute-ready-jekyll-file-name (date org-file)
   "Given a DATE and an ORG-FILE, compute a ready jekyll file name.
@@ -459,8 +459,8 @@ required values."
                                :tags "dummy-tags-should-be-replaced"
                                :author ""))
          (merged-metadata (kvplist-merge org-defaults buffer-metadata))
-         (categories (org2jekyll--csv-to-yaml (plist-get merged-metadata :categories)))
-         (tags (org2jekyll--csv-to-yaml (plist-get merged-metadata :tags)))
+         (categories (org2jekyll--space-separated-values-to-yaml (plist-get merged-metadata :categories)))
+         (tags (org2jekyll--space-separated-values-to-yaml (plist-get merged-metadata :tags)))
          (date (org2jekyll--convert-timestamp-to-yyyy-dd-mm-hh
                 (plist-get merged-metadata :date)))
          (yaml-metadata (-> merged-metadata

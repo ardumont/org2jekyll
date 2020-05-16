@@ -67,9 +67,9 @@
     (should (string= "/some/path/forbidden-symbol.ext"
                      (org2jekyll--draft-filename "/some/path/" "forbidden-symbol\\![](){}^$#")))))
 
-(ert-deftest test-org2jekyll--csv-to-yaml ()
-  (should (string= "\n- jabber\n- emacs\n- gtalk\n- tools\n- authentication"  (org2jekyll--csv-to-yaml "jabber, emacs, gtalk, tools, authentication")))
-  (should (string= "\n- jabber\n- emacs\n- gtalk\n- tools\n- authentication"  (org2jekyll--csv-to-yaml "jabber,emacs,gtalk,tools,authentication"))))
+(ert-deftest test-org2jekyll--space-separated-values-to-yaml ()
+  (should (string= "\n- jabber\n- emacs\n- gtalk\n- tools\n- authentication"  (org2jekyll--space-separated-values-to-yaml "jabber emacs gtalk tools authentication")))
+  (should (string= "\n- jabber\n- emacs\n- gtalk\n- tools\n- authentication"  (org2jekyll--space-separated-values-to-yaml "jabber emacs  gtalk tools  authentication"))))
 
 (ert-deftest org2jekyll--old-org-version-p ()
   ;; pre-9.0 Org releases
@@ -280,8 +280,8 @@ excerpt: fake-description with spaces and all
          (date-key "#+DATE:") (date-val "2015-12-23 Sat 14:20")
          (title-key "#+TITLE:") (title-val "some-title")
          (description-key "#+DESCRIPTION:") (description-val "desc")
-         (tags-key "#+TAGS:") (tags-val "tag0, tag1")
-         (categories-key "#+CATEGORIES:") (categories-val "cat0, cat1")
+         (tags-key "#+TAGS:") (tags-val "tag0 tag1")
+         (categories-key "#+CATEGORIES:") (categories-val "cat0 cat1")
          (comments-key "#+COMMENTS:") (comments-val "true")
          (_ (with-temp-file temp-file
               (insert (concat startup-key " " startup-val "\n"
@@ -330,8 +330,8 @@ Publication skipped" options-alist))))
 #+DATE: post-date
 #+TITLE: post title with spaces
 #+DESCRIPTION: post some description
-#+TAGS: post-tag0, post-tag1
-#+CATEGORIES: post-category, other-category
+#+TAGS: post-tag0 post-tag1
+#+CATEGORIES: post-category other-category
 
 "
                    (org2jekyll-default-headers-template "some-layout"
@@ -339,8 +339,8 @@ Publication skipped" options-alist))))
                                                         "post-date"
                                                         "post title with spaces"
                                                         "post some description"
-                                                        "post-tag0, post-tag1"
-                                                        "post-category, other-category"))))
+                                                        "post-tag0 post-tag1"
+                                                        "post-category other-category"))))
 
 (ert-deftest test-org2jekyll--optional-folder ()
   (should (string= "hello/there" (org2jekyll--optional-folder "hello" "there")))
@@ -420,8 +420,8 @@ Publication skipped" options-alist))))
          (date-key "#+DATE:") (date-val "post-date")
          (title-key "#+TITLE:") (title-val "post title with spaces")
          (description-key "#+DESCRIPTION:") (description-val "post some description")
-         (tags-key "#+TAGS:") (tags-val "post-tag0, post-tag1")
-         (categories-key "#+CATEGORIES:") (categories-val "post-category, other-category")
+         (tags-key "#+TAGS:") (tags-val "post-tag0 post-tag1")
+         (categories-key "#+CATEGORIES:") (categories-val "post-category other-category")
          (_ (with-temp-file temp-file
               (insert (concat startup-key " " startup-val "\n"
                               options-key " " options-val "\n"
@@ -500,8 +500,8 @@ Publication skipped" options-alist))))
 #+DATE: some date
 #+TITLE: some title
 #+DESCRIPTION: some description
-#+TAGS: tag0, tag1
-#+CATEGORIES: cat0, cat1, catn
+#+TAGS: tag0 tag1
+#+CATEGORIES: cat0 cat1 catn
 
 * "
                    (progn
@@ -514,17 +514,17 @@ Publication skipped" options-alist))))
                              (org2jekyll-jekyll-drafts-dir "")
                              (org2jekyll-blog-author "tony"))
                          (with-mock
-                           (mock (org2jekyll-now)                                                        => "some date")
-                           (mock (ido-completing-read "Layout: " '("post" "default") nil 'require-match) => "post")
-                           (mock (org2jekyll--read-title)                                                => "some title")
-                           (mock (org2jekyll--read-description)                                          => "some description")
-                           (mock (org2jekyll--read-tags)                                                 => "tag0, tag1")
-                           (mock (org2jekyll--read-categories)                                           => "cat0, cat1, catn")
-                           (mock (org2jekyll-input-directory "")                                         => "/tmp")
-                           ;; (mock (org2jekyll--draft-filename "/tmp" "some title")                     => "/tmp/some-title.org")
-                           (mock (org2jekyll--draft-filename * *)                                        => "/tmp/some-title.org")
-                           (mock (find-file "/tmp/some-title.org") => nil)
-                           (call-interactively #'org2jekyll-create-draft))))
+                          (mock (org2jekyll-now)                                                        => "some date")
+                          (mock (ido-completing-read "Layout: " '("post" "default") nil 'require-match) => "post")
+                          (mock (org2jekyll--read-title)                                                => "some title")
+                          (mock (org2jekyll--read-description)                                          => "some description")
+                          (mock (org2jekyll--read-tags)                                                 => "tag0 tag1")
+                          (mock (org2jekyll--read-categories)                                           => "cat0 cat1 catn")
+                          (mock (org2jekyll-input-directory "")                                         => "/tmp")
+                          ;; (mock (org2jekyll--draft-filename "/tmp" "some title")                     => "/tmp/some-title.org")
+                          (mock (org2jekyll--draft-filename * *)                                        => "/tmp/some-title.org")
+                          (mock (find-file "/tmp/some-title.org") => nil)
+                          (call-interactively #'org2jekyll-create-draft))))
                      ;; read the created file
                      (with-temp-buffer
                        (insert-file-contents "/tmp/some-title.org")
@@ -579,22 +579,22 @@ Publication skipped" options-alist))))
                 (org2jekyll--read-description))))
 
 (ert-deftest test-org2jekyll--read-tags ()
-  (should (string= "tag0, tag10"
+  (should (string= "tag0 tag10"
                    (with-mock
-                     (mock (read-string "Tags (csv): ") => "tag0, tag10")
-                     (org2jekyll--read-tags))))
+                    (mock (read-string "Tags (space separated values): ") => "tag0 tag10")
+                    (org2jekyll--read-tags))))
   (should-not (with-mock
-                (mock (read-string "Tags (csv): "))
-                (org2jekyll--read-tags))))
+               (mock (read-string "Tags (space separated values): "))
+               (org2jekyll--read-tags))))
 
 (ert-deftest test-org2jekyll--read-categories ()
-  (should (string= "cat0, cat10"
+  (should (string= "cat0 cat10"
                    (with-mock
-                     (mock (read-string "Categories (csv): ") => "cat0, cat10")
-                     (org2jekyll--read-categories))))
+                    (mock (read-string "Categories (space separated values): ") => "cat0 cat10")
+                    (org2jekyll--read-categories))))
   (should-not (with-mock
-                (mock (read-string "Categories (csv): "))
-                (org2jekyll--read-categories))))
+               (mock (read-string "Categories (space separated values): "))
+               (org2jekyll--read-categories))))
 
 (ert-deftest test-org2jekyll--input-read ()
   (should (eq :input-done
