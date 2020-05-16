@@ -246,12 +246,12 @@ excerpt: fake-description with spaces and all
 (ert-deftest test-org2jekyll--convert-timestamp-to-yyyy-dd-mm ()
   "Convert to simple YYYY-MM-DD date like out of either org date of iso8601 like dates"
   (should (string= "2013-04-29" (org2jekyll--convert-timestamp-to-yyyy-dd-mm "2013-04-29 lun. 00:46")))
-  (should (string= "2013-04-29" (org2jekyll--convert-timestamp-to-yyyy-dd-mm "2013-04-29 00:46:00"))))
+  (should (string= "2013-04-29" (org2jekyll--convert-timestamp-to-yyyy-dd-mm "2013-04-29 00:46"))))
 
-(ert-deftest test-org2jekyll--convert-timestamp-to-yyyy-dd-mm-hh-mm ()
+(ert-deftest test-org2jekyll--convert-timestamp-to-yyyy-dd-mm-hh ()
   "Convert org-mode date to iso8601 like date strings"
-  (should (string= "2020-04-29 00:46:00"
-                   (org2jekyll--convert-timestamp-to-yyyy-dd-mm-hh-mm "2020-04-29 lun. 00:46"))))
+  (should (string= "2020-04-29 00:46"
+                   (org2jekyll--convert-timestamp-to-yyyy-dd-mm-hh "2020-04-29 lun. 00:46"))))
 
 (ert-deftest test-org2jekyll-assoc-default ()
   (should (string= "default-value"  (org2jekyll-assoc-default nil nil "default-value")))
@@ -298,7 +298,7 @@ excerpt: fake-description with spaces and all
          (_ (delete-file temp-file)))
     (should (string= "default" (assoc-default "layout" options-alist)))
     (should (string= "some-title" (assoc-default "title" options-alist)))
-    (should (string= "2015-12-23 14:20:00" (assoc-default "date" options-alist)))
+    (should (string= "2015-12-23 14:20" (assoc-default "date" options-alist)))
     (should (string= "\n- cat0\n- cat1" (assoc-default "categories" options-alist)))
     (should (string= "\n- tag0\n- tag1" (assoc-default "tags" options-alist)))
     (should (string= "me" (assoc-default "author" options-alist)))

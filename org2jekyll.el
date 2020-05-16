@@ -342,9 +342,9 @@ Depends on the metadata header #+LAYOUT."
              it)
            org-metadata)))
 
-(defun org2jekyll--convert-timestamp-to-yyyy-dd-mm-hh-mm (timestamp)
-  "Convert org TIMESTAMP to YYYY-MM-DD HH:MM:00. For yaml header purposes."
-  (format-time-string "%Y-%m-%d %H:%M:%S"
+(defun org2jekyll--convert-timestamp-to-yyyy-dd-mm-hh (timestamp)
+  "Convert org TIMESTAMP to YYYY-MM-DD HH:MM. For yaml header purposes."
+  (format-time-string "%Y-%m-%d %H:%M"
                       (apply 'encode-time (org-parse-time-string timestamp))))
 
 (defun org2jekyll--convert-timestamp-to-yyyy-dd-mm (timestamp)
@@ -461,7 +461,7 @@ required values."
          (merged-metadata (kvplist-merge org-defaults buffer-metadata))
          (categories (org2jekyll--csv-to-yaml (plist-get merged-metadata :categories)))
          (tags (org2jekyll--csv-to-yaml (plist-get merged-metadata :tags)))
-         (date (org2jekyll--convert-timestamp-to-yyyy-dd-mm-hh-mm
+         (date (org2jekyll--convert-timestamp-to-yyyy-dd-mm-hh
                 (plist-get merged-metadata :date)))
          (yaml-metadata (-> merged-metadata
                             (plist-put :categories categories)
