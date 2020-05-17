@@ -551,7 +551,13 @@ Only for org-mode file, for other files, it's a noop.
 This function is intended to be used as org-publish hook function."
   (let ((original-file-ext (file-name-extension original-file))
         (published-file-ext (file-name-extension published-file)))
-    (when (and (string= "org" original-file-ext) (string= "html" published-file-ext))
+    ;; original-file is the temporary file generated which will be edited with
+    ;; jekyll's yaml headers
+
+    ;; careful about extensions: "post" -> org ; page -> org2jekyll
+    ;; other stuff are considered neither, so it's a noop
+    (when (and (or (string= "org" original-file-ext) (string= "org2jekyll" original-file-ext))
+               (string= "html" published-file-ext))
       (let ((yaml-headers (-> original-file
                               org2jekyll-read-metadata
                               org2jekyll--to-yaml-header)))

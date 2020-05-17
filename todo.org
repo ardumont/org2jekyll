@@ -3,6 +3,8 @@
 
 * IN-PROGRESS 0.2.3 [100%]
 - [X] Allow draft template headers customization
+- [X] Fix page publication which was no longer edited with yaml since the hook
+  change
 * DONE 0.2.2 [100%]
   CLOSED: [2020-05-16 Sat 16:53]
 - [X] Allow toc generation (respect more the org-mode user setup)
