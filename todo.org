@@ -1,7 +1,8 @@
 #+title: Backlog
 #+author: ardumont
 
-* IN-PROGRESS 0.2.3 [100%]
+* DONE 0.2.3 [100%]
+  CLOSED: [2020-05-17 Sun 16:05]
 - [X] Allow draft template headers customization
 - [X] Fix page publication which was no longer edited with yaml since the hook
   change
