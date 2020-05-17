@@ -407,29 +407,37 @@ Publication skipped" options-alist))))
 #+DESCRIPTION: some description
 #+TAGS: tag0 tag1
 #+CATEGORIES: cat0 cat1 catn
+#+THEME: dark
+#+COMMENTS: false
 
 * "
                    (progn
                      ;; clean up
                      (when (file-exists-p "/tmp/some-title.org")
                        (delete-file "/tmp/some-title.org"))
+                     ;; Define extra headers
+                     (custom-set-variables
+                      '(org2jekyll-default-template-entries-extra '(("theme" "dark")
+                                                                    ("comments" "false"))))
                      ;; execute draft creation
                      (save-excursion
                        (let ((org2jekyll-source-directory "/tmp")
                              (org2jekyll-jekyll-drafts-dir "")
                              (org2jekyll-blog-author "tony"))
                          (with-mock
-                          (mock (org2jekyll-now)                                                        => "some date")
-                          (mock (ido-completing-read "Layout: " '("post" "default") nil 'require-match) => "post")
-                          (mock (org2jekyll--read-title)                                                => "some title")
-                          (mock (org2jekyll--read-description)                                          => "some description")
-                          (mock (org2jekyll--read-tags)                                                 => "tag0 tag1")
-                          (mock (org2jekyll--read-categories)                                           => "cat0 cat1 catn")
-                          (mock (org2jekyll-input-directory "")                                         => "/tmp")
-                          ;; (mock (org2jekyll--draft-filename "/tmp" "some title")                     => "/tmp/some-title.org")
-                          (mock (org2jekyll--draft-filename * *)                                        => "/tmp/some-title.org")
-                          (mock (find-file "/tmp/some-title.org") => nil)
-                          (call-interactively #'org2jekyll-create-draft))))
+                           (mock (org2jekyll-now)                                                        => "some date")
+                           (mock (ido-completing-read "Layout: " '("post" "default") nil 'require-match) => "post")
+                           (mock (org2jekyll--read-title)                                                => "some title")
+                           (mock (org2jekyll--read-description)                                          => "some description")
+                           (mock (org2jekyll--read-tags)                                                 => "tag0 tag1")
+                           (mock (org2jekyll--read-categories)                                           => "cat0 cat1 catn")
+                           (mock (org2jekyll-input-directory "")                                         => "/tmp")
+                           (mock (org2jekyll--draft-filename * *)                                        => "/tmp/some-title.org")
+                           (mock (find-file "/tmp/some-title.org") => nil)
+                           (call-interactively #'org2jekyll-create-draft))))
+                     ;; Revert extra headers (common to all tests ¯\_(ツ)_/¯)
+                     (custom-set-variables
+                      '(org2jekyll-default-template-entries-extra nil))
                      ;; read the created file
                      (with-temp-buffer
                        (insert-file-contents "/tmp/some-title.org")
@@ -635,6 +643,26 @@ System information:
   (should (with-temp-buffer
             (insert "#+OPTIONS: H:2 num:t tags:t timestamps:t\n")
             (org2jekyll--with-tags-p (org2jekyll-get-options-from-buffer)))))
+
+(ert-deftest test-org2jekyll--header-entry ()
+  (should (string= "#+STARTUP: indent"
+                   (org2jekyll--header-entry '("startup" "indent"))))
+  (should (string= "#+AUTHOR: %s"
+                   (org2jekyll--header-entry '("author")))))
+
+(ert-deftest test-org2jekyll--header-entry ()
+  (should (string= "#+STARTUP: showall
+#+STARTUP: noindent
+#+OPTIONS: H:2 num:nil tags:t toc:nil timestamps:t
+#+LAYOUT: %s
+#+AUTHOR: %s
+
+"
+                   (org2jekyll--inline-headers '(("startup" "showall")
+                                                 ("startup" "noindent")
+                                                 ("options" "H:2 num:nil tags:t toc:nil timestamps:t")
+                                                 ("layout")
+                                                 ("author"))))))
 
 
 ;;; org2jekyll-test.el ends here

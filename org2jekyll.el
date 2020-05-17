@@ -115,26 +115,65 @@
   :require 'org2jekyll
   :group 'org2jekyll)
 
-(defvar org2jekyll-jekyll-post-ext ".org"
-  "File extension of Jekyll posts.")
+(defvar org2jekyll-default-template-entries
+  '(("startup" "showall")
+    ("startup" "hidestars")
+    ("options" "H:2 num:nil tags:t toc:nil timestamps:t")
+    ("layout")
+    ("author")
+    ("date")
+    ("title")
+    ("description")
+    ("tags")
+    ("categories"))
+  "Default list of tuple '(<header-name> <default-value>).
+Optionally a tuple could be in the form '(<header-name>).
+Its values are initialized according to the values defined in version <= 0.2.2.")
+
+(defun org2jekyll--header-entry (header-entry)
+  "Given a HEADER-ENTRY, format string as org-mode header."
+  (let ((header-name  (-> header-entry car s-upcase))
+        (header-value (if-let (val (cadr header-entry)) val "%s")))
+    (format "#+%s: %s" header-name header-value)))
+
+(defun org2jekyll--inline-headers (tuple-entries)
+  "Given TUPLE-ENTRIES, format as org-mode headers."
+  (->> tuple-entries
+       (mapcar 'org2jekyll--header-entry)
+       (s-join "\n")
+       (format "%s\n\n")))
+
+(defun org2jekyll--prepare-template (old-user-extra-headers new-user-extra-headers)
+  "Update the draft template according to user inputs.
+OLD-USER-EXTRA-HEADERS is the old value of
+`org2jekyll-default-template-entries-extra`.
+NEW-USER-EXTRA-HEADERS is the new value of the same custom out of
+a custom-set-variables call."
+  (setq org2jekyll-jekyll-org-post-template
+        (let ((template-entries (-concat org2jekyll-default-template-entries
+                                         new-user-extra-headers)))
+          (org2jekyll--inline-headers template-entries)))
+  (setq org2jekyll-default-template-entries-extra new-user-extra-headers))
+
+(defcustom org2jekyll-default-template-entries-extra nil
+  "Allow users to define extra template headers entries.
+The `org2jekyll-jekyll-org-post-template` should then be updated
+with those new entries."
+  :type 'alist
+  :set 'org2jekyll--prepare-template)
 
 (defvar org2jekyll-jekyll-org-post-template nil
   "Default template for org2jekyll draft posts.
-The `'%s`' will be replaced respectively by name, author, generated date, title,
- description and categories.")
+The `'%s`' defined in the template will be replace respectively
+by layout, author, title, description, categories...")
 
 (setq org2jekyll-jekyll-org-post-template
-      "#+STARTUP: showall
-#+STARTUP: hidestars
-#+OPTIONS: H:2 num:nil tags:t toc:nil timestamps:t
-#+LAYOUT: %s
-#+AUTHOR: %s
-#+DATE: %s
-#+TITLE: %s
-#+DESCRIPTION: %s
-#+TAGS: %s
-#+CATEGORIES: %s
-\n")
+      (let ((template-entries (-concat org2jekyll-default-template-entries
+                                       org2jekyll-default-template-entries-extra)))
+        (org2jekyll--inline-headers template-entries)))
+
+(defvar org2jekyll-jekyll-post-ext ".org"
+  "File extension of Jekyll posts.")
 
 (defun org2jekyll--optional-folder (folder-source &optional folder-name)
   "Compute the folder name from a FOLDER-SOURCE and an optional FOLDER-NAME."

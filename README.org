@@ -12,6 +12,7 @@ Blogging with org-mode and jekyll without alien yaml headers.
 
 * Table of Contents                                                     :TOC_4:
 - [[#upgrade][Upgrade]]
+  - [[#022---023][0.2.2 -> 0.2.3]]
   - [[#021---022][0.2.1 -> 0.2.2]]
   - [[#020---021][0.2.0 -> 0.2.1]]
   - [[#018---019][0.1.8 -> 0.1.9]]
@@ -39,11 +40,19 @@ Blogging with org-mode and jekyll without alien yaml headers.
   - [[#publish-all-pages][Publish all pages]]
   - [[#previews][Previews]]
 - [[#minor-mode][Minor mode]]
-- [[#layout-customization][Layout customization]]
+- [[#customization][Customization]]
+  - [[#layout][Layout]]
+  - [[#draft][Draft]]
 - [[#problems][Problems]]
   - [[#dependencies][dependencies]]
 
 * Upgrade
+
+** 0.2.2 -> 0.2.3
+
+- User can now extend the default templates with default values on their own
+  (at draft creation time). [[https://github.com/ardumont/org2jekyll/issues/47][Thanks for issue 47]] which revealed the need. See
+  [[#Draft][#draft]] for more details.
 
 ** 0.2.1 -> 0.2.2
 
@@ -351,8 +360,9 @@ To (de)activate this in an org file: /M-x org2jekyll-mode/
 
 As usual, you can use emacs' power to setup your own bindings.
 
-* Layout customization
+* Customization
 
+** Layout
 By default org2jekyll uses the layouts "post" (for article blog post) and
 "default" (for mostly dynamic pages, e.g. contact, about, ...). This now can be
 customized:
@@ -364,11 +374,27 @@ customized:
  '(org2jekyll-jekyll-layouts     '("page" "post")))
 #+END_SRC
 
-It's up to the users to make sure the entries are correctly setup-ed in the
+It's up to the users to make sure the entries are correctly configured in the
 `org-publish-project-alist`.
 
 See for example [[https://github.com/ardumont/org2jekyll/blob/master/testing-blog/testing-blog-config.el][this sample configuration]] which define their own while keeping
 correctly the `org-publish-project-alist` in sync.
+
+** Draft
+
+By default, a draft has a fixed set of headers. It is now possible to configure
+extra set of headers (with fixed values).
+
+To answer, for example, [[https://github.com/ardumont/org2jekyll/issues/47][issue 47 need]], a user could define the following:
+
+#+BEGIN_SRC emacs-lisp
+(custom-set-variables
+  '(org2jekyll-default-template-entries-extra '(("comments" "true") ("theme" "awesome")))
+#+END_SRC
+
+Which would then append the `#+COMMENTS: true` and `#+THEME: awesome` to the
+default template org2jekyll generates by default. All following created drafts
+would be created with that extra comments headers.
 
 * Problems
 
