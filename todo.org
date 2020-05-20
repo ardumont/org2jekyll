@@ -1,6 +1,11 @@
 #+title: Backlog
 #+author: ardumont
 
+* DONE 0.2.4 [100%]
+  CLOSED: [2020-05-21 Thu 01:26]
+- [X] Drop-kv-dependency origin/drop-kv-dependency Remove kv dependency as we can
+  avoid it
+- [X] Define variables locally to where it's needed
 * DONE 0.2.3 [100%]
   CLOSED: [2020-05-17 Sun 16:05]
 - [X] Allow draft template headers customization
