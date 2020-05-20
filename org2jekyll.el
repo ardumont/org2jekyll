@@ -485,29 +485,29 @@ and nil if no problems are found."
 (defun org2jekyll-read-metadata (org-file)
   "Given an ORG-FILE, return its org metadata.
 It can display an error message about missing required values."
-  (let* ((buffer-metadata (org2jekyll-get-options-from-file org-file))
-         (org-defaults `(:date ,(org2jekyll-now) :author ""))
-         (merged-metadata (kvplist-merge org-defaults buffer-metadata))
-         (categories (org2jekyll--space-separated-values-to-yaml
-                      (plist-get merged-metadata :categories)))
-         (tags (if (org2jekyll--with-tags-p buffer-metadata)
-                   (org2jekyll--space-separated-values-to-yaml
-                    (plist-get merged-metadata :tags))
-                 ""))
-         (date (org2jekyll--convert-timestamp-to-yyyy-dd-mm-hh
-                (plist-get merged-metadata :date)))
-         (yaml-metadata (-> merged-metadata
-                            (plist-put :categories categories)
-                            (plist-put :tags tags)
-                            (plist-put :date date)))
-         (yaml-alist (--map (cons (symbol-name (car it))
-                                  (cdr it))
-                            (kvplist->alist yaml-metadata))))
+  (let* ((buffer-metadata (org2jekyll-get-options-from-file org-file)))
     (-if-let (error-messages (org2jekyll-check-metadata buffer-metadata))
         (format "This org-mode file is missing required header(s):
 %s
 Publication skipped" error-messages)
-      (org2jekyll-remove-org-only-options yaml-alist))))
+      (let* ((org-defaults `(:date ,(org2jekyll-now) :author ""))
+             (merged-metadata (kvplist-merge org-defaults buffer-metadata))
+             (categories (org2jekyll--space-separated-values-to-yaml
+                          (plist-get merged-metadata :categories)))
+             (tags (if (org2jekyll--with-tags-p buffer-metadata)
+                       (org2jekyll--space-separated-values-to-yaml
+                        (plist-get merged-metadata :tags))
+                     ""))
+             (date (org2jekyll--convert-timestamp-to-yyyy-dd-mm-hh
+                    (plist-get merged-metadata :date)))
+             (yaml-metadata (-> merged-metadata
+                                (plist-put :categories categories)
+                                (plist-put :tags tags)
+                                (plist-put :date date)))
+             (yaml-alist (--map (cons (symbol-name (car it))
+                                      (cdr it))
+                                (kvplist->alist yaml-metadata))))
+        (org2jekyll-remove-org-only-options yaml-alist)))))
 
 
 (defun org2jekyll-read-metadata-and-execute (action-fn org-file)
