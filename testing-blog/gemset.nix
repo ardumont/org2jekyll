@@ -5,10 +5,10 @@
     platforms = [];
     source = {
       remotes = ["https://rubygems.org"];
-      sha256 = "0shh34xx9ygxb57s8mag8l22klvjfnk1c4jbjvchk16r6z0ps326";
+      sha256 = "1l29n9n38c9lpy5smh26r7fy7jp2bpjqlzhxgsr79cv7xpwlrbhs";
       type = "gem";
     };
-    version = "6.0.3";
+    version = "6.0.3.1";
   };
   addressable = {
     dependencies = ["public_suffix"];
@@ -682,10 +682,10 @@
     platforms = [];
     source = {
       remotes = ["https://rubygems.org"];
-      sha256 = "0g73x65hmjph8dg1h3rkzfg7ys3ffxm35hj35grw75fixmq53qyz";
+      sha256 = "09bz9nsznxgaf06cx3b5z71glgl0hdw469gqx3w7bqijgrb55p5g";
       type = "gem";
     };
-    version = "5.14.0";
+    version = "5.14.1";
   };
   multipart-post = {
     groups = ["default" "jekyll_plugins"];
