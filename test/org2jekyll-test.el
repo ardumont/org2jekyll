@@ -664,5 +664,40 @@ System information:
                                                  ("layout")
                                                  ("author"))))))
 
+(ert-deftest test-org2jekyll--symbol-to-string ()
+  ;; :symbol should be converted to string
+  (should (string= "source"
+                   (org2jekyll--symbol-to-string :source)))
+  ;; if the symbol is a string already, it's only the first character which is
+  ;; removed
+  (should (string= "source"
+                   (org2jekyll--symbol-to-string ":source")))
+  ;; careful for some other symbols
+  (should (string= "il"
+                   (org2jekyll--symbol-to-string nil))))
+
+(ert-deftest test-org2jekyll--plist-to-alist ()
+  ;; convert from plist to alist should be fine
+  (should (equal
+           '(("date" . "2015-09-06 12:59")
+             ("author" . "ardumont")
+             ("startup" . "hidestars")
+             ("options" . "H:2 num:t tags:t toc:t timestamps:t")
+             ("layout" . "post")
+             ("title" . "org-trello debug tools")
+             ("description" . "org-trello debugging tools")
+             ("tags" . "\n- tools\n- org-trello\n- debug")
+             ("categories" . "\n- tools\n- org-trello\n- debug")
+             ("permalink" . "/debug/"))
+           (org2jekyll--plist-to-alist '(:date "2015-09-06 12:59"
+                                               :author "ardumont"
+                                               :startup "hidestars"
+                                               :options "H:2 num:t tags:t toc:t timestamps:t"
+                                               :layout "post"
+                                               :title "org-trello debug tools"
+                                               :description "org-trello debugging tools"
+                                               :tags "\n- tools\n- org-trello\n- debug"
+                                               :categories "\n- tools\n- org-trello\n- debug"
+                                               :permalink "/debug/")))))
 
 ;;; org2jekyll-test.el ends here

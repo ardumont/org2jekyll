@@ -5,7 +5,7 @@
 ;; Author: Antoine R. Dumont (@ardumont) <antoine.romain.dumont@gmail.com>
 ;; Maintainer: Antoine R. Dumont (@ardumont) <antoine.romain.dumont@gmail.com>
 ;; Version: 0.2.3
-;; Package-Requires: ((dash-functional "2.11.0") (s "1.9.0") (deferred "0.3.1") (kv "0.0.19"))
+;; Package-Requires: ((dash-functional "2.11.0") (s "1.9.0") (deferred "0.3.1"))
 ;; Keywords: org-mode jekyll blog publish
 ;; URL: https://github.com/ardumont/org2jekyll
 
@@ -57,7 +57,6 @@
 (require 's)
 (require 'deferred)
 (require 'ido)
-(require 'kv)
 (require 'cl-lib) ;; lexical-let
 
 (defconst org2jekyll--version "0.2.3" "Current org2jekyll version installed.")
@@ -470,9 +469,25 @@ and nil if no problems are found."
                      s-trim))
       (if (string= "" error-messages) nil error-messages))))
 
+(defun org2jekyll--symbol-to-string (symbol)
+  "Make a string out of a SYMBOL.
+symbol is of the form ':<name>'"
+  (let ((s (if (stringp symbol) symbol (symbol-name symbol))))
+    (substring s 1 nil)))
+
+(defun org2jekyll--plist-to-alist (plist)
+  "Make an alist out of a PLIST."
+  (--map
+   (let ((key (-> it
+                  car
+                  org2jekyll--symbol-to-string))
+         (value (cadr it)))
+     `(,key . ,value))
+   (-partition 2 plist)))
+
 (defun org2jekyll-remove-org-only-options (yaml-alist)
   "Filter out org options with no Jekyll meaning from YAML-ALIST."
-  (let* ((required-options (--map (substring (symbol-name (car it)) 1 nil)
+  (let* ((required-options (--map (-> it car org2jekyll--symbol-to-string)
                                   org2jekyll-required-org-header-alist))
          (org-options (--map (downcase (substring it 0 -1))
                              org-options-keywords))
@@ -491,7 +506,7 @@ It can display an error message about missing required values."
 %s
 Publication skipped" error-messages)
       (let* ((org-defaults `(:date ,(org2jekyll-now) :author ""))
-             (merged-metadata (kvplist-merge org-defaults buffer-metadata))
+             (merged-metadata (org-combine-plists org-defaults buffer-metadata))
              (categories (org2jekyll--space-separated-values-to-yaml
                           (plist-get merged-metadata :categories)))
              (tags (if (org2jekyll--with-tags-p buffer-metadata)
@@ -504,11 +519,8 @@ Publication skipped" error-messages)
                                 (plist-put :categories categories)
                                 (plist-put :tags tags)
                                 (plist-put :date date)))
-             (yaml-alist (--map (cons (symbol-name (car it))
-                                      (cdr it))
-                                (kvplist->alist yaml-metadata))))
+             (yaml-alist (org2jekyll--plist-to-alist yaml-metadata)))
         (org2jekyll-remove-org-only-options yaml-alist)))))
-
 
 (defun org2jekyll-read-metadata-and-execute (action-fn org-file)
   "Execute ACTION-FN function after checking metadata from the ORG-FILE."
