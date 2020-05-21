@@ -780,4 +780,45 @@ Awesome page
                (insert-file-contents published-file)
                (buffer-substring-no-properties (point-min) (point-max)))))))
 
+(ert-deftest test-org2jekyll-publish ()
+  (should (string= "org2jekyll - published post!"
+                   (org2jekyll-tests-with-temp-buffer
+                    "#+STARTUP: showall
+#+STARTUP: hidestars
+#+OPTIONS: H:2 num:nil tags:t toc:nil timestamps:t
+#+LAYOUT: post
+#+AUTHOR: dude
+#+DATE: 2020-05-21 Thu 16:58
+#+TITLE: some-title
+#+DESCRIPTION: some-desc
+#+TAGS: some-tags
+#+CATEGORIES: some-cat
+
+Awesome post
+"
+                    (with-mock
+                      (mock (org2jekyll-publish-post nil) => "published post!")
+                      (mock (org2jekyll-publish-web-project) => 'done)
+                      (call-interactively 'org2jekyll-publish)))))
+
+  (should (string= "org2jekyll - published page!"
+                   (org2jekyll-tests-with-temp-buffer
+                    "#+STARTUP: showall
+#+STARTUP: hidestars
+#+OPTIONS: H:2 num:nil tags:t toc:nil timestamps:t
+#+LAYOUT: page
+#+AUTHOR: dude
+#+DATE: 2020-05-21 Thu 16:58
+#+TITLE: some-title
+#+DESCRIPTION: some-desc
+#+TAGS: some-tags
+#+CATEGORIES: some-cat
+
+Awesome post
+"
+                    (with-mock
+                      (mock (org2jekyll-publish-page nil) => "published page!")
+                      (mock (org2jekyll-publish-web-project) => 'done)
+                      (call-interactively 'org2jekyll-publish))))))
+
 ;;; org2jekyll-test.el ends here
