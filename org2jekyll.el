@@ -57,7 +57,6 @@
 (require 's)
 (require 'deferred)
 (require 'ido)
-(require 'cl-lib) ;; lexical-let
 
 (defconst org2jekyll--version "0.2.4" "Current org2jekyll version installed.")
 
@@ -409,8 +408,7 @@ Depends on the metadata header #+LAYOUT."
 
 (defun org2jekyll--to-yaml-header (org-metadata)
   "Given a list of ORG-METADATA, compute the yaml header string."
-  (--> org-metadata
-       org2jekyll--org-to-jekyll-metadata
+  (--> (org2jekyll--org-to-jekyll-metadata org-metadata)
        (--map (format "%s: %s" (car it) (cdr it)) it)
        (cons "---" it)
        (-snoc it "---\n")
@@ -617,15 +615,17 @@ This function is intended to be used as org-publish hook function."
 Layout `'post`' is a jekyll post.
 Layout `'default`' is a page (depending on the user customs)."
   (interactive)
-  (lexical-let* ((org-file (buffer-file-name (current-buffer))))
-    (let* ((publish-fn (-> (plist-get (org2jekyll-get-options-from-buffer) :layout)
-                           org2jekyll-post-p
-                           (if 'org2jekyll-publish-post
-                               'org2jekyll-publish-page)))
-           (final-message (funcall publish-fn org-file)))
-      (progn
-        (org2jekyll-publish-web-project)
-        (org2jekyll-message final-message)))))
+  (let* ((buffer (current-buffer))
+         (org-file (buffer-file-name buffer))
+         (org-options (with-current-buffer buffer (org2jekyll-get-options-from-buffer)))
+         (publish-fn (-> (plist-get org-options :layout)
+                         org2jekyll-post-p
+                         (if 'org2jekyll-publish-post
+                             'org2jekyll-publish-page)))
+         (final-message (funcall publish-fn org-file)))
+    (progn
+      (org2jekyll-publish-web-project)
+      (org2jekyll-message final-message))))
 
 (defvar org2jekyll-mode-map nil "Default Bindings map for org2jekyll mode.")
 
