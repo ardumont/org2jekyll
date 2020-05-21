@@ -607,8 +607,9 @@ This function is intended to be used as org-publish hook function."
 
 (defun org2jekyll-publish-web-project ()
   "Publish the 'web' project."
-  (org2jekyll-message "Publish `'web`' project (images, css, js, etc...).")
-  (org-publish-project "web"))
+  (let ((result (org-publish-project "web")))
+    (org2jekyll-message "Publish `'web`' project (images, css, js, etc...) done.")
+    result))
 
 ;;;###autoload
 (defun org2jekyll-publish ()

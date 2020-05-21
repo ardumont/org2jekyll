@@ -539,8 +539,8 @@ Publication skipped" options-alist))))
 (ert-deftest test-org2jekyll-publish-web-project ()
   (should (eq 'publish-done
               (with-mock
-               (mock (org-publish-project "web") => 'publish-done)
-               (org2jekyll-publish-web-project)))))
+                (mock (org-publish-project "web") => 'publish-done)
+                (org2jekyll-publish-web-project)))))
 
 (ert-deftest test-org2jekyll-publish-post ()
   (should (eq :publish-post-done
