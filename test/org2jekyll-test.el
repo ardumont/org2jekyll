@@ -821,4 +821,46 @@ Awesome post
                       (mock (org2jekyll-publish-web-project) => 'done)
                       (call-interactively 'org2jekyll-publish))))))
 
+(ert-deftest test-org2jekyll-publish-posts ()
+  (should (equal '("post.org")
+                 (let ((org2jekyll-jekyll-layout-post "post")
+                       (org2jekyll-jekyll-layout-page "page")
+                       (org-publish-project-alist '(("post" "something"))))
+                   (with-mock
+                     (mock (org-publish-get-base-files '("post" "something"))
+                           => '("post.org"))
+                     (mock (org2jekyll-article-p "post.org") => "post")
+                     (mock (org2jekyll-publish-post "post.org") => "post.org published!")
+                     (call-interactively 'org2jekyll-publish-posts)))))
+  (should-not (let ((org2jekyll-jekyll-layout-post "post")
+                    (org2jekyll-jekyll-layout-page "page")
+                    (org-publish-project-alist '(("post" "something"))))
+                (with-mock
+                  (mock (org-publish-get-base-files '("post" "something"))
+                        => '("page.org"))
+                  (mock (org2jekyll-article-p "page.org") => "page")
+                  (call-interactively 'org2jekyll-publish-posts)))))
+
+(ert-deftest test-org2jekyll-publish-pages ()
+  (should-not
+   (let ((org2jekyll-jekyll-layout-post "post")
+         (org2jekyll-jekyll-layout-page "page")
+         (org-publish-project-alist '(("page" "something-else"))))
+     (with-mock
+       (mock (org-publish-get-base-files '("page" "something-else"))
+             => '("post.org"))
+       (mock (org2jekyll-article-p "post.org") => "post")
+       (call-interactively 'org2jekyll-publish-pages))))
+  (should
+   (equal '("page.org")
+          (let ((org2jekyll-jekyll-layout-post "post")
+                (org2jekyll-jekyll-layout-page "page")
+                (org-publish-project-alist '(("page" "something-else"))))
+            (with-mock
+              (mock (org-publish-get-base-files '("page" "something-else"))
+                    => '("page.org"))
+              (mock (org2jekyll-article-p "page.org") => "page")
+              (mock (org2jekyll-publish-page "page.org") => "page.org published!")
+              (call-interactively 'org2jekyll-publish-pages))))))
+
 ;;; org2jekyll-test.el ends here

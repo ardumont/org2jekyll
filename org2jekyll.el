@@ -5,7 +5,7 @@
 ;; Author: Antoine R. Dumont (@ardumont) <antoine.romain.dumont@gmail.com>
 ;; Maintainer: Antoine R. Dumont (@ardumont) <antoine.romain.dumont@gmail.com>
 ;; Version: 0.2.4
-;; Package-Requires: ((dash-functional "2.11.0") (s "1.9.0") (deferred "0.3.1"))
+;; Package-Requires: ((dash-functional "2.11.0") (s "1.9.0"))
 ;; Keywords: org-mode jekyll blog publish
 ;; URL: https://github.com/ardumont/org2jekyll
 
@@ -55,7 +55,6 @@
 
 (require 'dash-functional)
 (require 's)
-(require 'deferred)
 (require 'ido)
 
 (defconst org2jekyll--version "0.2.4" "Current org2jekyll version installed.")
@@ -131,7 +130,7 @@ Its values are initialized according to the values defined in version <= 0.2.2."
 (defun org2jekyll--header-entry (header-entry)
   "Given a HEADER-ENTRY, format string as org-mode header."
   (let ((header-name  (-> header-entry car s-upcase))
-        (header-value (if-let (val (cadr header-entry)) val "%s")))
+        (header-value (-if-let (val (cadr header-entry)) val "%s")))
     (format "#+%s: %s" header-name header-value)))
 
 (defun org2jekyll--inline-headers (tuple-entries)
@@ -640,29 +639,21 @@ Layout `'default`' is a page (depending on the user customs)."
 
 ;;;###autoload
 (defun org2jekyll-publish-posts ()
-  "Publish all the posts."
+  "Publish all posts."
   (interactive)
-  (deferred:$
-    (deferred:next
-      (lambda () (->> (assoc org2jekyll-jekyll-layout-post org-publish-project-alist)
-                 org-publish-get-base-files
-                 (--filter (org2jekyll-post-p (org2jekyll-article-p it))))))
-    (deferred:nextc it
-      (lambda (posts)
-        (mapc #'org2jekyll-publish-post posts)))))
+  (->> (assoc org2jekyll-jekyll-layout-post org-publish-project-alist)
+       org-publish-get-base-files
+       (--filter (-> it org2jekyll-article-p org2jekyll-post-p))
+       (mapc #'org2jekyll-publish-post))  )
 
 ;;;###autoload
 (defun org2jekyll-publish-pages ()
-  "Publish all the pages."
+  "Publish all pages."
   (interactive)
-  (deferred:$
-    (deferred:next
-      (lambda () (->> (assoc org2jekyll-jekyll-layout-page org-publish-project-alist)
-                 org-publish-get-base-files
-                 (--filter (org2jekyll-page-p (org2jekyll-article-p it))))))
-    (deferred:nextc it
-      (lambda (pages)
-        (mapc #'org2jekyll-publish-page pages)))))
+  (->> (assoc org2jekyll-jekyll-layout-page org-publish-project-alist)
+       org-publish-get-base-files
+       (--filter (-> it org2jekyll-article-p org2jekyll-page-p))
+       (mapc #'org2jekyll-publish-page)))
 
 (defun org2jekyll-version ()
   "Little version helper"
