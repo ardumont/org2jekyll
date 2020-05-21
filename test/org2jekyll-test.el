@@ -3,6 +3,7 @@
 
 (require 'ert)
 (require 'el-mock)
+(require 'org2jekyll-utilities)
 
 ;;; Code:
 (ert-deftest test-org2jekyll-get-options-from-buffer ()
@@ -699,5 +700,84 @@ System information:
                                                :tags "\n- tools\n- org-trello\n- debug"
                                                :categories "\n- tools\n- org-trello\n- debug"
                                                :permalink "/debug/")))))
+
+(ert-deftest test-org2jekyll-install-yaml-headers ()
+  ;; original-file css should not be modified
+  (should-not (org2jekyll-install-yaml-headers "something.css" "something.css"))
+  ;; puslished file as no html should not be published
+  (should-not (org2jekyll-install-yaml-headers "something.org" "something.else"))
+  ;; org file should be modified with extra yaml headers
+
+  (should (string=
+           "---
+date: 2020-05-21 16:58
+author: dude
+layout: post
+title: some-title
+excerpt: some-desc
+tags: \n- some-tags
+categories: \n- some-cat
+---
+"
+           (let ((original-file "/tmp/awesome.org")
+                 (published-file "/tmp/awesome.html"))
+             (with-temp-file original-file
+               (insert
+                "#+STARTUP: showall
+#+STARTUP: hidestars
+#+OPTIONS: H:2 num:nil tags:t toc:nil timestamps:t
+#+LAYOUT: post
+#+AUTHOR: dude
+#+DATE: 2020-05-21 Thu 16:58
+#+TITLE: some-title
+#+DESCRIPTION: some-desc
+#+TAGS: some-tags
+#+CATEGORIES: some-cat
+
+Awesome post
+"))
+             ;; empty file which simulates a published article
+             (with-temp-file published-file (insert ""))
+             ;; install yaml headers on the published file
+             (org2jekyll-install-yaml-headers original-file published-file)
+             ;; checking the yaml header (there are only those)x
+             (with-temp-buffer
+               (insert-file-contents published-file)
+               (buffer-substring-no-properties (point-min) (point-max))))))
+
+  (should (string=
+           "---
+date: 2020-05-21 16:58
+author: guy
+layout: page
+title: this is a page
+excerpt: description
+tags: \n- tag0\n- tag1
+categories: \n- cat0
+---
+"
+           (let ((original-file "/tmp/page.org2jekyll")
+                 (published-file "/tmp/page.html"))
+             (with-temp-file original-file
+               (insert
+                "#+STARTUP: hidestars showall
+#+LAYOUT: page
+#+AUTHOR: guy
+#+DATE: 2020-05-21 Thu 16:58
+#+TITLE: this is a page
+#+DESCRIPTION: description
+#+TAGS: tag0 tag1
+#+CATEGORIES: cat0
+
+Awesome page
+"))
+             ;; empty file which simulates a published article
+             (with-temp-file published-file (insert ""))
+             ;; install yaml headers on the published file
+             (org2jekyll-install-yaml-headers original-file published-file)
+             ;; checking the yaml header (there are only those)x
+             (with-temp-buffer
+               (insert-file-contents published-file)
+               (buffer-substring-no-properties (point-min) (point-max)))))))
 
 ;;; org2jekyll-test.el ends here
