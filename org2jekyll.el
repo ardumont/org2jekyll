@@ -4,7 +4,7 @@
 
 ;; Author: Antoine R. Dumont (@ardumont) <antoine.romain.dumont@gmail.com>
 ;; Maintainer: Antoine R. Dumont (@ardumont) <antoine.romain.dumont@gmail.com>
-;; Version: 0.2.4
+;; Version: 0.2.5
 ;; Package-Requires: ((dash-functional "2.11.0") (s "1.9.0"))
 ;; Keywords: org-mode jekyll blog publish
 ;; URL: https://github.com/ardumont/org2jekyll
@@ -57,7 +57,7 @@
 (require 's)
 (require 'ido)
 
-(defconst org2jekyll--version "0.2.4" "Current org2jekyll version installed.")
+(defconst org2jekyll--version "0.2.5" "Current org2jekyll version installed.")
 
 (defgroup org2jekyll nil "Publish org-mode posts to jekyll"
   :tag "org2jekyll"

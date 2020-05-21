@@ -1,6 +1,12 @@
 #+title: Backlog
 #+author: ardumont
 
+* DONE 0.2.5 [100%]
+  CLOSED: [2020-05-21 Thu 18:55]
+- [X] Drop lexical-let dependency
+- [X] Drop deferred dependency
+- [X] Add missing coverage which was somehow wrong (apparent after lexical-let
+  dismissal)
 * DONE 0.2.4 [100%]
   CLOSED: [2020-05-21 Thu 01:26]
 - [X] Drop-kv-dependency origin/drop-kv-dependency Remove kv dependency as we can
