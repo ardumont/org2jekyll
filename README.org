@@ -60,7 +60,9 @@ Blogging with org-mode and jekyll without alien yaml headers.
   (`toc:t`) or not (`toc:nil`).
 - Note that org2jekyll changed internally how it's working and rely a bit
   further on org-mode mechanism (so it's good ;). Notably, it uses a hook at
-  the end of the publishing step to prepend the jekyll yaml headers.
+  the end of the publishing step to prepend the jekyll yaml headers. You need
+  to activate <kbd>M-x org2jekyll-mode</kbd> for that hook to be installed
+  though (respectively deactivate org2jkeyll-mode to remove that hook).
 
 ** 0.2.0 -> 0.2.1
 
@@ -227,8 +229,12 @@ You can clone this repository. Then, try and follow this [[https://github.com/ar
 For a post (layout 'post') or page (layout 'default'), add org headers (layout,
 title, author, date, description, categories) to your org files.
 
-** Post
+Activate the `org2jekyll-mode` in the buffer you wish to publish:
+<kdb>M-x org2jekyll-mode</kbd>
 
+This installs the necessary cogs for org2jekyll to work properly ([[https://github.com/ardumont/org2jekyll/issues/38][issue 38]]).
+
+** Post
 *** Headers
 
 For a post (layout 'post'):
