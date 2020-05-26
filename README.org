@@ -132,16 +132,21 @@ Update your packages archives:
 
 ** Setup
 
+org2jekyll leverage org-mode's publish abilities (`ox-publish`), so it needs
+the `org-publish-project-alist` custom to be defined to something sensible
+regarding your blogging setup.
+
 /M-x customize-group RET org2jekyll RET/
 
-Here is an example of my configuration for my [[http://ardumont.github.io/][blog site]]:
+For example, here is my [[http://ardumont.github.io/][blog site configuration]]:
+
 #+begin_src emacs-lisp
 (require 'org)
 (require 'org2jekyll)
 
 (custom-set-variables '(org2jekyll-blog-author "ardumont")
                       '(org2jekyll-source-directory (expand-file-name "~/org/"))
-                      '(org2jekyll-jekyll-directory (expand-file-name "~/public_html/"))
+                      '(org2jekyll-jekyll-directory (expand-file-name "~/repo/public/ardumont.github.io/"))
                       '(org2jekyll-jekyll-drafts-dir "")
                       '(org2jekyll-jekyll-posts-dir "_posts/")
                       '(org-publish-project-alist
@@ -151,8 +156,6 @@ Here is an example of my configuration for my [[http://ardumont.github.io/][blog
                            :publishing-directory ,(org2jekyll-output-directory)
                            :publishing-function org-html-publish-to-html
                            :headline-levels 4
-                           :section-numbers nil
-                           :with-toc nil
                            :html-head "<link rel=\"stylesheet\" href=\"./css/style.css\" type=\"text/css\"/>"
                            :html-preamble t
                            :recursive t
@@ -165,8 +168,6 @@ Here is an example of my configuration for my [[http://ardumont.github.io/][blog
                            :publishing-directory ,(org2jekyll-output-directory org2jekyll-jekyll-posts-dir)
                            :publishing-function org-html-publish-to-html
                            :headline-levels 4
-                           :section-numbers nil
-                           :with-toc nil
                            :html-head "<link rel=\"stylesheet\" href=\"./css/style.css\" type=\"text/css\"/>"
                            :html-preamble t
                            :recursive t
@@ -193,12 +194,19 @@ Here is an example of my configuration for my [[http://ardumont.github.io/][blog
                            :recursive t)
                           ("web" :components ("images" "js" "css")))))
 #+end_src
-source: https://github.com/ardumont/blog-pack/blob/master/blog-pack.el#L13-L71
+source: https://gitlab.com/ardumont/home/-/blob/master/emacs/blog-pack.el#L18-69
 
 The previous sample contains important information:
-- *default* and *post* represent the possible jekyll layouts you can use in your org2jekyll buffer `#+LAYOUT: default|post` (do not name those differently)
-- *images*, *js*, *css* represent where you choose to store those kinds of files (you can name these as you wish)
-- *web* is a composition of web files you may need to create a full post or page, typically, css, images, html, js, etc... (do not name this one differently either)
+- *default* and *post* represent the possible jekyll layouts you can use in
+  your org2jekyll buffer `#+LAYOUT: default|post` (you can name those
+  differently, follow [[#layout][the customization layout section]])
+
+- *images*, *js*, *css* represent where you choose to store those kinds of
+  files (you can name these as you wish)
+
+- *web* is a composition of web files you may need to create a full post or
+  page, typically, css, images, html, js, etc... (do not name this one
+  differently either)
 
 ** A running example
 
@@ -216,7 +224,8 @@ You can clone this repository. Then, try and follow this [[https://github.com/ar
 
 * Use
 
-For a post (layout 'post') or page (layout 'default'), add org headers (layout, title, author, date, description, categories) to your org files.
+For a post (layout 'post') or page (layout 'default'), add org headers (layout,
+title, author, date, description, categories) to your org files.
 
 ** Post
 
