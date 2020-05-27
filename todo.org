@@ -1,6 +1,11 @@
 #+title: Backlog
 #+author: ardumont
 
+* DONE 0.2.6 [100%]
+  CLOSED: [2020-05-27 Wed 21:14]
+- [X] Update missing documentations
+- [X] Make the testing-blog even more reproducible (through nix-shell)
+- [X] Close #63 - Fix org2jekyll-publish-posts & org2jekyll-publish-pages
 * DONE 0.2.5 [100%]
   CLOSED: [2020-05-21 Thu 18:55]
 - [X] Drop lexical-let dependency
