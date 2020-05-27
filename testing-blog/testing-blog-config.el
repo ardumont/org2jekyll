@@ -24,7 +24,16 @@
 
 ;;; Code:
 
+(require 'org)
+
+(setq org-publish-cache nil)
+
 (custom-set-variables
+ ;; org specifics to make the tryouts reproducible here
+ '(org-publish-use-timestamps-flag nil) ;; testing: no timestamp checking and always publish all files
+ '(org-publish-timestamp-directory (expand-file-name "./org-timestamps/"))
+
+ ;; org2jekyll specifics
  '(org2jekyll-jekyll-layout-page  "page")
  '(org2jekyll-jekyll-layouts     '("page" "post"))
  '(org2jekyll-blog-author        "drjekyll&mrtony")
@@ -38,52 +47,41 @@
       :base-extension "org"
       :publishing-directory ,(org2jekyll-output-directory)
       :publishing-function org-html-publish-to-html
-      :headline-levels 4
-      :section-numbers nil
-      :with-toc nil
       :html-head "<link rel=\"stylesheet\" href=\"./css/style.css\" type=\"text/css\"/>"
       :html-preamble t
       :recursive t
       :make-index t
       :html-extension "html"
       :body-only t)
-
      ("post"  ;; dynamic blog posts
       :base-directory ,(org2jekyll-input-directory)
       :base-extension "org"
       :publishing-directory ,(org2jekyll-output-directory org2jekyll-jekyll-posts-dir)
       :publishing-function org-html-publish-to-html
-      :headline-levels 4
-      :section-numbers nil
-      :with-toc nil
       :html-head "<link rel=\"stylesheet\" href=\"./css/style.css\" type=\"text/css\"/>"
       :html-preamble t
       :recursive t
       :make-index t
       :html-extension "html"
       :body-only t)
-
      ("images"
       :base-directory ,(org2jekyll-input-directory "img")
       :base-extension "jpg\\|gif\\|png"
       :publishing-directory ,(org2jekyll-output-directory "assets/img")
       :publishing-function org-publish-attachment
       :recursive t)
-
      ("js"
       :base-directory ,(org2jekyll-input-directory "js")
       :base-extension "js"
       :publishing-directory ,(org2jekyll-output-directory "assets/js")
       :publishing-function org-publish-attachment
       :recursive t)
-
      ("css"
       :base-directory ,(org2jekyll-input-directory "css")
       :base-extension "css\\|el"
       :publishing-directory ,(org2jekyll-output-directory "assets/css")
       :publishing-function org-publish-attachment
       :recursive t)
-
      ("web" :components ("images" "js" "css")))))
 
 (provide 'testing-blog-config)

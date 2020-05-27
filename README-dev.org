@@ -1,0 +1,34 @@
+#+title: README-dev
+#+author: ardumont
+
+* Enter the nix-shell
+
+#+BEGIN_SRC sh
+nix-shell
+#+END_SRC
+
+* Run tests
+
+#+BEGIN_SRC sh
+make test
+#+END_SRC
+
+* Run jekyll instance
+
+#+BEGIN_SRC sh
+make run-dev
+#+END_SRC
+
+* Run an emacs and play with the sandbox
+
+#+BEGIN_SRC sh
+make run-emacs
+#+END_SRC
+
+You now have an emacs ready with the latest:
+- org2jekyll
+- testing-blog sandbox configuration
+
+
+Then play: M-x org2jekyll-<TAB><TAB>
+
