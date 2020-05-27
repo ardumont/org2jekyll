@@ -1,0 +1,21 @@
+#+STARTUP: hidestars
+#+OPTIONS: H:2 num:t tags:t toc:t timestamps:t
+#+LAYOUT: post
+#+AUTHOR: drjekyll&mrtony
+#+DATE: 2020-05-27 Wed 18:18
+#+TITLE: Interesting post
+#+DESCRIPTION: An interesting post about something
+#+TAGS: hi hooooooo
+#+CATEGORIES: category
+
+Well, now, this is interesting!
+
+* title
+
+** chapter
+
+* another title
+
+#+BEGIN_SRC sh
+echo this is now
+#+END_SRC
