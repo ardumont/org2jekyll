@@ -252,42 +252,55 @@ Publication skipped" options-alist))))
 
 (ert-deftest test-org2jekyll-read-metadata-and-execute ()
   (should (string= "Post 'some-org-file' published!"
-                 (mocklet (((org2jekyll-article-p "org-file") => t)
-                           ((file-name-nondirectory "org-file") => "some-org-file")
-                           ((org2jekyll-read-metadata "org-file") => '(("layout" . "post"))))
-                   (org2jekyll-read-metadata-and-execute (lambda (org-metadata org-file) 2) "org-file"))))
+                   (mocklet (((org2jekyll-article-p "org-file") => t)
+                             ((file-name-nondirectory "org-file") => "some-org-file")
+                             ((org2jekyll-read-metadata "org-file") => '(("layout" . "post"))))
+                            (org2jekyll-read-metadata-and-execute (lambda (org-metadata org-file) 2) "org-file"))))
   (should (string= "'some-org-file' is not an article, publication skipped!"
-                 (mocklet (((org2jekyll-article-p "org-file") => nil)
-                           ((file-name-nondirectory "org-file") => "some-org-file"))
-                   (org2jekyll-read-metadata-and-execute (lambda (org-metadata org-file) 2) "org-file"))))
+                   (mocklet (((org2jekyll-article-p "org-file") => nil)
+                             ((file-name-nondirectory "org-file") => "some-org-file"))
+                            (org2jekyll-read-metadata-and-execute (lambda (org-metadata org-file) 2) "org-file"))))
   (should (string= "org2jekyll - some message"
-                 (mocklet (((org2jekyll-article-p "org-file") => t)
-                           ((org2jekyll-read-metadata "org-file") => "some message"))
-                   (org2jekyll-read-metadata-and-execute (lambda (org-metadata org-file) 2) "org-file")))))
+                   (mocklet (((org2jekyll-article-p "org-file") => t)
+                             ((org2jekyll-read-metadata "org-file") => "some message"))
+                            (org2jekyll-read-metadata-and-execute (lambda (org-metadata org-file) 2) "org-file")))))
+
+(ert-deftest test-org2jekyll-publish-temp-file-then-cleanup ()
+  "Temporary file should be published then cleaned-up"
+  (should (eq :published-file
+              (let ((temp-file "/tmp/temp-file"))
+                (with-mock
+                  (mock (copy-file :org-file temp-file 'overwrite 'keep-time 'preserve-ids 'preserve-perms) => nil)
+                  (mock (org-publish-file temp-file :project-metadata))
+                  (org2jekyll--publish-temp-file-then-cleanup :org-file "/tmp/temp-file" :project-metadata))
+                (if (file-exists-p temp-file)
+                    :something-is-wrong
+                  :published-file)))))
 
 (ert-deftest test-org2jekyll--publish-post-org-file-with-metadata ()
   (should (eq :published-post-file
-              (let ((org-publish-project-alist '((:post :project))))
+              (let ((org-publish-project-alist '((:post :project)))
+                    (temp-file "/tmp/temp-file"))
                 (with-mock
-                 (mock (org2jekyll--convert-timestamp-to-yyyy-dd-mm :date) => :date)
-                 (mock (org2jekyll--compute-ready-jekyll-file-name :date :org-file) => :temp-file)
-                 (mock (copy-file :org-file :temp-file 'overwrite 'keep-time 'preserve-ids 'preserve-perms) => nil)
-                 (mock (org-publish-file :temp-file '(:post :project)) => :published-post-file)
-                 (org2jekyll--publish-post-org-file-with-metadata '(("layout" . :post)
-                                                                    ("date" . :date)) :org-file))))))
+                  (mock (org2jekyll--convert-timestamp-to-yyyy-dd-mm :date) => :date)
+                  (mock (org2jekyll--compute-ready-jekyll-file-name :date :org-file) => temp-file)
+                  (mock (org2jekyll--publish-temp-file-then-cleanup :org-file temp-file
+                                                                    '(:post :project)) => :published-post-file)
+                  (org2jekyll--publish-post-org-file-with-metadata '(("layout" . :post)
+                                                                     ("date" . :date))
+                                                                   :org-file))))))
 
 (ert-deftest test-org2jekyll--publish-page-org-file-with-metadata ()
   (should (eq :published-page-file
               (let ((org-publish-project-alist '((:page :project)))
-                    (org2jekyll-source-directory "/path/something/"))
+                    (org2jekyll-source-directory "/tmp/")
+                    (temp-file "/tmp/filename.org2jekyll"))
                 (with-mock
-                 (mock (copy-file
-                        "filename.org" "/path/something/filename.org2jekyll"
-                        'overwrite 'keep-time 'preserve-ids 'preserve-perms) => nil)
-                 (mock (org-publish-file
-                        "/path/something/filename.org2jekyll" '(:page :project)) => :published-page-file)
-                 (org2jekyll--publish-page-org-file-with-metadata '(("layout" . :page)
-                                                                    ("date" . :date)) "filename.org"))))))
+                  (mock (org2jekyll--publish-temp-file-then-cleanup "filename.org"
+                                                                    temp-file
+                                                                    '(:page :project)) => :published-page-file)
+                  (org2jekyll--publish-page-org-file-with-metadata '(("layout" . :page)
+                                                                     ("date" . :date)) "filename.org"))))))
 
 (ert-deftest test-org2jekyll-post-p ()
   "With default layouts"

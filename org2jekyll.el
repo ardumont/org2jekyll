@@ -538,14 +538,27 @@ Publication skipped" error-messages)
   "Log formatted ARGS."
   (apply 'message (format "org2jekyll - %s" (car args)) (cdr args)))
 
+(defun org2jekyll--publish-temp-file-then-cleanup (org-file temp-file project)
+  "Publish ORG-FILE using TEMP-FILE (with yaml header) using PROJECT metadata."
+  (copy-file org-file temp-file 'overwrite 'keep-time 'preserve-ids 'preserve-perms)
+  (with-temp-file temp-file
+    ;; activate org2jekyll-mode to rely on its hook to work properly
+    (org2jekyll-mode)
+    (org-publish-file temp-file project))
+  ;; the org2jekyll installed hook should have kicked-in already, if it remains
+  ;; dangling temporary file, just delete it
+  (when (file-exists-p temp-file)
+    (delete-file temp-file)))
+
 (defun org2jekyll--publish-post-org-file-with-metadata (org-metadata org-file)
   "Publish as post with ORG-METADATA the ORG-FILE."
-  (let* ((blog-project (assoc-default "layout" org-metadata))
-         (file-date    (->  (assoc-default "date" org-metadata) org2jekyll--convert-timestamp-to-yyyy-dd-mm))
+  (let* ((project      (-> "layout"
+                           (assoc-default org-metadata)  ;; layout is the blog-project
+                           (assoc org-publish-project-alist)))
+         (file-date    (-> (assoc-default "date" org-metadata)
+                           org2jekyll--convert-timestamp-to-yyyy-dd-mm))
          (temp-file    (org2jekyll--compute-ready-jekyll-file-name file-date org-file)))
-    (copy-file org-file temp-file 'overwrite 'keep-time 'preserve-ids 'preserve-perms)
-    (org-publish-file temp-file
-                      (assoc blog-project org-publish-project-alist))))
+    (org2jekyll--publish-temp-file-then-cleanup org-file temp-file project)))
 
 (defun org2jekyll-publish-post (org-file)
   "Publish ORG-FILE as a post."
@@ -578,15 +591,15 @@ This function is intended to be used as org-publish hook function."
 
 (defun org2jekyll--publish-page-org-file-with-metadata (org-metadata org-file)
   "Publish as page with ORG-METADATA the ORG-FILE."
-  (let* ((blog-project (assoc-default "layout" org-metadata))
+  (let* ((project      (-> "layout"
+                           (assoc-default org-metadata)  ;; layout is the blog-project
+                           (assoc org-publish-project-alist)))
          (filename     (file-name-nondirectory org-file))
          (ext          (file-name-extension filename))
          (temp-file    (format "%s/%sorg2jekyll"
                                (s-chop-suffix "/" org2jekyll-source-directory)
                                (s-chop-suffix ext filename))))
-    (copy-file org-file temp-file 'overwrite 'keep-time 'preserve-ids 'preserve-perms)
-    (org-publish-file temp-file
-                      (assoc blog-project org-publish-project-alist))))
+    (org2jekyll--publish-temp-file-then-cleanup org-file temp-file project)))
 
 (defun org2jekyll-publish-page (org-file)
   "Publish ORG-FILE as a page."
@@ -644,7 +657,7 @@ Layout `'default`' is a page (depending on the user customs)."
   (->> (assoc org2jekyll-jekyll-layout-post org-publish-project-alist)
        org-publish-get-base-files
        (--filter (-> it org2jekyll-article-p org2jekyll-post-p))
-       (mapc #'org2jekyll-publish-post))  )
+       (mapc #'org2jekyll-publish-post)))
 
 ;;;###autoload
 (defun org2jekyll-publish-pages ()
