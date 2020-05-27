@@ -20,17 +20,17 @@ permalink: /blogging-with-org2jekyll-setup
 <h2>Table of Contents</h2>
 <div id="text-table-of-contents">
 <ul>
-<li><a href="#org147e595">1. Enter environment</a></li>
-<li><a href="#org1ce2d6f">2. Setup your emacs</a>
+<li><a href="#orgc176f33">1. Enter environment</a></li>
+<li><a href="#org6b2987e">2. Setup your emacs</a>
 <ul>
-<li><a href="#org0d2bf65">2.1. Install org2jekyll</a></li>
-<li><a href="#orga36e4c2">2.2. Setup org2jekyll</a></li>
+<li><a href="#org08bb3f7">2.1. Install org2jekyll</a></li>
+<li><a href="#orgfc4e5ba">2.2. Setup org2jekyll</a></li>
 </ul>
 </li>
-<li><a href="#orga0405a6">3. Create a blog post</a></li>
-<li><a href="#orgf5ed380">4. Create a static page</a></li>
-<li><a href="#org8503f56">5. Evaluate block code the org-mode way</a></li>
-<li><a href="#org7e2ee1c">6. Display image</a></li>
+<li><a href="#org220c602">3. Create a blog post</a></li>
+<li><a href="#org88ba411">4. Create a static page</a></li>
+<li><a href="#orgb6f0585">5. Evaluate block code the org-mode way</a></li>
+<li><a href="#orgb8af7f6">6. Display image</a></li>
 </ul>
 </div>
 </div>
@@ -48,8 +48,8 @@ Makefile. The end-goal being reproducibility.
 Do not only trust what you read, try and reproduce it yourself following this.
 </p>
 
-<div id="outline-container-org147e595" class="outline-2">
-<h2 id="org147e595"><span class="section-number-2">1</span> Enter environment</h2>
+<div id="outline-container-orgc176f33" class="outline-2">
+<h2 id="orgc176f33"><span class="section-number-2">1</span> Enter environment</h2>
 <div class="outline-text-2" id="text-1">
 <p>
 To make your environment with jekyll aware system:
@@ -89,12 +89,12 @@ Everything should be fine and you should see a basic jekyll instance running
 </div>
 </div>
 
-<div id="outline-container-org1ce2d6f" class="outline-2">
-<h2 id="org1ce2d6f"><span class="section-number-2">2</span> Setup your emacs</h2>
+<div id="outline-container-org6b2987e" class="outline-2">
+<h2 id="org6b2987e"><span class="section-number-2">2</span> Setup your emacs</h2>
 <div class="outline-text-2" id="text-2">
 </div>
-<div id="outline-container-org0d2bf65" class="outline-3">
-<h3 id="org0d2bf65"><span class="section-number-3">2.1</span> Install org2jekyll</h3>
+<div id="outline-container-org08bb3f7" class="outline-3">
+<h3 id="org08bb3f7"><span class="section-number-3">2.1</span> Install org2jekyll</h3>
 <div class="outline-text-3" id="text-2-1">
 <p>
 If you do not have installed org2jekyll yet, it's fine, you can always
@@ -107,8 +107,8 @@ Open <a href="https://github.com/ardumont/org2jekyll/blob/master/org2jekyll.el">
 </div>
 </div>
 
-<div id="outline-container-orga36e4c2" class="outline-3">
-<h3 id="orga36e4c2"><span class="section-number-3">2.2</span> Setup org2jekyll</h3>
+<div id="outline-container-orgfc4e5ba" class="outline-3">
+<h3 id="orgfc4e5ba"><span class="section-number-3">2.2</span> Setup org2jekyll</h3>
 <div class="outline-text-3" id="text-2-2">
 <p>
 Open <a href="https://github.com/ardumont/org2jekyll/blob/master/testing-blog/testing-blog-config.el">testing-blog-config.el</a> with emacs, load it (<b><b>M-x eval-buffer</b></b>).
@@ -127,8 +127,8 @@ the jekyll instance.
 </div>
 </div>
 
-<div id="outline-container-orga0405a6" class="outline-2">
-<h2 id="orga0405a6"><span class="section-number-2">3</span> Create a blog post</h2>
+<div id="outline-container-org220c602" class="outline-2">
+<h2 id="org220c602"><span class="section-number-2">3</span> Create a blog post</h2>
 <div class="outline-text-2" id="text-3">
 <p>
 <b><b>M-x org2jekyll-create-draft</b></b> and follow the minibuffer questions. Choose the
@@ -154,8 +154,8 @@ You can loop over edition in org and publish until you are satisfied.
 </div>
 </div>
 
-<div id="outline-container-orgf5ed380" class="outline-2">
-<h2 id="orgf5ed380"><span class="section-number-2">4</span> Create a static page</h2>
+<div id="outline-container-org88ba411" class="outline-2">
+<h2 id="org88ba411"><span class="section-number-2">4</span> Create a static page</h2>
 <div class="outline-text-2" id="text-4">
 <p>
 You can also edit static pages.
@@ -198,8 +198,8 @@ over the <a href="http://localhost:4000/about-me">about-me page</a> (if you used
 </div>
 </div>
 
-<div id="outline-container-org8503f56" class="outline-2">
-<h2 id="org8503f56"><span class="section-number-2">5</span> Evaluate block code the org-mode way</h2>
+<div id="outline-container-orgb6f0585" class="outline-2">
+<h2 id="orgb6f0585"><span class="section-number-2">5</span> Evaluate block code the org-mode way</h2>
 <div class="outline-text-2" id="text-5">
 <p>
 Make your emacs able to deal with <a href="https://gitlab.com/ardumont/home/-/blob/5afd58b89517dbe03a1510ce4fadb5200d80c5bb/emacs/default.nix#L140-142">python and matplotlib for the following</a>.
@@ -210,22 +210,22 @@ Evaluate the block (<b><b>C-c C-c</b></b>) to have the results below.
 </p>
 
 <div class="org-src-container">
-<pre class="src src-python"><span style="color: #4f97d7; font-weight: bold;">import</span> os
-<span style="color: #4f97d7; font-weight: bold;">import</span> matplotlib
-<span style="color: #4f97d7; font-weight: bold;">import</span> matplotlib.pyplot <span style="color: #4f97d7; font-weight: bold;">as</span> plt
-<span style="color: #4f97d7; font-weight: bold;">import</span> numpy <span style="color: #4f97d7; font-weight: bold;">as</span> np
+<pre class="src src-python"><span style="color: #a020f0;">import</span> os
+<span style="color: #a020f0;">import</span> matplotlib
+<span style="color: #a020f0;">import</span> matplotlib.pyplot <span style="color: #a020f0;">as</span> plt
+<span style="color: #a020f0;">import</span> numpy <span style="color: #a020f0;">as</span> np
 
-<span style="color: #7590db;">t</span> = np.arange(0.0, 2.0, 0.01)
-<span style="color: #7590db;">s</span> = 1 + np.sin(2 * np.pi * t)
+<span style="color: #a0522d;">t</span> = np.arange(0.0, 2.0, 0.01)
+<span style="color: #a0522d;">s</span> = 1 + np.sin(2 * np.pi * t)
 
-<span style="color: #7590db;">fig</span>, <span style="color: #7590db;">ax</span> = plt.subplots()
+<span style="color: #a0522d;">fig</span>, <span style="color: #a0522d;">ax</span> = plt.subplots()
 ax.plot(t, s)
 
-ax.<span style="color: #4f97d7;">set</span>(xlabel=<span style="color: #2d9574;">'time (s)'</span>, ylabel=<span style="color: #2d9574;">'voltage (mV)'</span>, title=<span style="color: #2d9574;">'Voltage over time'</span>)
+ax.<span style="color: #483d8b;">set</span>(xlabel=<span style="color: #8b2252;">'time (s)'</span>, ylabel=<span style="color: #8b2252;">'voltage (mV)'</span>, title=<span style="color: #8b2252;">'Voltage over time'</span>)
 ax.grid()
 
-os.makedirs(<span style="color: #2d9574;">"./img"</span>, exist_ok=<span style="color: #a45bad;">True</span>)
-fig.savefig(<span style="color: #2d9574;">"./img/plot-sin.png"</span>)
+os.makedirs(<span style="color: #8b2252;">"./img"</span>, exist_ok=<span style="color: #008b8b;">True</span>)
+fig.savefig(<span style="color: #8b2252;">"./img/plot-sin.png"</span>)
 </pre>
 </div>
 
@@ -259,8 +259,8 @@ fig.savefig(<span style="color: #2d9574;">"./img/plot-sin.png"</span>)
 </div>
 </div>
 
-<div id="outline-container-org7e2ee1c" class="outline-2">
-<h2 id="org7e2ee1c"><span class="section-number-2">6</span> Display image</h2>
+<div id="outline-container-orgb8af7f6" class="outline-2">
+<h2 id="orgb8af7f6"><span class="section-number-2">6</span> Display image</h2>
 <div class="outline-text-2" id="text-6">
 <p>
 Check your <a href="https://github.com/ardumont/org2jekyll/blob/master/testing-blog/_config.yml">_config.yml</a> to determine where to store images.

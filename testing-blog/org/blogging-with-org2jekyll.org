@@ -8,6 +8,7 @@
 #+DESCRIPTION: A post demo to blog with org2jekyll
 #+TAGS: blog org2jekyll setup jekyll
 #+CATEGORIES: blog org2jekyll setup jekyll
+#+PERMALINK: /blogging-with-org2jekyll-setup
 
 In this post, we will show how to setup org2jekyll and play with a local jekyll
 instance.
