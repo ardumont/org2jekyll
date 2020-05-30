@@ -55,4 +55,5 @@ clean-dev:
 	cd $(BLOG); bundle exec jekyll clean
 
 run-emacs:
-	cd testing-blog && $(EMACS) -Q --load=../org2jekyll.el --load=./testing-blog-config.el
+	cd testing-blog && $(EMACS) -Q --load=../org2jekyll.el --load=./testing-blog-config.el \
+		--eval="(dired \"./org\")"
