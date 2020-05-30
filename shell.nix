@@ -21,5 +21,8 @@ in stdenv.mkDerivation {
     bundix
     gitAndTools.gitFull
   ];
+  # GEM_HOME = "./gems";  # Do not install gems in user's home (default behavior)
+  BUNDLE_PATH = "../gems";
+  BUNDLE_DISABLE_SHARED_GEMS = 1;
   src = null;
 }
