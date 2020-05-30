@@ -147,12 +147,6 @@ permalink: /posts/gtalk/
   (should (string= "2020-04-29 00:46"
                    (org2jekyll--convert-timestamp-to-yyyy-dd-mm-hh "2020-04-29 lun. 00:46"))))
 
-(ert-deftest test-org2jekyll-assoc-default ()
-  (should (string= "default-value"  (org2jekyll-assoc-default nil nil "default-value")))
-  (should (string= "default-value"  (org2jekyll-assoc-default "key" '(("key". nil))  "default-value")))
-  (should (string= "original-value" (org2jekyll-assoc-default "key" '(("key". "original-value")) "default-value")))
-  (should (string= "default-value"  (org2jekyll-assoc-default "key" '(("key")) "default-value"))))
-
 (ert-deftest test-org2jekyll-remove-org-only-options ()
   (let* ((test-options '(("startup" . "hidestars")
                          ("options" . "toc:nil")

@@ -432,13 +432,6 @@ If the current path contains the `'org2jekyll-jekyll-drafts-dir`', removes it."
          (replace-regexp-in-string (format "%s" org2jekyll-jekyll-drafts-dir) "")
          (replace-regexp-in-string "//" "/"))))
 
-(defun org2jekyll-assoc-default (key org-data default-value)
-  "Given KEY, ORG-DATA and DEFAULT-VALUE, return the value associated with key.
-Return DEFAULT-VALUE if not found."
-  (-if-let (data (assoc-default key org-data nil default-value))
-      data
-    default-value))
-
 (defconst org2jekyll-required-org-header-alist '((:title       . 'required)
                                                  (:date)
                                                  (:categories  . 'required)
