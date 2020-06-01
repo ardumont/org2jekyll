@@ -12,6 +12,7 @@ Blogging with org-mode and jekyll without alien yaml headers.
 
 * Table of Contents                                                     :TOC_4:
 - [[#upgrade][Upgrade]]
+  - [[#026---027][0.2.6 -> 0.2.7]]
   - [[#022---023][0.2.2 -> 0.2.3]]
   - [[#021---022][0.2.1 -> 0.2.2]]
   - [[#020---021][0.2.0 -> 0.2.1]]
@@ -43,13 +44,17 @@ Blogging with org-mode and jekyll without alien yaml headers.
 - [[#customization][Customization]]
   - [[#layout][Layout]]
   - [[#draft][Draft]]
+- [[#about-internal-publication-links][About internal publication links]]
 - [[#problems][Problems]]
   - [[#dependencies][dependencies]]
 
 * Upgrade
 
-** 0.2.2 -> 0.2.3
+** 0.2.6 -> 0.2.7
+- We can now export properly links to other internal publications. See
+  [[#about-internal-publication-links][#about-internal-publication-links]] for more details.
 
+** 0.2.2 -> 0.2.3
 - User can now extend the default templates with default values on their own
   (at draft creation time). [[https://github.com/ardumont/org2jekyll/issues/47][Thanks for issue 47]] which revealed the need. See
   [[#Draft][#draft]] for more details.
@@ -411,8 +416,20 @@ Which would then append the `#+COMMENTS: true` and `#+THEME: awesome` to the
 default template org2jekyll generates by default. All following created drafts
 would be created with that extra comments headers.
 
-* Problems
+* About internal publication links
 
+You can now link properly between your jekyll publications. You need however to
+prefix your local links with the `local:` prefix.
+
+For example:
+#+BEGIN_SRC org
+[[local:/interesting-post]]
+#+END_SRC
+
+will render into a proper html `a` anchor linking to your interesting post. See
+[[https://github.com/ardumont/org2jekyll/issues/66][#66 issue for more details]].
+
+* Problems
 ** dependencies
 
 As a note, org2jekyll [[https://github.com/ardumont/org2jekyll/blob/master/org2jekyll.el#L8][declares its dependencies]] but it's possible that

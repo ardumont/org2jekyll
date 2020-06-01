@@ -3,12 +3,13 @@
 #+LAYOUT: post
 #+AUTHOR: drjekyll&mrtony
 #+DATE: 2020-05-27 Wed 18:18
-#+TITLE: Interesting post
+#+TITLE: Interesting scratch post
 #+DESCRIPTION: An interesting post about something
 #+TAGS: hi hooooooo
 #+CATEGORIES: category
 
-Well, now, this is interesting!
+In [[local:/blogging-with-org2jekyll-setup][this post]], we saw that interesting property. Now, here goes another part
+which is even more so.
 
 * title
 

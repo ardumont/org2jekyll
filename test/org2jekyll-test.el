@@ -868,5 +868,13 @@ Awesome post
              (mock (org2jekyll-publish-page "page.org") => "page.org published!")
              (call-interactively 'org2jekyll-publish-pages))))))
 
+(ert-deftest test-org2jekyll-local-link-export ()
+  "Ensure the local link export function works as expected"
+  (should (string= "org2jekyll - Unknown format pdf, only dealing with html"
+                   (org2jekyll-local-link-export "/some-link" "link description" "pdf")))
+  (should (string= "<a href=\"/some-link\">link description</a>"
+                   (org2jekyll-local-link-export "/some-link" "link description" "html")))
+  (should (string= "<a href=\"/link\">/link</a>"
+                   (org2jekyll-local-link-export "/link" nil "html"))))
 
 ;;; org2jekyll-test.el ends here

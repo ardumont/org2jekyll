@@ -728,6 +728,19 @@ Commands:
 (add-hook 'org2jekyll-mode-off-hook
           (lambda () (remove-hook 'org-publish-after-publishing-hook 'org2jekyll-install-yaml-headers)))
 
+;; Extend org-mode hyperlinks policy with a "local" link so we can publish
+;; internal links which are then browsable when published
+;; https://orgmode.org/manual/Adding-Hyperlink-Types.html#Adding-Hyperlink-Types
+
+;; register new local links so org-mode exports them as is
+(org-link-set-parameters "local" :export #'org2jekyll-local-link-export)
+
+(defun org2jekyll-local-link-export (link description format)
+  "Export a man page link from Org files."
+  (let ((desc (or description link)))
+    (if (string= format "html")
+        (format "<a href=\"%s\">%s</a>" link desc)
+      (org2jekyll-message "Unknown format %s, only dealing with html" format))))
 
 (provide 'org2jekyll)
 ;;; org2jekyll.el ends here
