@@ -16,7 +16,11 @@ env:
 install:
   # The default "emacs" executable on the $PATH will now be the version named by $EMACS_CI
   - bash <(curl https://raw.githubusercontent.com/purcell/nix-emacs-ci/master/travis-install)
-  - nix-env -iA nixpkgs.cask
+  # enforce the stable channel version
+  - nix-channel --add https://nixos.org/channels/nixos-20.03 nixpkgs-stable
+  - nix-channel --update nixpkgs-stable
+  - nix-channel --list
+  - nix-env -iA nixpkgs-stable.cask
 
 script:
   - make install test
