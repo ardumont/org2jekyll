@@ -710,6 +710,11 @@ Commands:
   :group 'org2jekyll
   :keymap org2jekyll-mode-map)
 
+;; install/uninstall hook when activating/deactivating org2jekyll-mode
+;; org2jekyll inserts the yaml when the publishing step is done, so now org
+;; does all the publishing in concordance to what the user expects and we do
+;; our update after it so Jekyll is happy.
+
 (defvar org2jekyll-mode-on-hook nil "org2jekyll starting hook")
 (setq org2jekyll-mode-off-hook nil) ;; for dev
 ;; install org2jekyll hook in org-publish when activating org2jekyll-mode
@@ -723,10 +728,6 @@ Commands:
 (add-hook 'org2jekyll-mode-off-hook
           (lambda () (remove-hook 'org-publish-after-publishing-hook 'org2jekyll-install-yaml-headers)))
 
-;; install/uninstall hook when activating/deactivating org2jekyll-mode
-;; org2jekyll inserts the yaml when the publishing step is done, so now org
-;; does all the publishing in concordance to what the user expects and we do
-;; our update after it so Jekyll is happy.
 
 (provide 'org2jekyll)
 ;;; org2jekyll.el ends here
