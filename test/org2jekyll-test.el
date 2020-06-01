@@ -264,9 +264,9 @@ Publication skipped" options-alist))))
   (should (eq :published-file
               (let ((temp-file "/tmp/temp-file"))
                 (with-mock
-                  (mock (copy-file :org-file temp-file 'overwrite 'keep-time 'preserve-ids 'preserve-perms) => nil)
-                  (mock (org-publish-file temp-file :project-metadata))
-                  (org2jekyll--publish-temp-file-then-cleanup :org-file "/tmp/temp-file" :project-metadata))
+                 (mock (copy-file :org-file temp-file 'overwrite 'keep-time 'preserve-ids 'preserve-perms) => nil)
+                 (mock (org-publish-file temp-file :project-metadata))
+                 (org2jekyll--publish-temp-file-then-cleanup :org-file "/tmp/temp-file" :project-metadata))
                 (if (file-exists-p temp-file)
                     :something-is-wrong
                   :published-file)))))
@@ -276,13 +276,13 @@ Publication skipped" options-alist))))
               (let ((org-publish-project-alist '((:post :project)))
                     (temp-file "/tmp/temp-file"))
                 (with-mock
-                  (mock (org2jekyll--convert-timestamp-to-yyyy-dd-mm :date) => :date)
-                  (mock (org2jekyll--compute-ready-jekyll-file-name :date :org-file) => temp-file)
-                  (mock (org2jekyll--publish-temp-file-then-cleanup :org-file temp-file
-                                                                    '(:post :project)) => :published-post-file)
-                  (org2jekyll--publish-post-org-file-with-metadata '(("layout" . :post)
-                                                                     ("date" . :date))
-                                                                   :org-file))))))
+                 (mock (org2jekyll--convert-timestamp-to-yyyy-dd-mm :date) => :date)
+                 (mock (org2jekyll--compute-ready-jekyll-file-name :date :org-file) => temp-file)
+                 (mock (org2jekyll--publish-temp-file-then-cleanup :org-file temp-file
+                                                                   '(:post :project)) => :published-post-file)
+                 (org2jekyll--publish-post-org-file-with-metadata '(("layout" . :post)
+                                                                    ("date" . :date))
+                                                                  :org-file))))))
 
 (ert-deftest test-org2jekyll--publish-page-org-file-with-metadata ()
   (should (eq :published-page-file
@@ -290,11 +290,11 @@ Publication skipped" options-alist))))
                     (org2jekyll-source-directory "/tmp/")
                     (temp-file "/tmp/filename.org2jekyll"))
                 (with-mock
-                  (mock (org2jekyll--publish-temp-file-then-cleanup "filename.org"
-                                                                    temp-file
-                                                                    '(:page :project)) => :published-page-file)
-                  (org2jekyll--publish-page-org-file-with-metadata '(("layout" . :page)
-                                                                     ("date" . :date)) "filename.org"))))))
+                 (mock (org2jekyll--publish-temp-file-then-cleanup "filename.org"
+                                                                   temp-file
+                                                                   '(:page :project)) => :published-page-file)
+                 (org2jekyll--publish-page-org-file-with-metadata '(("layout" . :page)
+                                                                    ("date" . :date)) "filename.org"))))))
 
 (ert-deftest test-org2jekyll-post-p ()
   "With default layouts"
@@ -433,16 +433,16 @@ Publication skipped" options-alist))))
                              (org2jekyll-jekyll-drafts-dir "")
                              (org2jekyll-blog-author "tony"))
                          (with-mock
-                           (mock (org2jekyll-now)                                                        => "some date")
-                           (mock (ido-completing-read "Layout: " '("post" "default") nil 'require-match) => "post")
-                           (mock (org2jekyll--read-title)                                                => "some title")
-                           (mock (org2jekyll--read-description)                                          => "some description")
-                           (mock (org2jekyll--read-tags)                                                 => "tag0 tag1")
-                           (mock (org2jekyll--read-categories)                                           => "cat0 cat1 catn")
-                           (mock (org2jekyll-input-directory "")                                         => "/tmp")
-                           (mock (org2jekyll--draft-filename * *)                                        => "/tmp/some-title.org")
-                           (mock (find-file "/tmp/some-title.org") => nil)
-                           (call-interactively #'org2jekyll-create-draft))))
+                          (mock (org2jekyll-now)                                                        => "some date")
+                          (mock (ido-completing-read "Layout: " '("post" "default") nil 'require-match) => "post")
+                          (mock (org2jekyll--read-title)                                                => "some title")
+                          (mock (org2jekyll--read-description)                                          => "some description")
+                          (mock (org2jekyll--read-tags)                                                 => "tag0 tag1")
+                          (mock (org2jekyll--read-categories)                                           => "cat0 cat1 catn")
+                          (mock (org2jekyll-input-directory "")                                         => "/tmp")
+                          (mock (org2jekyll--draft-filename * *)                                        => "/tmp/some-title.org")
+                          (mock (find-file "/tmp/some-title.org") => nil)
+                          (call-interactively #'org2jekyll-create-draft))))
                      ;; Revert extra headers (common to all tests ¯\_(ツ)_/¯)
                      (custom-set-variables
                       '(org2jekyll-default-template-entries-extra nil))
@@ -471,33 +471,33 @@ Publication skipped" options-alist))))
 * already present
 "
                     (with-mock
-                      (mock (org2jekyll--init-buffer-metadata) => '(:author "dude"
-                                                                            :date "some-date"
-                                                                            :layout "some-layout"
-                                                                            :title "some-title"
-                                                                            :description "some-desc"
-                                                                            :tags "some-tags"
-                                                                            :categories "some-cat"))
-                      (call-interactively #'org2jekyll-init-current-buffer))))))
+                     (mock (org2jekyll--init-buffer-metadata) => '(:author "dude"
+                                                                           :date "some-date"
+                                                                           :layout "some-layout"
+                                                                           :title "some-title"
+                                                                           :description "some-desc"
+                                                                           :tags "some-tags"
+                                                                           :categories "some-cat"))
+                     (call-interactively #'org2jekyll-init-current-buffer))))))
 
 
 (ert-deftest test-org2jekyll--read-title ()
   (should (string= "some super title"
                    (with-mock
-                     (mock (read-string "Title: ") => "some super title")
-                     (org2jekyll--read-title))))
+                    (mock (read-string "Title: ") => "some super title")
+                    (org2jekyll--read-title))))
   (should-not (with-mock
-                (mock (read-string "Title: "))
-                (org2jekyll--read-title))))
+               (mock (read-string "Title: "))
+               (org2jekyll--read-title))))
 
 (ert-deftest test-org2jekyll--read-description ()
   (should (string= "some super description"
                    (with-mock
-                     (mock (read-string "Description: ") => "some super description")
-                     (org2jekyll--read-description))))
+                    (mock (read-string "Description: ") => "some super description")
+                    (org2jekyll--read-description))))
   (should-not (with-mock
-                (mock (read-string "Description: "))
-                (org2jekyll--read-description))))
+               (mock (read-string "Description: "))
+               (org2jekyll--read-description))))
 
 (ert-deftest test-org2jekyll--read-tags ()
   (should (string= "tag0 tag10"
@@ -520,11 +520,11 @@ Publication skipped" options-alist))))
 (ert-deftest test-org2jekyll--input-read ()
   (should (eq :input-done
               (with-mock
-                (mock (ido-completing-read :prompt
-                                           :collection
-                                           nil
-                                           'require-match) => :input-done)
-                (org2jekyll--input-read :prompt :collection)))))
+               (mock (ido-completing-read :prompt
+                                          :collection
+                                          nil
+                                          'require-match) => :input-done)
+               (org2jekyll--input-read :prompt :collection)))))
 
 (ert-deftest test-org2jekyll--init-buffer-metadata ()
   (should (equal '(:author "dude"
@@ -547,24 +547,24 @@ Publication skipped" options-alist))))
 (ert-deftest test-org2jekyll-publish-web-project ()
   (should (eq 'publish-done
               (with-mock
-                (mock (org-publish-project "web") => 'publish-done)
-                (org2jekyll-publish-web-project)))))
+               (mock (org-publish-project "web") => 'publish-done)
+               (org2jekyll-publish-web-project)))))
 
 (ert-deftest test-org2jekyll-publish-post ()
   (should (eq :publish-post-done
               (with-mock
-                (mock (org2jekyll-read-metadata-and-execute
-                       'org2jekyll--publish-post-org-file-with-metadata
-                       :org-file) => :publish-post-done)
-                (org2jekyll-publish-post :org-file)))))
+               (mock (org2jekyll-read-metadata-and-execute
+                      'org2jekyll--publish-post-org-file-with-metadata
+                      :org-file) => :publish-post-done)
+               (org2jekyll-publish-post :org-file)))))
 
 (ert-deftest test-org2jekyll-publish-page ()
   (should (eq :publish-page-done
               (with-mock
-                (mock (org2jekyll-read-metadata-and-execute
-                       'org2jekyll--publish-page-org-file-with-metadata
-                       :org-file) => :publish-page-done)
-                (org2jekyll-publish-page :org-file)))))
+               (mock (org2jekyll-read-metadata-and-execute
+                      'org2jekyll--publish-page-org-file-with-metadata
+                      :org-file) => :publish-page-done)
+               (org2jekyll-publish-page :org-file)))))
 
 (ert-deftest test-org2jekyll--bug-report ()
   (should (string= "Please:
@@ -585,10 +585,10 @@ System information:
                          (locale-coding-system "locale-coding-system")
                          (org2jekyll--version "org2jekyll-version"))
                      (with-mock
-                       (mock (emacs-version) => "emacs-version")
-                       (mock (org-version) => "org-version")
-                       (mock (find-library-name "org2jekyll") => "/path/to/org2jekyll")
-                       (org2jekyll--bug-report))))))
+                      (mock (emacs-version) => "emacs-version")
+                      (mock (org-version) => "org-version")
+                      (mock (find-library-name "org2jekyll") => "/path/to/org2jekyll")
+                      (org2jekyll--bug-report))))))
 
 (ert-deftest test-org2jekyll-bug-report ()
   (should (equal :res
@@ -804,9 +804,9 @@ Awesome page
 Awesome post
 "
                     (with-mock
-                      (mock (org2jekyll-publish-post nil) => "published post!")
-                      (mock (org2jekyll-publish-web-project) => 'done)
-                      (call-interactively 'org2jekyll-publish)))))
+                     (mock (org2jekyll-publish-post nil) => "published post!")
+                     (mock (org2jekyll-publish-web-project) => 'done)
+                     (call-interactively 'org2jekyll-publish)))))
 
   (should (string= "org2jekyll - published page!"
                    (org2jekyll-tests-with-temp-buffer
@@ -824,9 +824,9 @@ Awesome post
 Awesome post
 "
                     (with-mock
-                      (mock (org2jekyll-publish-page nil) => "published page!")
-                      (mock (org2jekyll-publish-web-project) => 'done)
-                      (call-interactively 'org2jekyll-publish))))))
+                     (mock (org2jekyll-publish-page nil) => "published page!")
+                     (mock (org2jekyll-publish-web-project) => 'done)
+                     (call-interactively 'org2jekyll-publish))))))
 
 (ert-deftest test-org2jekyll-publish-posts ()
   (should (equal '("post.org")
@@ -834,19 +834,19 @@ Awesome post
                        (org2jekyll-jekyll-layout-page "page")
                        (org-publish-project-alist '(("post" "something"))))
                    (with-mock
-                     (mock (org-publish-get-base-files '("post" "something"))
-                           => '("post.org"))
-                     (mock (org2jekyll-article-p "post.org") => "post")
-                     (mock (org2jekyll-publish-post "post.org") => "post.org published!")
-                     (call-interactively 'org2jekyll-publish-posts)))))
+                    (mock (org-publish-get-base-files '("post" "something"))
+                          => '("post.org"))
+                    (mock (org2jekyll-article-p "post.org") => "post")
+                    (mock (org2jekyll-publish-post "post.org") => "post.org published!")
+                    (call-interactively 'org2jekyll-publish-posts)))))
   (should-not (let ((org2jekyll-jekyll-layout-post "post")
                     (org2jekyll-jekyll-layout-page "page")
                     (org-publish-project-alist '(("post" "something"))))
                 (with-mock
-                  (mock (org-publish-get-base-files '("post" "something"))
-                        => '("page.org"))
-                  (mock (org2jekyll-article-p "page.org") => "page")
-                  (call-interactively 'org2jekyll-publish-posts)))))
+                 (mock (org-publish-get-base-files '("post" "something"))
+                       => '("page.org"))
+                 (mock (org2jekyll-article-p "page.org") => "page")
+                 (call-interactively 'org2jekyll-publish-posts)))))
 
 (ert-deftest test-org2jekyll-publish-pages ()
   (should-not
@@ -854,20 +854,21 @@ Awesome post
          (org2jekyll-jekyll-layout-page "page")
          (org-publish-project-alist '(("page" "something-else"))))
      (with-mock
-       (mock (org-publish-get-base-files '("page" "something-else"))
-             => '("post.org"))
-       (mock (org2jekyll-article-p "post.org") => "post")
-       (call-interactively 'org2jekyll-publish-pages))))
+      (mock (org-publish-get-base-files '("page" "something-else"))
+            => '("post.org"))
+      (mock (org2jekyll-article-p "post.org") => "post")
+      (call-interactively 'org2jekyll-publish-pages))))
   (should
    (equal '("page.org")
           (let ((org2jekyll-jekyll-layout-post "post")
                 (org2jekyll-jekyll-layout-page "page")
                 (org-publish-project-alist '(("page" "something-else"))))
             (with-mock
-              (mock (org-publish-get-base-files '("page" "something-else"))
-                    => '("page.org"))
-              (mock (org2jekyll-article-p "page.org") => "page")
-              (mock (org2jekyll-publish-page "page.org") => "page.org published!")
-              (call-interactively 'org2jekyll-publish-pages))))))
+             (mock (org-publish-get-base-files '("page" "something-else"))
+                   => '("page.org"))
+             (mock (org2jekyll-article-p "page.org") => "page")
+             (mock (org2jekyll-publish-page "page.org") => "page.org published!")
+             (call-interactively 'org2jekyll-publish-pages))))))
+
 
 ;;; org2jekyll-test.el ends here
