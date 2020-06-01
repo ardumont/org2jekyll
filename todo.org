@@ -1,6 +1,11 @@
 #+title: Backlog
 #+author: ardumont
 
+* DONE 0.2.7 [100%]
+  CLOSED: [2020-06-01 Mon 19:42]
+- [X] Fix ci
+- [X] Close #66: Properly link to internal publications
+- [X] Clean dead code
 * DONE 0.2.6 [100%]
   CLOSED: [2020-05-27 Wed 21:14]
 - [X] Update missing documentations
