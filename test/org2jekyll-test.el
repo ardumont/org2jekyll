@@ -47,8 +47,6 @@
     (should article)
     (should-not not-article)))
 
-
-
 (ert-deftest test-org2jekyll-make-slug ()
   (should (string= "this-is-a-test"
                    (org2jekyll--make-slug "this-is-a-test")))
