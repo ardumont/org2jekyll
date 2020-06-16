@@ -204,29 +204,8 @@ by layout, author, title, description, categories...")
   "Generate a formatted now date."
   (format-time-string "%Y-%m-%d %a %H:%M"))
 
-(defun org2jekyll-default-headers-template (blog-layout
-                                            blog-author
-                                            post-date
-                                            post-title
-                                            post-description
-                                            post-tags
-                                            post-categories)
-  "Compute default headers.
-BLOG-LAYOUT is the layout of the post.
-BLOG-AUTHOR is the author.
-POST-DATE is the date of the post.
-POST-TITLE is the title.
-POST-DESCRIPTION is the description.
-POST-TAGS is the tags
-POST-CATEGORIES is the categories."
-  (format org2jekyll-jekyll-org-post-template
-          blog-layout
-          blog-author
-          post-date
-          (org2jekyll--yaml-escape post-title)
-          post-description
-          post-tags
-          post-categories))
+(defun org2jekyll-default-headers-template (headers)
+  (mapconcat #'org2jekyll--header-entry headers "\n"))
 
 (defun org2jekyll--draft-filename (draft-dir title)
   "Compute the draft's filename from the DRAFT-DIR and TITLE."
@@ -255,66 +234,76 @@ POST-CATEGORIES is the categories."
                        nil
                        'require-match))
 
-(defun org2jekyll--init-buffer-metadata ()
-  "Initialize a DRAFT-FILE or current buffer routine.
-:: () -> [(Symbol, String)]"
-  (list :author      org2jekyll-blog-author
-        :date        (org2jekyll-now)
-        :layout      (org2jekyll--input-read "Layout: " org2jekyll-jekyll-layouts)
-        :title       (org2jekyll--read-title)
-        :description (org2jekyll--read-description)
-        :tags        (org2jekyll--read-tags)
-        :categories  (org2jekyll--read-categories)))
+(defun org2jekyll--init-buffer-metadata (&optional ignore-plist)
+  "Return an alist holding buffer metadata information collected from the user.
+Any non-nil property in IGNORE-PLIST will not be collected from the user, and
+will instead have its value in the alist set as nil."
+  (-concat (unless (plist-get ignore-plist :author)
+	     (list :author org2jekyll-blog-author))
+	   (unless (plist-get ignore-plist :date)
+	     (list :date (org2jekyll-now)))
+	   (unless (plist-get ignore-plist :layout)
+	     (list :layout (org2jekyll--input-read "Layout: " org2jekyll-jekyll-layouts)))
+	   (unless (plist-get ignore-plist :title)
+	     (list :title (org2jekyll--read-title)))
+	   (unless (plist-get ignore-plist :description)
+	     (list :description (org2jekyll--read-description)))
+	   (unless (plist-get ignore-plist :tags)
+	     (list :tags (org2jekyll--read-tags)))
+	   (unless (plist-get ignore-plist :categories)
+	     (list :categories (org2jekyll--read-categories)))))
+
+(defun org2jekyll--get-template-entries (&optional decided-options-alist)
+  "Return the contents of org2jekyll-default-template-entries and org2jekyll-default-template-entries-extra replaced by entries is DECIDED-OPTIONS-ALIST."
+  (let ((-compare-fn #'string=)
+	(decided-options (-map #'car decided-options-alist)))
+(--map-when (and (not (cdr it)) (-contains? decided-options (car it)))
+	    (-first (lambda (option) (string= (car it) (car option)))
+		    decided-options-alist)
+	    (-concat org2jekyll-default-template-entries
+		     org2jekyll-default-template-entries-extra))))
+
+(defun org2jekyll--get-filtered-entries (entries ignore-list)
+  "Return a list from ENTRIES whose car is not present in IGNORE-LIST."
+  (let ((-compare-fn #'string=))
+    (--filter (not (-contains? ignore-list (car it))) entries)))
 
 ;;;###autoload
 (defun org2jekyll-init-current-buffer ()
   "Given an existing buffer, add the needed metadata to make it a post or page."
   (interactive)
-  (let* ((metadata (org2jekyll--init-buffer-metadata))
-         (author      (plist-get metadata :author))
-         (date        (plist-get metadata :date))
-         (layout      (plist-get metadata :layout))
-         (title       (plist-get metadata :title))
-         (description (plist-get metadata :description))
-         (tags        (plist-get metadata :tags))
-         (categories  (plist-get metadata :categories)))
+  (let* ((existing-options-plist (org2jekyll-get-options-from-buffer))
+	 (existing-options-alist (org2jekyll--plist-to-alist existing-options-plist))
+	 (metadata (org2jekyll--plist-to-alist
+		    (org2jekyll--init-buffer-metadata existing-options-plist)))
+	 ;; Drop options known to already be in the buffer
+	 (ignore-list (-map #'car existing-options-alist))
+	 (add-to-file-options (org2jekyll--get-filtered-entries
+			       (org2jekyll--get-template-entries metadata) ignore-list))
+	 (add-to-file-tuples (org2jekyll--alist-to-tuples add-to-file-options)))
     (save-excursion
       (with-current-buffer (buffer-name)
         (goto-char (point-min))
-        (insert (org2jekyll-default-headers-template layout
-                                                     author
-                                                     date
-                                                     title
-                                                     description
-                                                     tags
-                                                     categories))))))
+	;; Ensure we insert after any existing options
+	(forward-line (length existing-options-alist))
+        (insert (org2jekyll-default-headers-template add-to-file-tuples) "\n\n")))))
 
 ;;;###autoload
 (defun org2jekyll-create-draft ()
-  "Create a new Jekyll blog post with TITLE.
-The `'%s`' will be replaced respectively by the blog entry name, the author, the
- generated date, the title, the description, the tags and the categories."
+  "Prompt the user for org metadata and then create a new Jekyll blog post.
+The specified title will be used as the name of the file."
   (interactive)
   (let* ((metadata (org2jekyll--init-buffer-metadata))
-         (author      (plist-get metadata :author))
-         (date        (plist-get metadata :date))
-         (layout      (plist-get metadata :layout))
-         (title       (plist-get metadata :title))
-         (description (plist-get metadata :description))
-         (tags        (plist-get metadata :tags))
-         (categories  (plist-get metadata :categories))
+	 (metadata-alist (org2jekyll--plist-to-alist metadata))
+	 (title (plist-get metadata :title))
          (draft-file  (org2jekyll--draft-filename
                        (org2jekyll-input-directory org2jekyll-jekyll-drafts-dir)
-                       title)))
+                       title))
+	 (add-to-file-options (org2jekyll--get-template-entries metadata-alist))
+	 (add-to-file-tuples (org2jekyll--alist-to-tuples add-to-file-options)))
     (unless (file-exists-p draft-file)
       (with-temp-file draft-file
-        (insert (org2jekyll-default-headers-template layout
-                                                     author
-                                                     date
-                                                     title
-                                                     description
-                                                     tags
-                                                     categories))
+        (insert (org2jekyll-default-headers-template add-to-file-tuples) "\n\n")
         (insert "* ")))
     (find-file draft-file)))
 
@@ -474,6 +463,15 @@ symbol is of the form ':<name>'"
          (value (cadr it)))
      `(,key . ,value))
    (-partition 2 plist)))
+
+(defun org2jekyll--alist-to-tuples (alist)
+  "Return a list of tuples with values from ALIST.
+Any values for which -cons-pair? returns nil are left unchanged."
+  (--map (cond
+	  ((and (-cons-pair? it) (cdr it)) (list (car it) (cdr it)))
+	  ((-cons-pair? it) (list (car it)))
+	  (t it))
+	 alist))
 
 (defun org2jekyll-remove-org-only-options (yaml-alist)
   "Filter out org options with no Jekyll meaning from YAML-ALIST."

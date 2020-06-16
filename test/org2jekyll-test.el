@@ -422,28 +422,25 @@ Publication skipped" options-alist))))
                      (when (file-exists-p "/tmp/some-title.org")
                        (delete-file "/tmp/some-title.org"))
                      ;; Define extra headers
-                     (custom-set-variables
-                      '(org2jekyll-default-template-entries-extra '(("theme" "dark")
-                                                                    ("comments" "false"))))
-                     ;; execute draft creation
-                     (save-excursion
-                       (let ((org2jekyll-source-directory "/tmp")
-                             (org2jekyll-jekyll-drafts-dir "")
-                             (org2jekyll-blog-author "tony"))
-                         (with-mock
-                          (mock (org2jekyll-now)                                                        => "some date")
-                          (mock (ido-completing-read "Layout: " '("post" "default") nil 'require-match) => "post")
-                          (mock (org2jekyll--read-title)                                                => "some title")
-                          (mock (org2jekyll--read-description)                                          => "some description")
-                          (mock (org2jekyll--read-tags)                                                 => "tag0 tag1")
-                          (mock (org2jekyll--read-categories)                                           => "cat0 cat1 catn")
-                          (mock (org2jekyll-input-directory "")                                         => "/tmp")
-                          (mock (org2jekyll--draft-filename * *)                                        => "/tmp/some-title.org")
-                          (mock (find-file "/tmp/some-title.org") => nil)
-                          (call-interactively #'org2jekyll-create-draft))))
-                     ;; Revert extra headers (common to all tests ¯\_(ツ)_/¯)
-                     (custom-set-variables
-                      '(org2jekyll-default-template-entries-extra nil))
+		     (let ((org2jekyll-default-template-entries-extra
+			    '(("theme" "dark")
+			      ("comments" "false"))))
+		       ;; execute draft creation
+		       (save-excursion
+			 (let ((org2jekyll-source-directory "/tmp")
+			       (org2jekyll-jekyll-drafts-dir "")
+			       (org2jekyll-blog-author "tony"))
+			   (with-mock
+			    (mock (org2jekyll-now)                                                        => "some date")
+			    (mock (ido-completing-read "Layout: " '("post" "default") nil 'require-match) => "post")
+			    (mock (org2jekyll--read-title)                                                => "some title")
+			    (mock (org2jekyll--read-description)                                          => "some description")
+			    (mock (org2jekyll--read-tags)                                                 => "tag0 tag1")
+			    (mock (org2jekyll--read-categories)                                           => "cat0 cat1 catn")
+			    (mock (org2jekyll-input-directory "")                                         => "/tmp")
+			    (mock (org2jekyll--draft-filename * *)                                        => "/tmp/some-title.org")
+			    (mock (find-file "/tmp/some-title.org") => nil)
+			    (call-interactively #'org2jekyll-create-draft)))))
                      ;; read the created file
                      (with-temp-buffer
                        (insert-file-contents "/tmp/some-title.org")
@@ -469,7 +466,7 @@ Publication skipped" options-alist))))
 * already present
 "
                     (with-mock
-                     (mock (org2jekyll--init-buffer-metadata) => '(:author "dude"
+                     (mock (org2jekyll--init-buffer-metadata *) => '(:author "dude"
                                                                            :date "some-date"
                                                                            :layout "some-layout"
                                                                            :title "some-title"
