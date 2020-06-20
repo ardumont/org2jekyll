@@ -205,6 +205,7 @@ by layout, author, title, description, categories...")
   (format-time-string "%Y-%m-%d %a %H:%M"))
 
 (defun org2jekyll-default-headers-template (headers)
+  "Return an org metadata string with entries in HEADERS."
   (mapconcat #'org2jekyll--header-entry headers "\n"))
 
 (defun org2jekyll--draft-filename (draft-dir title)
@@ -235,9 +236,9 @@ by layout, author, title, description, categories...")
                        'require-match))
 
 (defun org2jekyll--init-buffer-metadata (&optional ignore-plist)
-  "Return an alist holding buffer metadata information collected from the user.
+  "Return an plist holding buffer metadata information collected from the user.
 Any non-nil property in IGNORE-PLIST will not be collected from the user, and
-will instead have its value in the alist set as nil."
+will instead have its value omitted in the returned plist."
   (-concat (unless (plist-get ignore-plist :author)
 	     (list :author org2jekyll-blog-author))
 	   (unless (plist-get ignore-plist :date)

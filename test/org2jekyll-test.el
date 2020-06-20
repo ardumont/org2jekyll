@@ -217,16 +217,18 @@ Publication skipped" options-alist))))
 #+TITLE: post title with spaces
 #+DESCRIPTION: post some description
 #+TAGS: post-tag0 post-tag1
-#+CATEGORIES: post-category other-category
-
-"
-                   (org2jekyll-default-headers-template "some-layout"
-                                                        "blog-author"
-                                                        "post-date"
-                                                        "post title with spaces"
-                                                        "post some description"
-                                                        "post-tag0 post-tag1"
-                                                        "post-category other-category"))))
+#+CATEGORIES: post-category other-category"
+                   (org2jekyll-default-headers-template
+		    '(("startup" "showall")
+		      ("startup" "hidestars")
+		      ("options" "H:2 num:nil tags:t toc:nil timestamps:t")
+		      ("layout" "some-layout")
+		      ("author" "blog-author")
+		      ("date" "post-date")
+		      ("title" "post title with spaces")
+		      ("description" "post some description")
+		      ("tags" "post-tag0 post-tag1")
+		      ("categories" "post-category other-category"))))))
 
 (ert-deftest test-org2jekyll--optional-folder ()
   (should (string= "hello/there" (org2jekyll--optional-folder "hello" "there")))
@@ -525,7 +527,6 @@ Publication skipped" options-alist))))
   (should (equal '(:author "dude"
                            :date :some-date
                            :layout :some-layout
-                           :title :some-title
                            :description :some-desc
                            :tags :some-tags
                            :categories :some-cat)
@@ -533,11 +534,54 @@ Publication skipped" options-alist))))
                    (with-mock
                     (mock (org2jekyll-now) => :some-date)
                     (mock (org2jekyll--input-read "Layout: " '("post" "default")) => :some-layout)
-                    (mock (org2jekyll--read-title) => :some-title)
                     (mock (org2jekyll--read-description) => :some-desc)
                     (mock (org2jekyll--read-tags) => :some-tags)
                     (mock (org2jekyll--read-categories) => :some-cat)
-                    (org2jekyll--init-buffer-metadata))))))
+                    (org2jekyll--init-buffer-metadata '(:title "existing title")))))))
+
+(ert-deftest test-org2jekyll--get-template-entries ()
+  (let ((org2jekyll-default-template-entries-extra
+	 '(("flavour" "lemon")
+	   ("result" "big")))
+	(decided-options
+	 '(("layout" . "post")
+	   ("title" . "gtalk in emacs using jabber mode")
+	   ("date" . "2013-01-13 10:10")
+	   ("author" . "Antoine R. Dumont")
+	   ("categories" . "\n- jabber\n- emacs\n- tools\n- gtalk")
+	   ("tags"  . "\n- tag0\n- tag1\n- tag2")
+	   ("description" . "Installing jabber and using it from emacs + authentication tips and tricks"))))
+    (should (equal
+	     '(("startup" "showall")
+	       ("startup" "hidestars")
+	       ("options" "H:2 num:nil tags:t toc:nil timestamps:t")
+	       ("layout" . "post")
+	       ("author" . "Antoine R. Dumont")
+	       ("date" . "2013-01-13 10:10")
+	       ("title" . "gtalk in emacs using jabber mode")
+	       ("description" . "Installing jabber and using it from emacs + authentication tips and tricks")
+	       ("tags" . "\n- tag0\n- tag1\n- tag2")
+	       ("categories" . "\n- jabber\n- emacs\n- tools\n- gtalk")
+	       ("flavour" "lemon")
+	       ("result" "big"))
+	     (org2jekyll--get-template-entries decided-options)))))
+
+(ert-deftest test-org2jekyll--get-filtered-entries ()
+  (should (equal
+	   '(("layout" . "post")
+	     ("author" . "Antoine R. Dumont")
+	     ("date" . "2013-01-13 10:10")
+	     ("title" . "gtalk in emacs using jabber mode"))
+	   (org2jekyll--get-filtered-entries
+	    '(("startup" "showall")
+	      ("startup" "hidestars")
+	      ("options" "H:2 num:nil tags:t toc:nil timestamps:t")
+	      ("layout" . "post")
+	      ("author" . "Antoine R. Dumont")
+	      ("date" . "2013-01-13 10:10")
+	      ("title" . "gtalk in emacs using jabber mode")
+	      ("description" . "Installing jabber and using it from emacs + authentication tips and tricks"))
+	    '("description" "startup" "options" "nothing")))))
 
 (ert-deftest test-org2jekyll-publish-web-project ()
   (should (eq 'publish-done
@@ -702,6 +746,20 @@ System information:
                                                :tags "\n- tools\n- org-trello\n- debug"
                                                :categories "\n- tools\n- org-trello\n- debug"
                                                :permalink "/debug/")))))
+
+(ert-deftest test-org2jekyll--alist-to-tuples ()
+  (should (equal
+	   '(("author" "ardumont")
+             ("startup" "hidestars")
+             ("options")
+             ("layout" "post")
+             ("title" "org-trello debug tools"))
+	   (org2jekyll--alist-to-tuples
+	    '(("author" . "ardumont")
+             ("startup" "hidestars")
+             ("options")
+             ("layout" . "post")
+             ("title" . "org-trello debug tools"))))))
 
 (ert-deftest test-org2jekyll-install-yaml-headers ()
   ;; original-file css should not be modified
