@@ -140,34 +140,9 @@ Its values are initialized according to the values defined in version <= 0.2.2."
        (s-join "\n")
        (format "%s\n\n")))
 
-(defun org2jekyll--prepare-template (old-user-extra-headers new-user-extra-headers)
-  "Update the draft template according to user inputs.
-OLD-USER-EXTRA-HEADERS is the old value of
-`org2jekyll-default-template-entries-extra`.
-NEW-USER-EXTRA-HEADERS is the new value of the same custom out of
-a custom-set-variables call."
-  (setq org2jekyll-jekyll-org-post-template
-        (let ((template-entries (-concat org2jekyll-default-template-entries
-                                         new-user-extra-headers)))
-          (org2jekyll--inline-headers template-entries)))
-  (setq org2jekyll-default-template-entries-extra new-user-extra-headers))
-
 (defcustom org2jekyll-default-template-entries-extra nil
-  "Allow users to define extra template headers entries.
-The `org2jekyll-jekyll-org-post-template` should then be updated
-with those new entries."
-  :type 'alist
-  :set 'org2jekyll--prepare-template)
-
-(defvar org2jekyll-jekyll-org-post-template nil
-  "Default template for org2jekyll draft posts.
-The `'%s`' defined in the template will be replace respectively
-by layout, author, title, description, categories...")
-
-(setq org2jekyll-jekyll-org-post-template
-      (let ((template-entries (-concat org2jekyll-default-template-entries
-                                       org2jekyll-default-template-entries-extra)))
-        (org2jekyll--inline-headers template-entries)))
+  "Allow users to define extra template headers entries."
+  :type 'alist)
 
 (defvar org2jekyll-jekyll-post-ext ".org"
   "File extension of Jekyll posts.")
@@ -285,9 +260,17 @@ will instead have its value omitted in the returned plist."
     (save-excursion
       (with-current-buffer (buffer-name)
         (goto-char (point-min))
-	;; Ensure we insert after any existing options
-	(forward-line (length existing-options-alist))
-        (insert (org2jekyll-default-headers-template add-to-file-tuples) "\n\n")))))
+	(let* ((no-options (length existing-options-alist))
+	       (non-metadata-present-p (> (count-lines (point-min) (point-max))
+					  no-options)))
+	  ;; Ensure we insert after any existing options
+	  (forward-line (length existing-options-alist))
+	  ;; If the buffer ends at the end of existing options, insert a new line
+	  (when (and (> no-options 0) (not (char-equal ?\n (char-before))))
+	    (insert "\n"))
+	  (insert (org2jekyll-default-headers-template add-to-file-tuples) "\n")
+	  ;; Create line between metadata and non-metadata if non-metadata exists
+	  (when (and (= no-options 0) non-metadata-present-p) (insert "\n")))))))
 
 ;;;###autoload
 (defun org2jekyll-create-draft ()
@@ -470,7 +453,6 @@ symbol is of the form ':<name>'"
 Any values for which -cons-pair? returns nil are left unchanged."
   (--map (cond
 	  ((and (-cons-pair? it) (cdr it)) (list (car it) (cdr it)))
-	  ((-cons-pair? it) (list (car it)))
 	  (t it))
 	 alist))
 

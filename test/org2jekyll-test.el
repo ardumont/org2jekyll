@@ -475,6 +475,27 @@ Publication skipped" options-alist))))
                                                                            :description "some-desc"
                                                                            :tags "some-tags"
                                                                            :categories "some-cat"))
+                     (call-interactively #'org2jekyll-init-current-buffer)))))
+  (should (string= "#+TITLE: already-present-title
+#+STARTUP: showall
+#+STARTUP: hidestars
+#+OPTIONS: H:2 num:nil tags:t toc:nil timestamps:t
+#+LAYOUT: some-layout
+#+AUTHOR: dude
+#+DATE: some-date
+#+DESCRIPTION: some-desc
+#+TAGS: some-tags
+#+CATEGORIES: some-cat
+"
+                   (org2jekyll-tests-with-temp-buffer-and-return-content
+                    "#+TITLE: already-present-title"
+                    (with-mock
+                     (mock (org2jekyll--init-buffer-metadata *) => '(:author "dude"
+                                                                           :date "some-date"
+                                                                           :layout "some-layout"
+                                                                           :description "some-desc"
+                                                                           :tags "some-tags"
+                                                                           :categories "some-cat"))
                      (call-interactively #'org2jekyll-init-current-buffer))))))
 
 
