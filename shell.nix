@@ -3,7 +3,7 @@ with import <nixpkgs> {};
 let sources = import ./nix/sources.nix;
     pkgs = import sources.nixpkgs {};
     org2jekyll-emacs = emacsWithPackages (epkgs: (with epkgs.melpaStablePackages; [
-      dash-functional
+      dash
       s
       htmlize
     ]));

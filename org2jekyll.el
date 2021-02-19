@@ -5,7 +5,7 @@
 ;; Author: Antoine R. Dumont (@ardumont) <antoine.romain.dumont@gmail.com>
 ;; Maintainer: Antoine R. Dumont (@ardumont) <antoine.romain.dumont@gmail.com>
 ;; Version: 0.2.7
-;; Package-Requires: ((dash-functional "2.11.0") (s "1.9.0"))
+;; Package-Requires: ((dash "2.18.0") (s "1.9.0"))
 ;; Keywords: org-mode jekyll blog publish
 ;; URL: https://github.com/ardumont/org2jekyll
 
@@ -53,7 +53,7 @@
 (require 'org)
 (require (if (version< emacs-version "24.4") 'org-publish 'ox-publish))
 
-(require 'dash-functional)
+(require 'dash)
 (require 's)
 (require 'ido)
 
