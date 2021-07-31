@@ -16,7 +16,19 @@
                                                           "Beef fungus articles"))
                                           (org2jekyll-get-options-from-buffer))))
     (should (string= blog-val (plist-get options-plist :blog)))
-    (should (string= date-val (plist-get options-plist :date)))))
+    (should (string= date-val (plist-get options-plist :date))))
+  (let* ((description-key "#+DESCRIPTION:")
+         (description-val "")
+         (categories-key "#+CATEGORIES:")
+         (categories-val "some-category")
+         (options-plist
+          (with-temp-buffer
+            (insert (concat description-key " " description-val "\n"
+                            categories-key " " categories-val "\n"
+                            "Beef fungus articles"))
+            (org2jekyll-get-options-from-buffer))))
+    (should-not (plist-get options-plist :description))
+    (should (string= categories-val (plist-get options-plist :categories)))))
 
 (ert-deftest test-org2jekyll-get-options-from-file ()
   (let* ((temp-file "/tmp/test-get-options-from-file")

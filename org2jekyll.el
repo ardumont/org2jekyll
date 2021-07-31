@@ -311,7 +311,7 @@ The specified title will be used as the name of the file."
 
 (defun org2jekyll-get-options-from-buffer ()
   "Return special lines at the beginning of current buffer."
-  (let ((special-line-regex "^#\\+\\(.+\\):[ \t]+\\(.+\\)$")
+  (let ((special-line-regex "^#\\+\\(.+\\):[ \t]+\\(.*\\)$")
         (get-current-line (lambda ()
                             (buffer-substring-no-properties (line-beginning-position)
                                                             (line-end-position))))
@@ -320,13 +320,15 @@ The specified title will be used as the name of the file."
       (goto-char (point-min))
       (catch 'break
         (while (string-match special-line-regex (funcall get-current-line))
-          (setq options-plist (plist-put options-plist
-                                         (->> (funcall get-current-line)
-                                              (match-string 1)
-                                              downcase
-                                              (concat ":")
-                                              intern)
-                                         (match-string 2 (funcall get-current-line))))
+          (let ((current-line (funcall get-current-line)))
+            (unless (s-blank-str-p (match-string 2 current-line))
+              (setq options-plist (plist-put options-plist
+                                             (->> current-line
+                                               (match-string 1)
+                                               downcase
+                                               (concat ":")
+                                               intern)
+                                             (match-string 2 current-line)))))
           (unless (= 0 (forward-line))
             (throw 'break nil))))
       options-plist)))
