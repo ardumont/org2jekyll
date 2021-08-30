@@ -1,10 +1,10 @@
 #+title: README-dev
 #+author: ardumont
 
-* Enter the nix-shell
+* Enter the nix develop (requires flake)
 
 #+BEGIN_SRC sh
-nix-shell
+nix develop
 #+END_SRC
 
 * Run tests

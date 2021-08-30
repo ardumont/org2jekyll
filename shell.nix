@@ -1,18 +1,18 @@
-with import <nixpkgs> {};
+{ pkgs, ... }:
 
-let sources = import ./nix/sources.nix;
-    pkgs = import sources.nixpkgs {};
-    org2jekyll-emacs = emacsWithPackages (epkgs: (with epkgs.melpaStablePackages; [
-      dash
-      s
-      htmlize
-    ]));
-in stdenv.mkDerivation {
+let org2jekyll-emacs = pkgs.emacsWithPackages (epkgs:
+      (with epkgs.melpaStablePackages; [
+        pkgs.org2jekyll
+        dash
+        s
+        htmlize
+      ]));
+in pkgs.stdenv.mkDerivation {
   name = "org2jekyll-env";
-  buildInputs = [
+  buildInputs = with pkgs; [
     org2jekyll-emacs
     # emacs-lisp testing
-    pkgs.cask
+    cask
     # jekyll instance to check manually against
     zlib
     ruby
