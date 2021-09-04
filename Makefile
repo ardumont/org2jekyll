@@ -5,6 +5,9 @@ EMACS ?= emacs
 CASK ?= cask
 BLOG ?= testing-blog
 
+activate:
+	nix develop
+
 pr:
 	hub pull-request -b ardumont:master
 

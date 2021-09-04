@@ -23,24 +23,27 @@
       (system:
         let lib = nixpkgs.lib;
             pkgs = nixpkgs.legacyPackages.${system};
-            python3-pkgs = pkgs.python3Packages;
+            pname = "org2jekyll";
+            version = "0.2.7";
         in rec {
           packages."${system}" = rec {
             org2jekyll = pkgs.stdenv.mkDerivation {
-              pname = "org2jekyll";
-              version = "0.2.7";
+              inherit pname version;
               src = ./.;
-              buildInputs = with pkgs.emacs.pkgs; [ emacs s dash htmlize ];
+              buildInputs = with pkgs.emacs.pkgs; [
+                emacs s dash htmlize
+              ];
               unpackPhase = ''
                 cp $src/org2jekyll.el .
               '';
               buildPhase = ''
-                emacs -L . --batch -f batch-byte-compile org2jekyll.el
+                emacs -L . --batch -f batch-byte-compile *.el
               '';
-              installPhase = ''
-                mkdir -p $out/share/emacs/site-lisp
-                install -d $out/share/emacs/site-lisp
-                install *.el *.elc $out/share/emacs/site-lisp
+              installPhase =
+                let install-dir = "$out/share/emacs/site-lisp/elpa/${pname}-${version}/"; in
+                ''
+                mkdir -p ${install-dir}
+                cp -v *.el *.elc ${install-dir}
               '';
 
               doCheck = false;
