@@ -1,5 +1,5 @@
 {
-  description = "ardumont-pytools flake";
+  description = "org2jekyll flake";
 
   inputs = {
     nixpkgs = {
